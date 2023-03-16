@@ -1,14 +1,15 @@
 /* eslint-disable */
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
-import { routerPathName } from '@/utils/urlHelper';
+
+const env = import.meta.env
 
 export const initUserManager = () => {
   var client = new UserManager({
-    userStore: new WebStorageStateStore({ prefix: `oidc_${CLIENT_ID}_` }),
-    authority: API_BASE_URL,
-    client_id: CLIENT_ID,
-    redirect_uri: CLIENT_ROOT + '/auth/redirect',
-    post_logout_redirect_uri: CLIENT_ROOT + '/auth/logout_redirect',
+    userStore: new WebStorageStateStore({ prefix: `oidc_${env.VITE_clientId}_` }),
+    authority: env.VITE_apiRoot,
+    client_id: env.VITE_clientId,
+    redirect_uri: env.VITE_clientRoot + '/auth/redirect',
+    post_logout_redirect_uri: env.VITE_clientRoot + '/auth/logout_redirect',
     scope: "openid profile email roles offline_access",
     filterProtocolClaims: true,
     loadUserInfo: true,
@@ -58,13 +59,8 @@ export const initUserManager = () => {
 
 
 let oidcClient: UserManager
-//微前端，使用上层Window 对象的 oidcClient
-if (window.__POWERED_BY_WUJIE__) {
-  console.log("微前端，使用上层oidc 客户端", window.parent.oidcClient);
-  oidcClient = window.parent.oidcClient;
-} else {
-  oidcClient = initUserManager()
-}
+oidcClient = initUserManager()
+
 
 
 let authService = {

@@ -1,4 +1,3 @@
-import type { History } from "@umijs/max";
 import { buildUrl, mustNotEndsWith, mustStartsWith } from "./util";
 
 export const apiUrl = (path) => {

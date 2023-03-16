@@ -3,10 +3,12 @@
  */
 
 import APPSchema from './app';
-import {createHashHistory} from 'history';
+import {createBrowserHistory} from 'history';
 import {embed} from './amislib/embed';
 import {match} from 'path-to-regexp';
-const history = createHashHistory({});
+import {checkLogin} from './services/permissions';
+import path from 'path';
+const history = createBrowserHistory({});
 
 const normalizeLink = (to: string, location = history.location) => {
   to = to || '';
@@ -123,7 +125,14 @@ const APPENV = {
   isCurrentUrl: isCurrentUrl
 };
 
-export function bootstrap(mountTo) {
+export async function bootstrap(mountTo: string | HTMLElement) {
+  console.log('history.location: ', history.location);
+  if (!await checkLogin(history.location.pathname)) {
+    console.log('用户未登录');
+
+    history.push('/login');
+    return;
+  }
   const amisInstance = embed(
     mountTo,
     APPSchema,
@@ -133,7 +142,12 @@ export function bootstrap(mountTo) {
     APPENV
   );
 
-  history.listen(state => {
+  history.listen(async state => {
+    if (!(await checkLogin(state.location.pathname))) {
+      console.log('用户未登录');
+      history.push('/login');
+      return;
+    }
     amisInstance?.updateProps({
       location: state.location || state
     });
