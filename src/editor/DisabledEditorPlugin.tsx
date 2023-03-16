@@ -7,13 +7,13 @@ import {RendererEventContext, SubRendererInfo, BasicSubRenderInfo, PluginInterfa
  */
 
 // 需要在组件面板中隐藏的组件
-const disabledRenderers = [
- 'audio', // 音频
- 'carousel', // 轮播图
- 'custom', // 自定义代码
- 'log', // 日志
- 'sparkline', // 走势图
-];
+const disabledRenderers: string | any[] = []
+//  'audio', // 音频
+//  'carousel', // 轮播图
+//  'custom', // 自定义代码
+//  'log', // 日志
+//  'sparkline', // 走势图
+// ];
 
 export class ManagerEditorPlugin extends BasePlugin {
   order = 9999;
