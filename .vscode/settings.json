@@ -1,0 +1,22 @@
+{
+  "editor.formatOnSave": true,
+  "prettier.requireConfig": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "terminal.integrated.fontFamily": "Fira Code Semibold,monospace",
+  "editor.fontLigatures": true,
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "editor.fontFamily": "Fira Code Semibold,Consolas, 'Courier New', monospace",
+  "scm.inputFontFamily": "Fira Code Semibold,default",
+  "editor.formatOnType": true,
+  "editor.fontWeight": "500",
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  },
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
+}

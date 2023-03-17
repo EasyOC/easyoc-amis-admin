@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import AppSettings from '../appsettings';
 
 const env = import.meta.env
 
@@ -8,8 +9,8 @@ export const initUserManager = () => {
     userStore: new WebStorageStateStore({ prefix: `oidc_${env.VITE_clientId}_` }),
     authority: env.VITE_apiRoot,
     client_id: env.VITE_clientId,
-    redirect_uri: env.VITE_clientRoot + '/auth/redirect',
-    post_logout_redirect_uri: env.VITE_clientRoot + '/auth/logout_redirect',
+    redirect_uri: AppSettings.CLIENT_ROOT + '/auth/redirect',
+    post_logout_redirect_uri: AppSettings.CLIENT_ROOT + '/auth/logout_redirect',
     scope: "openid profile email roles offline_access",
     filterProtocolClaims: true,
     loadUserInfo: true,

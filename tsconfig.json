@@ -1,12 +1,18 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
+    "module": "esnext",
     "target": "ES6",
     "lib": ["ES6", "DOM", "ES2015", "ES2021"],
     "importHelpers": true,
     "allowJs": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     //https://vitejs.cn/guide/features.html#typescript-compiler-options
     // "useDefineForClassFields": true,
@@ -14,18 +20,14 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
     "strictNullChecks": true,
-    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react",
-
+    "typeRoots": ["./node_modules/@types", "./typings"],
+    "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"]
 }

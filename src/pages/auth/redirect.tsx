@@ -1,15 +1,20 @@
 import { getUserInfo } from '@/services/auth';
 import authService from '@/services/auth/authService';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { message, Modal } from 'antd';
+import { toast } from 'amis-ui';
+import { Modal } from 'antd';
+
+import { History } from 'history';
+import { translate } from 'i18n-runtime';
+import { observer } from 'mobx-react';
+import React from 'react';
 import { useEffect, useState } from 'react';
-import { history, useIntl, useModel } from '@umijs/max';
-const LoginCallBack: React.FC = () => {
-  const { initialState, setInitialState } = useModel('@@initialState');
+  
+
+const LoginCallBack: React.FC<{ history: History }> = (props) => {
+  const { history}=props
   const [state, setState] = useState({ mounted: false, loginTimeOut: false });
   const redirect = localStorage.getItem('returnUrl');
-  const intl = useIntl();
-
   useEffect(() => {
     (async () => {
       const isLoggedIn = await authService.isLoggedIn();
@@ -25,16 +30,10 @@ const LoginCallBack: React.FC = () => {
         const userInfo = await getUserInfo(user);
         console.log('userInfo: ', userInfo);
         if (userInfo) {
-          const serverSideSettings = await initialState?.fetchServerSideSettings?.(userInfo);
           console.log('monitor: after login fetchServerSideSettings');
-          await setInitialState((s) => ({
-            ...s,
-            currentUser: userInfo,
-            serverSideSettings: serverSideSettings,
-            settings: serverSideSettings?.siteSettingsData,
-          }));
-          message.success(
-            intl.formatMessage({ id: 'pages.login.success', defaultMessage: '登录成功' }),
+          
+          toast.success(
+            translate('pages.login.success'),
           );
           //;
           localStorage.removeItem('returnUrl');
@@ -46,10 +45,7 @@ const LoginCallBack: React.FC = () => {
         Modal.confirm({
           title: 'Confirm',
           icon: <ExclamationCircleOutlined />,
-          content: intl.formatMessage({
-            id: 'pages.login.loginFaild',
-            defaultMessage: 'Login Faild',
-          }),
+          content: translate('pages.login.loginFaild') ,
           okText: 'Retry',
           onOk: () => {
             history.push('/');
@@ -57,7 +53,7 @@ const LoginCallBack: React.FC = () => {
         });
       }
     })();
-  }, [initialState, intl, redirect, setInitialState, state]);
+  }, [  redirect,  state]);
 
   const RenderText = () => {
     if (!state.loginTimeOut) {
@@ -74,4 +70,4 @@ const LoginCallBack: React.FC = () => {
   return <div>{RenderText()}</div>;
 };
 
-export default LoginCallBack;
+export default observer(LoginCallBack);

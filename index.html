@@ -46,23 +46,21 @@
         }
         link.setAttribute(
           'href',
-          new URL(
-            `/node_modules/amis/lib/themes/${key}.css`,
-            import.meta.url
-          ).href
+          new URL(`/node_modules/amis/lib/themes/${key}.css`, import.meta.url)
+            .href
         );
         document.head.appendChild(link);
       });
     </script>
     <link rel="stylesheet" href="/node_modules/amis/lib/helper.css" />
+    <link
+      rel="stylesheet"
+      href="/node_modules/amis-editor-core/lib/style.css"
+    />
   </head>
 
   <body>
     <div id="root" class="app-wrapper"></div>
-    <script type="module">
-      import {bootstrap} from './src/index.tsx';
-      const initialState = {};
-      bootstrap(document.getElementById('root'), initialState);
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

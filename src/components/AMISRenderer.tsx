@@ -2,7 +2,7 @@ import React from 'react';
 import {RouteComponentProps, withRouter} from 'react-router';
 import {inject, observer} from 'mobx-react';
 import {getEnv} from 'mobx-state-tree';
-import {IMainStore} from '../store';
+import {IMainStore} from '../stores';
 import qs from 'qs';
 import {render, utils, filter} from 'amis';
 
@@ -122,7 +122,7 @@ export function schema2component(
           ((location: string, replace: boolean) => {
             const history = this.props.history;
             if (location === 'goBack') {
-              return history.goBack();
+              return history.back();
             } else if (/^https?\:\/\//.test(location)) {
               return (window.location.href = location);
             }
@@ -136,7 +136,7 @@ export function schema2component(
           ((to: string, action?: any) => {
             const history = this.props.history;
             if (to === 'goBack') {
-              return history.goBack();
+              return history.back();
             }
 
             to = normalizeLink(to);

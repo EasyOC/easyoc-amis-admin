@@ -11,11 +11,11 @@ import type {
   RequestUploadFileOptions,
 } from '@/types'
 import axios from 'axios'
-import qs from 'query-string';
 import { isFunction } from '@/utils'
 import { AxiosCanceler } from './axiosCancel'
 import { ContentTypeEnum, RequestEnum } from '@/types'
 import { cloneDeep } from 'lodash'
+import qs from 'qs'
 export * from './axiosTransform'
 
 /**

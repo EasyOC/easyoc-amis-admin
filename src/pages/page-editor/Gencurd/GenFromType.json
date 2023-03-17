@@ -1,0 +1,151 @@
+{
+  "type": "page",
+  "regions": [
+    "body",
+    "toolbar",
+    "header"
+  ],
+  "title": "页面生成器",
+  "body": [
+    {
+      "type": "form",
+      "name": "schemaForm",
+      "placeholder": "-",
+      "title": "生成增删改查",
+      "body": [
+        {
+          "type": "select",
+          "name": "typeName",
+          "id": "ftypeName",
+          "label": "数据模型",
+          "source": {
+            "method": "get",
+            "url": "/api/ContentTypeManagement/GetAllTypes",
+            "data": {
+              "stereotype": "1",
+              "pageSize": "-1"
+            },
+            "adaptor": "console.log('dropdown options11',response)\r\nvar items = response.data.items.map(x=>{\r\n    return {label:x.displayName,value:x.name}\r\n})\r\nconsole.log('dropdown options',items)\r\nreturn {options:items}",
+            "replaceData": false,
+            "responseData": null,
+            "dataType": "json"
+          },
+          "onEvent": {
+            "change": {
+              "actions": [
+                {
+                  "actionType": "custom",
+                  "script": "(context,doAction ,event)=>{}"
+                }
+              ]
+            }
+          },
+          "searchable": true,
+          "submitOnChange": false,
+          "validations": {},
+          "mode": "horizontal",
+          "size": "",
+          "horizontal": {
+            "leftFixed": "normal",
+            "left": 2,
+            "right": 10
+          },
+          "checkAll": false,
+          "required": true,
+          "editable": false
+        },
+        {
+          "type": "control",
+          "label": "技术名称",
+          "body": [
+            {
+              "type": "tpl",
+              "tpl": "<p>${typeName}</p>",
+              "id": "u:9f487e803642"
+            }
+          ],
+          "id": "u:213dbd1f0dd0",
+          "placeholder": "",
+          "remark": null
+        },
+        {
+          "type": "hidden",
+          "id": "u:bd12b2a13634",
+          "name": "contentItemId"
+        },
+        {
+          "type": "hidden",
+          "name": "contentType",
+          "id": "u:a1ae08b567b3",
+          "value": "AmisSchema"
+        },
+        {
+          "type": "hidden",
+          "name": "schema",
+          "id": "u:8d9ea63a69f6",
+          "label": "Schema JSON",
+          "mode": "normal",
+          "value": "{\n          \"type\": \"tpl\",\n          \"tpl\": \"内容aaaaaaaaaa\",\n          \"inline\": false\n        }",
+          "horizontal": {
+            "leftFixed": "normal"
+          },
+          "required": true,
+          "minRows": 3,
+          "maxRows": 20,
+          "minLength": 5,
+          "maxLength": 120
+        },
+        {
+          "type": "service",
+          "name": "svrPreview",
+          "tpl": "${schema}",
+          "id": "svrPreview"
+        }
+      ],
+      "id": "u:5bd9921a8c0a",
+      "submitOnChange": false,
+      "checkAll": false,
+      "wrapWithPanel": true,
+      "mode": "horizontal",
+      "horizontal": {
+        "leftFixed": "normal",
+        "left": 3,
+        "right": 9
+      },
+      "affixFooter": false,
+      "strictMode": true,
+      "debug": false,
+      "canAccessSuperData": false,
+      "actions": [
+        {
+          "type": "button",
+          "label": "生成",
+          "id": "btnPrview",
+          "actionType": "custom",
+          "onEvent": {
+            "click": {
+              "actions": [
+                {
+                  "actionType": "custom",
+                  "script": "doAction({actionType: 'ajax', args: {api: '/amis/api/mock2/form/saveForm'}});\n //event.stopPropagation();"
+                }
+              ]
+            }
+          },
+          "level": "primary",
+          "block": true
+        }
+      ]
+    }
+  ],
+  "messages": {},
+  "style": {
+    "fontWeight": "normal",
+    "backgroundColor": "",
+    "fontSize": "16px"
+  },
+  "subTitle": "根据类型生成页面",
+  "toolbar": [],
+  "name": "page1",
+  "id": "u:20915032d8c9"
+}

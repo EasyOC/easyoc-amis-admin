@@ -1,8 +1,7 @@
 import type { ErrorMessageMode } from '@/types'
+import { toast } from 'amis-ui'
 import { get } from 'lodash'
-import { message } from 'antd'
 import lang from './lang/sys'
-import { history } from '@umijs/max'
 
 export function checkStatus(
   status: number,
@@ -26,8 +25,8 @@ export function checkStatus(
       // errMessage = '抱歉，您没有权限访问该内容'
 
       errMessage = t('sys.api.errMsg401')
-      // authService.goLogin()
-      history.push("/")
+        // authService.goLogin()
+        (history).push("/")
       break
     case 403:
       errMessage = t('sys.api.errMsg403')
@@ -64,6 +63,6 @@ export function checkStatus(
   }
 
   if (errMessage) {
-    message.error(errMessage)
+    toast.error(errMessage)
   }
 }

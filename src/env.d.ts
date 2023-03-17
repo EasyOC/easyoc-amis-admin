@@ -1,8 +1,6 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-
-    VITE_apiRoot: string
     VITE_apiRoot: string
     VITE_serverApiPrefix: string
     VITE_clientRoot: string

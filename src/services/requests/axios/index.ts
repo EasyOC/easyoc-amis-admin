@@ -2,9 +2,12 @@
 // The axios configuration can be changed according to the project, just change the file, other files can be left unchanged
 
 import type { AxiosResponse } from 'axios'
-import type { RequestOptions, RequestResult } from '@/types'
+import {
+  RequestOptions, RequestResult, RequestEnum,
+  ResultEnum, ContentTypeEnum
+} from '@/types'
 import type { AxiosTransform, CreateAxiosOptions } from './axiosTransform'
-
+import { toast } from 'amis';
 import { VAxios } from './Axios'
 import { checkStatus } from './checkStatus'
 import {
@@ -13,10 +16,8 @@ import {
   deepMerge,
   setObjToUrlParams,
 } from '@/utils'
-import { RequestEnum, ResultEnum, ContentTypeEnum } from '@/types'
 import { joinTimestamp, formatRequestDate } from './helper'
 // import useI18n from '@/utils/useI18n'
-import { message } from 'antd'
 import authService from '@/services/auth/authService'
 import { processResponseMessage } from './processResponseMessage'
 import { clone } from 'lodash'
@@ -64,22 +65,14 @@ const transform: AxiosTransform = {
     let timeoutMsg = ''
     switch (statusCode) {
       case ResultEnum.TIMEOUT:
-        message.error("请求超时");
+        toast.error("请求超时");
         break
       default:
         if (msg) {
           timeoutMsg = msg
+          toast.error(msg);
         }
     }
-
-    // errorMessageMode=‘modal’的时候会显示modal错误弹窗，而不是消息提示，用于一些比较重要的错误
-    // errorMessageMode='none' 一般是调用时明确表示不希望自动弹出错误提示
-    if (options.errorMessageMode === 'modal') {
-      message.error(timeoutMsg, 3600)
-    } else if (options.errorMessageMode === 'message') {
-      message.error(timeoutMsg)
-    }
-
     throw new Error(timeoutMsg || 'api Request Failed!')
   },
 
@@ -233,7 +226,7 @@ const transform: AxiosTransform = {
         }
 
         if (errMessage) {
-          message.error(errMessage)
+          toast.error(errMessage)
           return Promise.reject(error)
         }
       } catch (err1) {
@@ -256,7 +249,7 @@ export const createAxios = (opt?: Partial<CreateAxiosOptions>) => {
         // authenticationScheme: '',
         timeout: 10 * 1000,
         // 基础接口地址
-        baseURL: API_BASE_URL,
+        baseURL: import.meta.env.VITE_apiRoot,
         headers: { 'Content-Type': ContentTypeEnum.JSON },
         // 如果是form-data格式
         // headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
