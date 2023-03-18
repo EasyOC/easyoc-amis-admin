@@ -50,5 +50,5 @@ export default {
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
   "menu.AmisPage": "rending",
-
+  "搜索菜单": "Search Menus"
 };

@@ -13,7 +13,7 @@ import {
 } from 'amis';
 import {eachTree} from 'amis-core';
 import 'amis-ui/lib/locale/en-US';
-import {withRouter} from 'react-router';
+import {RouteComponentProps, withRouter} from 'react-router';
 import {
   BrowserRouter as Router,
   Route,
@@ -22,14 +22,15 @@ import {
   Link,
   NavLink
 } from 'react-router-dom';
+import {inject, observer} from 'mobx-react';
+import {IMainStore} from '@/stores';
+import AppSettings from '@/services/appsettings';
+import Components from './Components';
+import {translate} from 'i18n-runtime';
 import {schema2component} from '@/components/AMISRenderer';
-declare const _hmt: any;
+const _hmt: any = [];
 
-let ContextPath = '';
-
-if (process.env.NODE_ENV === 'production') {
-  ContextPath = '/amis';
-}
+let ContextPath = AppSettings.PUBLIC_PATH;
 
 export function getContextPath() {
   return ContextPath;
@@ -84,44 +85,192 @@ function getPath(path: string) {
       : `${ContextPath}/${path}`
     : '';
 }
-
-class BackTop extends React.PureComponent {
-  state = {
-    show: false
-  };
-
-  componentDidMount() {
-    document.addEventListener('scroll', this.handleScroll);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('scroll', this.handleScroll);
-  }
-
-  handleScroll = (e: any) => {
-    this.setState({
-      show: e.target.scrollingElement?.scrollTop > 350
-    });
-  };
-
-  render() {
-    return (
-      <div
-        className={`Backtop ${this.state.show ? 'visible' : ''}`}
-        onClick={() => scrollTo({top: 0})}
-      >
-        <i className="fa fa-rocket"></i>
-      </div>
-    );
-  }
+function isActive(link: any, location: any) {
+  return !!(link.path && getPath(link.path) === location.pathname);
 }
 
+export function navigations2route(
+  navigations: any,
+  additionalProperties?: any
+) {
+  let routes: any = [];
+
+  navigations.forEach((root: any) => {
+    root.children &&
+      eachTree(root.children, (item: any) => {
+        if (item.path && item.component) {
+          routes.push(
+            additionalProperties ? (
+              <Route
+                key={routes.length + 1}
+                path={
+                  item.path[0] === '/'
+                    ? ContextPath + item.path
+                    : `${ContextPath}/${item.path}`
+                }
+                render={(props: any) => (
+                  <item.component {...additionalProperties} {...props} />
+                )}
+              />
+            ) : (
+              <Route
+                key={routes.length + 1}
+                path={
+                  item.path[0] === '/'
+                    ? ContextPath + item.path
+                    : `${ContextPath}/${item.path}`
+                }
+                component={item.component}
+              />
+            )
+          );
+        }
+      });
+  });
+
+  return routes;
+}
+
+const loadMenus = async () => {
+  return [
+    {
+      label: 'Home',
+      url: '/',
+      redirect: '/pageA'
+    },
+    {
+      label: '示例',
+      children: [
+        {
+          label: '页面A',
+          url: 'pageA',
+          schema: {
+            type: 'page',
+            title: '页面A',
+            body: '页面A'
+          },
+
+          children: [
+            {
+              label: '页面A-1',
+              url: '1',
+              schema: {
+                type: 'page',
+                title: '页面A-1',
+                body: '页面A-1'
+              }
+            },
+
+            {
+              label: '页面A-2',
+              url: '2',
+              schemaId: '123124',
+              schema: {
+                type: 'page',
+                title: '页面A-2',
+                body: '页面A-2'
+              }
+            },
+
+            {
+              label: '页面A-3',
+              url: '3',
+              schema: {
+                type: 'page',
+                title: '页面A-3',
+                body: '页面A-3'
+              }
+            }
+          ]
+        },
+
+        {
+          label: '页面B',
+          schema: {
+            type: 'page',
+            title: '页面B',
+            body: '页面B'
+          }
+        },
+
+        {
+          label: '页面C',
+          schema: {
+            type: 'page',
+            title: '页面C',
+            body: '页面C'
+          }
+        },
+
+        {
+          label: '表单',
+          url: '/form',
+          icon: 'fa fa-plus',
+          schemaApi: '/api/mock2/service/schema?type=form'
+        },
+        {
+          label: '列表',
+          url: '/crud/list',
+          icon: 'fa fa-list',
+          schemaApi: '/api/mock2/service/schema?type=crud'
+        }
+      ]
+    },
+
+    {
+      label: '分组2',
+      children: [
+        {
+          label: '用户管理',
+          schema: {
+            type: 'page',
+            title: '用户管理',
+            body: '页面C'
+          }
+        },
+
+        {
+          label: '外部链接',
+          link: 'http://baidu.gitee.io/amis'
+        },
+
+        {
+          label: '部门管理',
+          schemaApi: '/api/mock2/service/form?tpl=tpl3'
+        }
+      ]
+    }
+
+    // {
+    //   label: '404',
+    //   visible: false,
+    //   isDefaultPage: true,
+    //   schema: {
+    //     type: 'page',
+    //     body: '自定义 404 页面，可以不配置'
+    //   }
+    // }
+  ];
+};
+
 // @ts-ignore
-@withRouter // @ts-ignore
-export class App extends React.PureComponent<{
-  location: Location;
-}> {
-  state = {
+ 
+@inject('store')(
+  observer(
+    (props) => {
+      
+    }
+  )
+)
+
+export default class extends React.PureComponent<
+  {
+    history: History;
+    location: Location;
+    store: IMainStore;
+  } & RouteComponentProps
+> {
+  state: {store: IMainStore} & any = {
     viewMode: localStorage.getItem('amis-viewMode') || 'pc',
     offScreen: false,
     folded: false,
@@ -134,11 +283,20 @@ export class App extends React.PureComponent<{
       ? localStorage.getItem('amis-locale')?.replace('zh-cn', 'zh-CN')
       : '',
     navigations: [],
-    filter: '' // 导航过滤，方便找组件
+    filter: '', // 导航过滤，方便找组件
+    store: {}
   };
 
   constructor(props: any) {
     super(props);
+    // const navigations = this.props.store.pages.map(item => ({
+    //   label: item.label,
+    //   path: `/${item.path}`,
+    //   icon: item.icon,
+    //   component: () => schema2component(item.schema)
+    // }));
+    // this.state.navigations = [{label: 'Menus', children: navigations}];
+
     this.setNavigations = this.setNavigations.bind(this);
     this.setNavigationFilter = this.setNavigationFilter.bind(this);
     document.querySelector('body')?.classList.add(this.state.theme.value);
@@ -166,6 +324,10 @@ export class App extends React.PureComponent<{
         },
         () => window.scrollTo(0, 0)
       );
+
+      const loadMenus => async () => {
+        await this.loadMenus()
+      }
 
       _hmt && _hmt.push(['_trackPageview', props.location.pathname]);
     }
@@ -295,10 +457,11 @@ export class App extends React.PureComponent<{
 
   renderNavigation() {
     return (
-      <div className="Doc-navigation">
+      <div>
         <SearchBox
-          className="m-b m-r-md"
-          placeholder="输入组件名称"
+          className="m-b m-r-md justify-center"
+          style={{paddingLeft: '20px'}}
+          placeholder={translate('搜索菜单')}
           value={this.state.filter}
           onSearch={this.setNavigationFilter}
           onChange={this.setNavigationFilter}
@@ -416,7 +579,7 @@ export class App extends React.PureComponent<{
     );
   }
 
-  renderContent() {
+  renderContent = () => {
     const locale = 'zh-CN'; // 暂时不支持切换，因为目前只有中文文档
     const {theme} = this.state;
 
@@ -425,26 +588,38 @@ export class App extends React.PureComponent<{
         fallback={<Spinner overlay spinnerClassName="m-t-lg" size="lg" />}
       >
         <Switch>
-          {store.pages.map(item => (
+          {/* {this.loadMenus().map(item => (
             <Route
-              key={item.id}
-              path={`/${item.path}`}
-              component={schema2component(item.schema)}
+              key={item.url}
+              path={`/${item.url}`}
+              children={item.children}
+              // component={schema2component(item.children)}
             />
-          ))}
-
+          ))} */}
           <Route
-            render={() => (
-              <div className="Doc-content">
-                <NotFound />
-              </div>
+            path={`${ContextPath}`}
+            render={(props: any) => (
+              <Components
+                {...{
+                  setNavigations: this.setNavigations,
+                  navigations: this.state.navigations,
+                  theme: theme.value,
+                  classPrefix: theme.ns,
+                  viewMode: this.state.viewMode,
+                  locale: this.state.locale,
+                  offScreen: this.state.offScreen,
+                  ContextPath,
+                  showCode: false
+                }}
+                {...props}
+              />
             )}
           />
         </Switch>
       </React.Suspense>
     );
-  }
-  renderExamples() {
+  };
+  render() {
     const theme = this.state.theme;
 
     return (
@@ -453,7 +628,8 @@ export class App extends React.PureComponent<{
         offScreen={this.state.offScreen}
         folded={this.state.folded}
         header={this.renderHeader()}
-        aside={this.renderAsideNav()}
+        aside={this.renderNavigation()}
+        // aside={this.renderAsideNav()}
       >
         <ToastComponent theme={theme.value} locale={this.state.locale} />
         <AlertComponent theme={theme.value} locale={this.state.locale} />
@@ -469,162 +645,10 @@ export class App extends React.PureComponent<{
           offScreen: this.state.offScreen,
           ContextPath
         })} */}
+        {/* <BackTop /> */}
+
         {this.renderContent()}
       </Layout>
     );
   }
-  render() {
-    const theme = this.state.theme;
-    const location = this.props.location;
-    return this.renderExamples();
-    if (/examples\/app/.test(location.pathname)) {
-      return (
-        <>
-          <ToastComponent theme={theme.value} locale={this.state.locale} />
-          <AlertComponent theme={theme.value} locale={this.state.locale} />
-          {/* {React.cloneElement(this.props.children as any, {
-            key: theme.value,
-            ...(this.props.children as any).props,
-            setNavigations: this.setNavigations,
-            theme: theme.value,
-            classPrefix: theme.ns,
-            viewMode: this.state.viewMode,
-            locale: this.state.locale,
-            offScreen: this.state.offScreen,
-            ContextPath,
-            showCode: false
-          })} */}
-          {this.renderContent()}
-        </>
-      );
-    } else if (/examples/.test(location.pathname)) {
-    }
-
-    return (
-      <Layout
-        // className={':DocLayout'}
-        theme={theme.value}
-        boxed={true}
-        offScreen={this.state.offScreen}
-        header={this.state.headerVisible ? this.renderHeader() : null}
-        headerClassName={':DocLayout-header'}
-      >
-        <ToastComponent theme={theme.value} locale={this.state.locale} />
-        <AlertComponent theme={theme.value} locale={this.state.locale} />
-
-        <div className="Doc">
-          <div className="Doc-nav hidden-xs hidden-sm">
-            {this.renderNavigation()}
-          </div>
-
-          <Drawer
-            size="xs"
-            className="Doc-navDrawer"
-            overlay
-            closeOnOutside
-            onHide={() => this.setState({offScreen: false})}
-            show={this.state.offScreen}
-            position="left"
-          >
-            <ul className={`HeaderLinks`}>
-              <NavLink
-                to={`${ContextPath}/zh-CN/docs`}
-                activeClassName="is-active"
-              >
-                文档
-              </NavLink>
-
-              <NavLink
-                to={`${ContextPath}/zh-CN/components`}
-                activeClassName="is-active"
-              >
-                组件
-              </NavLink>
-              <NavLink
-                to={`${ContextPath}/zh-CN/style`}
-                activeClassName="is-active"
-              >
-                样式
-              </NavLink>
-            </ul>
-            {this.renderNavigation()}
-          </Drawer>
-
-          <BackTop />
-
-          {/* {React.cloneElement(this.props.children as any, {
-            key: theme.value,
-            ...(this.props.children as any).props,
-            setNavigations: this.setNavigations,
-            theme: theme.value,
-            classPrefix: theme.ns,
-            viewMode: this.state.viewMode,
-            locale: this.state.locale,
-            offScreen: this.state.offScreen,
-            ContextPath
-          })} */}
-          {this.renderContent()}
-        </div>
-      </Layout>
-    );
-  }
-}
-
-function isActive(link: any, location: any) {
-  return !!(link.path && getPath(link.path) === location.pathname);
-}
-
-export function navigations2route(
-  navigations: any,
-  additionalProperties?: any
-) {
-  let routes: any = [];
-
-  navigations.forEach((root: any) => {
-    root.children &&
-      eachTree(root.children, (item: any) => {
-        if (item.path && item.component) {
-          routes.push(
-            additionalProperties ? (
-              <Route
-                key={routes.length + 1}
-                path={
-                  item.path[0] === '/'
-                    ? ContextPath + item.path
-                    : `${ContextPath}/${item.path}`
-                }
-                render={(props: any) => (
-                  <item.component {...additionalProperties} {...props} />
-                )}
-              />
-            ) : (
-              <Route
-                key={routes.length + 1}
-                path={
-                  item.path[0] === '/'
-                    ? ContextPath + item.path
-                    : `${ContextPath}/${item.path}`
-                }
-                component={item.component}
-              />
-            )
-          );
-        }
-      });
-  });
-
-  return routes;
-}
-
-export default function entry() {
-  // PathPrefix = pathPrefix || DocPathPrefix;
-
-  return (
-    <Router>
-      <Switch>
-        <Route component={App}></Route>
-        <Route component={NotFound} />
-      </Switch>
-    </Router>
-  );
 }

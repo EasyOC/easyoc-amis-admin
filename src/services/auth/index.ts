@@ -3,6 +3,7 @@
 import { ContentTypeEnum } from '@/types';
 import { isArray } from 'lodash';
 import { User } from 'oidc-client-ts';
+import AppSettings from '../appsettings';
 import { wrapedResultRequest } from '../requests/axios';
 import { getAppConfig } from '../requests/urlHelper';
 import authService from './authService';
@@ -73,14 +74,13 @@ export async function getUserInfo(user?: User) {
 
 /** 登录接口 POST   */
 export async function login(body: API.LoginParams) {
-    var appConfig = getAppConfig()
     var result = await wrapedResultRequest.request<API.LoginResult>({
         url: '/connect/token',
         headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },
         method: 'POST',
         data: {
             grant_type: 'password',
-            client_id: appConfig.clientId,
+            client_id: AppSettings.CLIENT_ID,
             username: body.username,
             password: body.password,
             rememberMe: body.autoLogin,

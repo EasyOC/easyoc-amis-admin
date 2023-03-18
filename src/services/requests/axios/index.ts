@@ -22,6 +22,7 @@ import authService from '@/services/auth/authService'
 import { processResponseMessage } from './processResponseMessage'
 import { clone } from 'lodash'
 import { getAppConfig } from '../urlHelper'
+import AppSettings from '@/services/appsettings';
 /**
  * @description: 数据处理，方便区分多种处理方式
  */
@@ -239,7 +240,6 @@ const transform: AxiosTransform = {
 }
 
 export const createAxios = (opt?: Partial<CreateAxiosOptions>) => {
-  const appConfig = getAppConfig()
   const config = new VAxios(
     deepMerge(
       {
@@ -249,7 +249,7 @@ export const createAxios = (opt?: Partial<CreateAxiosOptions>) => {
         // authenticationScheme: '',
         timeout: 10 * 1000,
         // 基础接口地址
-        baseURL: import.meta.env.VITE_apiRoot,
+        baseURL: AppSettings.API_BASE_URL,
         headers: { 'Content-Type': ContentTypeEnum.JSON },
         // 如果是form-data格式
         // headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },

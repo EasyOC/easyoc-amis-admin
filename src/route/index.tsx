@@ -1,18 +1,29 @@
 import React from 'react';
 import {ToastComponent, AlertComponent, Spinner} from 'amis';
-import {
-  Route,
-  Switch,
-  Redirect,
-  BrowserRouter as Router
-} from 'react-router-dom';
+import {Route, Switch, BrowserRouter as Router} from 'react-router-dom';
 import {observer} from 'mobx-react';
 import {IMainStore} from '../stores';
+import {History, Location} from 'history';
+import {schema2component} from '@/components/AMISRenderer';
+// import AutoLayout from '@/Layout/SchemaLayout';
+// import {set} from 'lodash';
+// const mainLayout = React.lazy(() => import('@/Layout/Index'));
+// const mainLayout = React.lazy(() => import('@/App1'));
+const Editor = React.lazy(() => import('@/pages/editor/editor'));
+// import '@/Layout/styles/autolayout.less';
 
-const mainLayout = React.lazy(() => import('@/Layout/Index'));
-const Editor = React.lazy(() => import('@/pages/page-editor/editor'));
-
-export default observer(function ({store}: {store: IMainStore}) {
+export default observer(function ({
+  store,
+  history,
+  localtion
+}: {
+  store: IMainStore;
+  history?: History;
+  localtion?: Location;
+}) {
+  // const appSchema = AutoLayout;
+  // set(appSchema, 'pages', store.pages);
+  // const amisInstance = schema2component(appSchema);
   return (
     <Router>
       <div className="routes-wrapper">
@@ -22,7 +33,6 @@ export default observer(function ({store}: {store: IMainStore}) {
           fallback={<Spinner overlay className="m-t-lg" size="lg" />}
         >
           <Switch>
-            <Redirect to={`/hello-world`} from={`/`} exact />
             <Route path="/editor" component={Editor} />
             <Route
               path="/auth/login"
@@ -38,7 +48,10 @@ export default observer(function ({store}: {store: IMainStore}) {
                 () => import('@/pages/auth/logout_redirect')
               )}
             />
-            <Route component={mainLayout} />
+            <Route
+              component={React.lazy(() => import('@/Layout/CustomLayout'))}
+            />
+            {/* <Route component={amisInstance} /> */}
           </Switch>
         </React.Suspense>
       </div>

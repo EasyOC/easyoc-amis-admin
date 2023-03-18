@@ -423,7 +423,7 @@ const AmisEditor: React.FC<{history: History}> = props => {
                   setState(s => ({...s, isMobile: false}));
                 }}
               >
-                <Icon icon="pc-preview" title="PC模式" />
+                {/* <Icon icon="pcPreview" title="PC模式" /> */}
               </div>
               <div
                 className={`Editor-view-mode-btn ${
@@ -433,7 +433,7 @@ const AmisEditor: React.FC<{history: History}> = props => {
                   setState(s => ({...s, isMobile: true}));
                 }}
               >
-                <Icon icon="h5-preview" title="移动模式" />
+                {/* <Icon icon="h5Preview" title="移动模式" /> */}
               </div>
             </div>
           </div>
@@ -471,27 +471,23 @@ const AmisEditor: React.FC<{history: History}> = props => {
             <div style={{marginLeft: '15px'}}>
               <Dropdown.Button
                 icon={<DownOutlined />}
-                overlay={() => {
-                  return (
-                    <Menu
-                      items={[
-                        {
-                          label: '从类型生成',
-                          key: '1',
-                          onClick: () => {
-                            setState(s => ({...s, showGenModal: true}));
-                          }
-                        },
-                        {
-                          label: '历史版本',
-                          key: '2',
-                          onClick: () => {
-                            setState(s => ({...s, showVersion: true}));
-                          }
-                        }
-                      ]}
-                    />
-                  );
+                menu={{
+                  items: [
+                    {
+                      label: '从类型生成',
+                      key: '1',
+                      onClick: () => {
+                        setState(s => ({...s, showGenModal: true}));
+                      }
+                    },
+                    {
+                      label: '历史版本',
+                      key: '2',
+                      onClick: () => {
+                        setState(s => ({...s, showVersion: true}));
+                      }
+                    }
+                  ]
                 }}
               >
                 加载...

@@ -6,9 +6,9 @@ const env = import.meta.env
 
 export const initUserManager = () => {
   var client = new UserManager({
-    userStore: new WebStorageStateStore({ prefix: `oidc_${env.VITE_clientId}_` }),
-    authority: env.VITE_apiRoot,
-    client_id: env.VITE_clientId,
+    userStore: new WebStorageStateStore({ prefix: `oidc_${AppSettings.CLIENT_ID}_` }),
+    authority: AppSettings.API_BASE_URL,
+    client_id: AppSettings.CLIENT_ID,
     redirect_uri: AppSettings.CLIENT_ROOT + '/auth/redirect',
     post_logout_redirect_uri: AppSettings.CLIENT_ROOT + '/auth/logout_redirect',
     scope: "openid profile email roles offline_access",

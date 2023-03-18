@@ -3,10 +3,11 @@
  */
 
 import {Icon, registerIcon} from 'amis';
-import PCPreview from './pc-preview.svg';
-import H5Preview from './h5-preview.svg';
+import PCPreview from './pcpreview.svg';
+import H5Preview from './h5preview.svg';
+import React from 'react';
 
-registerIcon('pc-preview', PCPreview);
-registerIcon('h5-preview', H5Preview);
+registerIcon('pcPreview', () => <PCPreview />);
+registerIcon('h5Preview', () => <H5Preview />);
 
 export {Icon};
