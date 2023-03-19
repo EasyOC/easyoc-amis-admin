@@ -24,7 +24,7 @@ import {
 } from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
-import AppSettings from '@/services/appsettings';
+import AppSettings from '@/services/appSettings';
 import Components from './Components';
 import {translate} from 'i18n-runtime';
 import {schema2component} from '@/components/AMISRenderer';

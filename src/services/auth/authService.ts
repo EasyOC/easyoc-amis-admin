@@ -1,8 +1,7 @@
 /* eslint-disable */
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
-import AppSettings from '../appsettings';
+import AppSettings from '../appSettings';
 
-const env = import.meta.env
 
 export const initUserManager = () => {
   var client = new UserManager({

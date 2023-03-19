@@ -1,4 +1,4 @@
-import AppSettings from "@/services/appsettings";
+import AppSettings from "@/services/appSettings";
 import { buildUrl, mustNotEndsWith, mustStartsWith } from "./util";
 
 export const apiUrl = (path: string) => {

@@ -30,7 +30,7 @@ export const mustStartsWith = (str: string, prefix: string) => {
   if (str.startsWith(prefix)) {
     return str
   } else {
-    str.substring(prefix.length)
+    return str.substring(prefix.length)
   }
 }
 

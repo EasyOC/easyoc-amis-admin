@@ -22,7 +22,7 @@ import authService from '@/services/auth/authService'
 import { processResponseMessage } from './processResponseMessage'
 import { clone } from 'lodash'
 import { getAppConfig } from '../urlHelper'
-import AppSettings from '@/services/appsettings';
+import AppSettings from '@/services/appSettings';
 /**
  * @description: 数据处理，方便区分多种处理方式
  */

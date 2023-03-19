@@ -9,9 +9,10 @@ import authService from '../auth/authService';
 //自定义过滤器
 import './filters'
 import { unset } from 'lodash';
+import AppSettings from '../appsettings';
 
 const amisRequest = axios.create({
-    baseURL: import.meta.env.VITE_apiRoot,
+    baseURL: AppSettings.API_BASE_URL,
     timeout: 10 * 1000,
 })
 // //@ts-ignore

@@ -3,7 +3,7 @@
 import { ContentTypeEnum } from '@/types';
 import { isArray } from 'lodash';
 import { User } from 'oidc-client-ts';
-import AppSettings from '../appsettings';
+import AppSettings from '../appSettings';
 import { wrapedResultRequest } from '../requests/axios';
 import { getAppConfig } from '../requests/urlHelper';
 import authService from './authService';

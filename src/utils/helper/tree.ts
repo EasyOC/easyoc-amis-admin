@@ -76,7 +76,7 @@ export const treeToList = <T = any>(
 
 export const findTreeNode = <T = any>(
   tree: any,
-  func: AnyFunction<any>,
+  func: Function,
   config: Partial<TreeHelperConfig> = {},
 ): T | null => {
   config = mergeConfig(config)
@@ -91,7 +91,7 @@ export const findTreeNode = <T = any>(
 
 export const findAllTreeNode = <T = any>(
   tree: any,
-  func: AnyFunction<any>,
+  func: Function,
   config: Partial<TreeHelperConfig> = {},
 ): T[] => {
   config = mergeConfig(config)
@@ -107,7 +107,7 @@ export const findAllTreeNode = <T = any>(
 
 export const findTreeParentPath = <T = any>(
   tree: any,
-  func: AnyFunction<any>,
+  func: Function,
   config: Partial<TreeHelperConfig> = {},
 ): T | T[] | null => {
   config = mergeConfig(config)
@@ -134,7 +134,7 @@ export const findTreeParentPath = <T = any>(
 
 export const findAllTreeParentPath = (
   tree: any,
-  func: AnyFunction<any>,
+  func: Function,
   config: Partial<TreeHelperConfig> = {},
 ) => {
   config = mergeConfig(config)
@@ -240,7 +240,7 @@ export const treeMap = <T = any>(
  */
 export const treeTraverse = (
   data: any[],
-  callBack: AnyFunction<any>,
+  callBack: Function,
   parentNode = {},
 ) => {
   data.forEach((element) => {

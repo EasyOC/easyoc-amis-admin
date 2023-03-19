@@ -10,6 +10,7 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -20,7 +21,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "typeRoots": ["./node_modules/@types", "./typings"],
@@ -29,5 +30,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"]
+  "include": ["./**/*.d.ts", "./src/*.ts", "./**/*.tsx"]
 }

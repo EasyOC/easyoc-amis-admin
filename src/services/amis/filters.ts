@@ -1,7 +1,7 @@
 import { buildUrl, deepMerge, toMoney } from '@/utils';
 import { apiUrl } from '@/utils/urlHelper';
 import { registerFilter } from 'amis';
-import AppSettings from '../appsettings';
+import AppSettings from '../appSettings';
 
 registerFilter('apiUrl', (input: string) => {
     return apiUrl(input)

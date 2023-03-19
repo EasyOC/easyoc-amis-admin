@@ -9,7 +9,7 @@ import {schema2component} from '@/components/AMISRenderer';
 // import {set} from 'lodash';
 // const mainLayout = React.lazy(() => import('@/Layout/Index'));
 // const mainLayout = React.lazy(() => import('@/App1'));
-const Editor = React.lazy(() => import('@/pages/editor/editor'));
+const Editor = React.lazy(() => import('../pages/editor/editor'));
 // import '@/Layout/styles/autolayout.less';
 
 export default observer(function ({
@@ -36,16 +36,16 @@ export default observer(function ({
             <Route path="/editor" component={Editor} />
             <Route
               path="/auth/login"
-              component={React.lazy(() => import('@/pages/auth/login'))}
+              component={React.lazy(() => import('../pages/auth/login'))}
             />
             <Route
               path="/auth/redirect"
-              component={React.lazy(() => import('@/pages/auth/redirect'))}
+              component={React.lazy(() => import('../pages/auth/redirect'))}
             />
             <Route
               path="/auth/logout_redirect"
               component={React.lazy(
-                () => import('@/pages/auth/logout_redirect')
+                () => import('../pages/auth/logout_redirect')
               )}
             />
             <Route

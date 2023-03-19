@@ -31,6 +31,7 @@ import qs from 'qs';
 import dayjs from 'dayjs';
 import {History} from 'history';
 import {currentLocale} from 'i18n-runtime';
+import AppSettings from '@/services/appSettings';
 // import 'amis/schema.json';
 //禁用部分组件
 // import './components/DisabledEditorPlugin';
@@ -43,7 +44,7 @@ import {currentLocale} from 'i18n-runtime';
 //#endregion
 
 const schemaUrl =
-  mustEndsWith(import.meta.env.VITE_publicPathPrefix, '/') + 'amis/schema.json';
+  mustEndsWith(AppSettings.PUBLIC_PATH as string, '/') + 'amis/schema.json';
 // @ts-ignore
 // __uri?.('amis/schema.json');
 console.log('schemaUrl: ', schemaUrl);
