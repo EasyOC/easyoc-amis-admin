@@ -1,6 +1,11 @@
-const isVite = process.env?.npm_lifecycle_script?.includes('vite');
-
-const runtime = isVite ? import.meta.env : process.env
+let isVite = true;
+let runtime: any = null;
+if (typeof process != 'undefined') {
+    isVite = process?.env?.npm_lifecycle_script?.includes('vite');
+    runtime = process?.env
+} else {
+    runtime = import.meta.env
+}
 
 const AppSettings = {
     CLIENT_ROOT: runtime.VITE_clientRoot as string,

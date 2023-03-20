@@ -287,7 +287,7 @@ export default class extends React.PureComponent<
       label: item.label,
       path: `/${item.path}`,
       icon: item.icon,
-      component: () => schema2component(item.schema)
+      component: schema2component(item.schema)
     }));
     this.state.navigations = [{label: 'Menus', children: navigations}];
 
