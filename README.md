@@ -4,10 +4,12 @@
 默认未开启授权检查，对接后台默认使用的 openid-connect
 
 
+
 ## vite
 
 ```
-npm run vite
+pnpm i 
+pnpm run vite
 ```
 
 ## Webpack 集成有问题，暂时不用了
