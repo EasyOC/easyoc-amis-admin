@@ -1,13 +1,13 @@
 {
-  "name": "jz-lowcode2",
+  "name": "easyoc-amis-admin",
+  "description": "base on amis-react-starter",
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "build": "webpack",
-    "server": "node server.js",
     "vite": "vite",
-    "vite-build": "vite build"
+    "vite-build": "vite build",
+    "start": "node server.js",
+    "build": "webpack"
   },
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
