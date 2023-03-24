@@ -16,12 +16,13 @@ import {
   Select
 } from 'antd';
 
-import {wrapedResultRequest} from '@/services/requests';
+import {defaultRequest} from '@/services/requests';
 // import 'amis-editor-core/lib/style.css';
 import './style.less';
 import {Icon} from '@/icons/index';
 import {FullScreen, useFullScreenHandle} from 'react-full-screen';
 import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
+import {gql, useQuery} from '@apollo/client';
 import GenFromType from './Gencurd/GenFromType';
 import {CloudUploadOutlined, DownOutlined} from '@ant-design/icons';
 import {Switch, DatePicker as AMISDatePicker} from 'amis';
@@ -265,7 +266,7 @@ const AmisEditor: React.FC<{history: History}> = props => {
 
       values.draft = !values.publish;
       unset(values, 'publish');
-      const result = await wrapedResultRequest.request({
+      const result = await defaultRequest.request({
         url: `/api/ContentManagement/PostContent?draft=${values.draft}`,
         method: 'post',
         data: {
@@ -364,7 +365,7 @@ const AmisEditor: React.FC<{history: History}> = props => {
             <Form.Item
               hidden={!publishOption.publishLaterFlag}
               name="publishLaterWhen"
-              label="延时发布"
+              label="发布时间"
             >
               <AMISDatePicker
                 value={publishOption.publishLaterWhen}
@@ -518,7 +519,7 @@ const AmisEditor: React.FC<{history: History}> = props => {
             className="is-fixed"
             $schemaUrl={schemaUrl}
             showCustomRenderersPanel={true}
-            amisEnv={{...getEnv()}}
+            amisEnv={{...getEnv()} as any}
           />
         </div>
       </div>

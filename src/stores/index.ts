@@ -1,22 +1,27 @@
 import { types, getEnv, applySnapshot, getSnapshot } from 'mobx-state-tree';
 import { PageStore } from './Page';
-import { when, reaction } from 'mobx';
+import { when, reaction, flow, runInAction } from 'mobx';
+import { NavItem } from '@/types/src/NavItem';
+import { loadMenus } from "@/services/amis/menus"
+
 let pagIndex = 1;
 export const MainStore = types
   .model('MainStore', {
-    pages: types.optional(types.array(PageStore), [
-      {
-        id: `${pagIndex}`,
-        path: 'hello-world',
-        label: 'Hello world',
-        icon: 'fa fa-file',
-        schema: {
-          type: 'page',
-          title: 'Hello world',
-          body: '初始页面'
-        }
-      }
-    ]),
+    pages: types.optional(types.array(PageStore)
+      , [
+        // {
+        //   id: `${pagIndex}`,
+        //   path: 'hello-world',
+        //   label: 'Hello world',
+        //   icon: 'fa fa-file',
+        //   schema: {
+        //     type: 'page',
+        //     title: 'Hello world',
+        //     body: '初始页面'
+        //   }
+        // }
+      ]
+    ),
     theme: 'cxd',
     asideFixed: true,
     asideFolded: false,
@@ -41,10 +46,18 @@ export const MainStore = types
     }
   }))
   .actions(self => {
+    function fetchPages() {
+      flow(function* () {
+        const menus = yield loadMenus();
+        runInAction(() => {
+          self.pages = menus
+        })
+      })
+    }
+
     function toggleAsideFolded() {
       self.asideFolded = !self.asideFolded;
     }
-
     function toggleAsideFixed() {
       self.asideFixed = !self.asideFixed;
     }
@@ -57,16 +70,10 @@ export const MainStore = types
       self.addPageIsOpen = isOpened;
     }
 
-    function addPage(data: {
-      label: string;
-      path: string;
-      icon?: string;
-      schema?: any;
-    }) {
+    function addPage(data: Partial<NavItem>) {
       self.pages.push(
         PageStore.create({
-          ...data,
-          id: `${++pagIndex}`
+          ...data
         })
       );
     }
@@ -92,6 +99,7 @@ export const MainStore = types
     }
 
     return {
+      initPages: fetchPages,
       toggleAsideFolded,
       toggleAsideFixed,
       toggleOffScreen,
@@ -120,3 +128,5 @@ export const MainStore = types
   });
 
 export type IMainStore = typeof MainStore.Type;
+
+

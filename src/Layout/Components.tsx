@@ -4,16 +4,10 @@ import React from 'react';
 import {Switch} from 'react-router-dom';
 import {navigations2route} from './CustomLayout';
 
-type NavItem = {
-  label: string;
-  path: string;
-  component: any;
-  children: NavItem[];
-};
-
+import {NavigationItem} from 'amis-ui/lib/components/menu';
 export default class Components extends React.PureComponent<any> {
-  components: NavItem[] = [];
-  constructor(props: {navigations: NavItem[]}) {
+  components: NavigationItem[] = [];
+  constructor(props: {navigations: NavigationItem[]}) {
     super(props);
     this.components = props.navigations;
     console.log('props.navigations: ', props.navigations);

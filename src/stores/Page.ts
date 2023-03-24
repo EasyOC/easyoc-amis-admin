@@ -1,12 +1,7 @@
-import {types, getEnv} from 'mobx-state-tree';
+import { NavItem } from '@/types/src/NavItem';
+import { types, getEnv } from 'mobx-state-tree';
 export const PageStore = types
-  .model('Page', {
-    id: types.identifier,
-    icon: '',
-    path: '',
-    label: '',
-    schema: types.frozen({})
-  })
+  .model<NavItem>('Page')
   .views(self => ({}))
   .actions(self => {
     function updateSchema(schema: any) {

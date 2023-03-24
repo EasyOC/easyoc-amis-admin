@@ -1,6 +1,6 @@
 
 import { ContentTypeEnum } from "@/utils/http"
-import { wrapedResultRequest } from "../requests"
+import defaultRequest from "../requests/defaultRequest"
 
 export const GraphqlServiceAPI = '/api/graphql'
 export type GraphQLQueryParams = {
@@ -9,7 +9,7 @@ export type GraphQLQueryParams = {
   variables?: LuceneCommonQueryParams
 }
 export const excuteGraphqlQuery = async (query: GraphQLQueryParams) => {
-  const result = await wrapedResultRequest.request({
+  const result = await defaultRequest.request({
     url: GraphqlServiceAPI,
     method: 'POST',
     data: query
@@ -21,7 +21,7 @@ export const excuteGraphqlQuery = async (query: GraphQLQueryParams) => {
 }
 
 export const excuteGraphqlGetQuery = async (params: { query: string }) => {
-  const result = await wrapedResultRequest.request({
+  const result = await defaultRequest.request({
     url: GraphqlServiceAPI,
     method: 'GET',
     params: params,

@@ -1,8 +1,5 @@
 import React from 'react';
 import * as aliIcons from '@ant-design/icons'
-import * as allCustomIcons from '@/components/icons/customIcons'
-import { has } from 'lodash';
-import { EocMenuDataItem } from '@/types/src/SiteGlobalSettings';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import { treeMap } from './tree';
 // FIX从接口获取菜单时icon为string类型
@@ -21,9 +18,7 @@ export const fixMenuItemIcon = (menus: EocMenuDataItem[], iconType = 'Outlined')
             //     return
             // }
             const fixIconName = icon.slice(0, 1).toLocaleUpperCase() + icon.slice(1) + iconType;
-            if (has(allCustomIcons, icon)) {
-                item.icon = React.createElement(allCustomIcons[icon])
-            }
+
             const iconNode = aliIcons[fixIconName] || aliIcons[icon];
             if (iconNode) {
                 item.icon = React.createElement(aliIcons[fixIconName] || aliIcons[icon]);

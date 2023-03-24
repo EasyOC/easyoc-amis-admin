@@ -254,15 +254,8 @@ const loadMenus = async () => {
 };
 
 // @ts-ignore
- 
-@inject('store')(
-  observer(
-    (props) => {
-      
-    }
-  )
-)
 
+@inject('store')(observer(props => {}))
 export default class extends React.PureComponent<
   {
     history: History;
@@ -325,9 +318,10 @@ export default class extends React.PureComponent<
         () => window.scrollTo(0, 0)
       );
 
-      const loadMenus => async () => {
-        await this.loadMenus()
-      }
+      const loadMenusAsyc = async () => {
+        await loadMenus();
+      };
+      loadMenusAsyc();
 
       _hmt && _hmt.push(['_trackPageview', props.location.pathname]);
     }

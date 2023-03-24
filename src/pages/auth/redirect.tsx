@@ -1,24 +1,29 @@
-import { getUserInfo } from '@/services/auth';
+import {getUserInfo} from '@/services/auth';
 import authService from '@/services/auth/authService';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { toast } from 'amis-ui';
-import { Modal } from 'antd';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
+import {PageLoading} from '@ant-design/pro-components';
+import {toast} from 'amis-ui';
 
-import { History } from 'history';
-import { translate } from 'i18n-runtime';
-import { observer } from 'mobx-react';
+import {History} from 'history';
+import {translate} from 'i18n-runtime';
+import {observer} from 'mobx-react';
 import React from 'react';
-import { useEffect, useState } from 'react';
-  
+import {useEffect, useState} from 'react';
+import UserStore from '@/stores/userStore';
+import {IMainStore} from '@/stores';
+import confirm from 'antd/es/modal/confirm';
 
-const LoginCallBack: React.FC<{ history: History }> = (props) => {
-  const { history}=props
-  const [state, setState] = useState({ mounted: false, loginTimeOut: false });
-  const redirect = localStorage.getItem('returnUrl');
+const LoginCallBack: React.FC<{
+  history: History;
+  store: IMainStore;
+}> = props => {
+  const {history} = props;
+  const [state, setState] = useState({mounted: false, loginTimeOut: false});
+  const returnUrl = localStorage.getItem('returnUrl');
+
   useEffect(() => {
-    (async () => {
+    const completeLogin = async () => {
       const isLoggedIn = await authService.isLoggedIn();
-      const returnUrl = localStorage.getItem('returnUrl');
       if (isLoggedIn) {
         localStorage.removeItem('returnUrl');
         history.push(returnUrl || '/');
@@ -30,38 +35,46 @@ const LoginCallBack: React.FC<{ history: History }> = (props) => {
         const userInfo = await getUserInfo(user);
         console.log('userInfo: ', userInfo);
         if (userInfo) {
+          // UserStore.updateUser(userInfo); // 更新当前用户信息
+          // if (props.store.pages.length == 0) {
+          //   props.store.initPages();
+          // }
           console.log('monitor: after login fetchServerSideSettings');
-          
-          toast.success(
-            translate('pages.login.success'),
-          );
-          //;
+          toast.success(translate('pages.login.success'));
           localStorage.removeItem('returnUrl');
           history.push(returnUrl || '/');
         }
       } catch (error) {
         console.log('登录失败：error: ', error);
-        setState({ ...state, loginTimeOut: true });
-        Modal.confirm({
+        setState({...state, loginTimeOut: true});
+
+        confirm({
           title: 'Confirm',
           icon: <ExclamationCircleOutlined />,
-          content: translate('pages.login.loginFaild') ,
+          content: translate('pages.login.loginFaild'),
           okText: 'Retry',
           onOk: () => {
             history.push('/');
-          },
+          }
         });
       }
-    })();
-  }, [  redirect,  state]);
+    };
+    completeLogin();
+  }, [state]);
 
   const RenderText = () => {
     if (!state.loginTimeOut) {
-      return <div>Logging in, please wait...</div>;
+      return (
+        <div>
+          <PageLoading>
+            <div>Logging in, please wait...</div>
+          </PageLoading>
+        </div>
+      );
     } else {
       return (
         <div>
-          Login timeout, click<a href={redirect || '/'}>retry</a>。。。
+          Login timeout, click<a href={returnUrl || '/'}>retry</a>。。。
         </div>
       );
     }

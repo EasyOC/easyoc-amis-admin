@@ -1,29 +1,22 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {ToastComponent, AlertComponent, Spinner} from 'amis';
 import {Route, Switch, BrowserRouter as Router} from 'react-router-dom';
 import {observer} from 'mobx-react';
 import {IMainStore} from '../stores';
-import {History, Location} from 'history';
+import Permission from './Permissions';
+import AutoLayout from '@/Layout/SchemaLayout';
 import {schema2component} from '@/components/AMISRenderer';
-// import AutoLayout from '@/Layout/SchemaLayout';
-// import {set} from 'lodash';
+import {set} from 'lodash';
 // const mainLayout = React.lazy(() => import('@/Layout/Index'));
 // const mainLayout = React.lazy(() => import('@/App1'));
 const Editor = React.lazy(() => import('../pages/editor/editor'));
 // import '@/Layout/styles/autolayout.less';
 
-export default observer(function ({
-  store,
-  history,
-  localtion
-}: {
-  store: IMainStore;
-  history?: History;
-  localtion?: Location;
-}) {
+export default observer(function (props: {store: IMainStore}) {
   // const appSchema = AutoLayout;
-  // set(appSchema, 'pages', store.pages);
+  // set(appSchema, 'pages', props.store.pages);
   // const amisInstance = schema2component(appSchema);
+
   return (
     <Router>
       <div className="routes-wrapper">
@@ -33,7 +26,7 @@ export default observer(function ({
           fallback={<Spinner overlay className="m-t-lg" size="lg" />}
         >
           <Switch>
-            <Route path="/editor" component={Editor} />
+            {/* 不需要授权的页面 */}
             <Route
               path="/auth/login"
               component={React.lazy(() => import('../pages/auth/login'))}
@@ -48,10 +41,14 @@ export default observer(function ({
                 () => import('../pages/auth/logout_redirect')
               )}
             />
-            <Route
-              component={React.lazy(() => import('@/Layout/CustomLayout'))}
-            />
-            {/* <Route component={amisInstance} /> */}
+            {/* 需要授权的页面 */}
+            <Route component={Permission}>
+              <Route path="/editor" component={Editor} />
+              <Route
+                component={React.lazy(() => import('@/Layout/CustomLayout'))}
+              />
+              {/* <Route component={amisInstance} /> */}
+            </Route>
           </Switch>
         </React.Suspense>
       </div>

@@ -1,35 +1,27 @@
+import { action, decorate, observable } from 'mobx';
 import axios from 'axios';
-import { makeAutoObservable, runInAction } from 'mobx';
-
+import authService from '../services/auth/authService';
+import { CurrentUser } from '../types/src/CurrentUser';
+import { merge } from 'lodash';
+/**
+ * 管理当前用户状态
+*/
 class UserStore {
-  currentUser = null;
-
+  userInfo: CurrentUser
   constructor() {
-    makeAutoObservable(this);
+    this.userInfo = new CurrentUser()
   }
 
-  async login(username: string, password: string) {
-    const { data } = await axios.post('/api/login', { username, password });
-    runInAction(() => {
-      this.currentUser = data;
-    });
-  }
-
-  async logout() {
-    await axios.post('/api/logout');
-    runInAction(() => {
-      this.currentUser = null;
-    });
-  }
-
-  async fetchCurrentUser() {
-    const { data } = await axios.get('/api/current_user');
-    runInAction(() => {
-      this.currentUser = data;
-    });
+  //更新用户
+  updateUser(userProps: Partial<CurrentUser>) {
+    merge(this.userInfo, userProps)
   }
 }
 
-const userStore = new UserStore();
+decorate(UserStore, {
+  userInfo: observable,
+  updateUser: action
+});
 
-export default userStore;
+export default new UserStore();
+

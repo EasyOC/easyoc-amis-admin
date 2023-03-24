@@ -8,11 +8,10 @@ if (typeof process != 'undefined') {
 }
 
 const AppSettings = {
+    API_BASE_URL: runtime.VITE_apiRoot + runtime.VITE_serverApiPrefix as string,
     CLIENT_ROOT: runtime.VITE_clientRoot as string,
     CLIENT_ID: runtime.VITE_clientId as string,
-    API_BASE_URL: runtime.VITE_apiRoot as string,
-    PUBLIC_PATH: runtime.VITE_publicPathPrefix as string
+    PUBLIC_PATH: runtime.VITE_publicPathPrefix as string,
+    LOGIN_URL: "/auth/login" as string
 }
-
-
 export default AppSettings

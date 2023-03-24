@@ -9,7 +9,7 @@
   "editor.fontFamily": "Fira Code Semibold,Consolas, 'Courier New', monospace",
   "scm.inputFontFamily": "Fira Code Semibold,default",
   "editor.formatOnType": true,
-  "editor.fontWeight": "500",
+  "editor.fontWeight": "80",
   "[xml]": {
     "editor.defaultFormatter": "redhat.vscode-xml"
   },

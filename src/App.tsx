@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Provider} from 'mobx-react';
 import {MainStore} from './stores/index';
 import RootRoute from './route/index';

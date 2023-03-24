@@ -9,7 +9,7 @@
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
@@ -30,5 +30,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./**/*.d.ts", "./src/*.ts", "./**/*.tsx"]
+  "include": ["./**/*.d.ts", "./src/*.ts", "./**/*.tsx"],
+  "exclude": ["./src/amislib/polyfills/*"]
 }
