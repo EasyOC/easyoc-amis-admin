@@ -13,7 +13,7 @@ export default (props: {
   useEffect(() => {
     const init = async () => {
       if (await checkLogin(props.history)) {
-        props.stroe.initPages();
+        props.stroe.fetchPages();
       }
     };
     init();

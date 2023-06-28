@@ -7,7 +7,41 @@ import { excuteGraphqlQuery } from "../graphql/graphqlApi";
 const GET_MENUS = gql`
  query {
     userMenus {
-      items {
+        contentItemId
+        createdUtc
+        hideInMenu
+        icon
+        locale
+        menuType
+        name
+        orderIndex
+        otherConfig
+        path
+        redirect
+        parent {
+          firstValue
+        }
+        target
+        enUS
+        zhCN
+        schemaConfig: schemaId {
+          schemaDetails: firstContentItem {
+            ... on AmisSchema {
+              name,
+              schema
+            }
+          }
+        }
+      }
+  }           
+`
+
+
+export const loadMenus = async (): Promise<NavItem[]> => {
+
+  const { userMenus } = await excuteGraphqlQuery({
+    query: `query {
+      userMenus {
         contentItemId
         createdUtc
         hideInMenu
@@ -35,15 +69,7 @@ const GET_MENUS = gql`
           schemaId: firstValue
         }
       }
-    }
-  }           
-`
-
-
-export const loadMenus = async (): Promise<NavItem[]> => {
-
-  const { userMenus } = await excuteGraphqlQuery({
-    query: GET_MENUS
+    }`
   })
   // const { data: menuList } = useQuery(GET_MENUS)
   console.log('menuList: ', userMenus);

@@ -1,5 +1,7 @@
 import authService from '@/services/auth/authService';
 import {History} from 'history';
+import {observable} from 'mobx';
+import {observer} from 'mobx-react';
 import React from 'react';
 import {useEffect, useState} from 'react';
 
@@ -36,4 +38,4 @@ const LoutCallBack: React.FC<{history: History}> = props => {
   return <div>Signing out... </div>;
 };
 
-export default LoutCallBack;
+export default observer(LoutCallBack);

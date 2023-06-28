@@ -1,10 +1,10 @@
 import authService from '@/services/auth/authService';
+import {IMainStore} from '@/stores';
 import {LoginForm, LoginFormPage} from '@ant-design/pro-components';
+import {inject, observer} from 'mobx-react';
 import React from 'react';
-import {useEffect} from 'react';
 
-const GoLogin: React.FC = props => {
-  console.log('login props', props);
+function Lgoin() {
   const goLogin = async () => {
     await authService.goLogin('/');
   };
@@ -19,5 +19,5 @@ const GoLogin: React.FC = props => {
       </LoginForm>
     </div>
   );
-};
-export default GoLogin;
+}
+export default Lgoin;

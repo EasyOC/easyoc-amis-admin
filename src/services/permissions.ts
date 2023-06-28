@@ -1,4 +1,3 @@
-import { toast } from "amis";
 import { History } from "history"
 import AppSettings from "./appSettings";
 import authService from "./auth/authService"

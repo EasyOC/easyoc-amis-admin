@@ -30,6 +30,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./**/*.d.ts", "./src/*.ts", "./**/*.tsx"],
-  "exclude": ["./src/amislib/polyfills/*"]
+  "include": ["./**/*.d.ts", "./src/*.ts", "./**/*.tsx"]
+  // "exclude": ["./src/amislib/polyfills/*"]
 }

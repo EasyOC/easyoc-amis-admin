@@ -25,9 +25,8 @@ import {
 import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
 import AppSettings from '@/services/appSettings';
-import Components from './Components';
+import Navigations2routeComponents from './Components/Navigations2routeComponents';
 import {translate} from 'i18n-runtime';
-import {schema2component} from '@/components/AMISRenderer';
 const _hmt: any = [];
 
 let ContextPath = AppSettings.PUBLIC_PATH;
@@ -593,7 +592,7 @@ export default class extends React.PureComponent<
           <Route
             path={`${ContextPath}`}
             render={(props: any) => (
-              <Components
+              <Navigations2routeComponents
                 {...{
                   setNavigations: this.setNavigations,
                   navigations: this.state.navigations,
