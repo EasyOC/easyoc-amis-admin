@@ -41,8 +41,9 @@ export function embed(
     container = document.querySelector(container) as HTMLElement;
   }
   if (!container) {
-    console.error(__('Embed.invalidRoot'));
-    return;
+    const error = __('Embed.invalidRoot');
+    console.error(error);
+    throw error;
   } else if (container.tagName === 'BODY') {
     let div = document.createElement('div');
     container.appendChild(div);
