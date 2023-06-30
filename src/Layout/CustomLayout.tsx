@@ -53,28 +53,21 @@ export default class Admin extends React.Component<AdminProps, any> {
   logout = () => {
     const store = this.props.store;
     store.logout();
-    const history = this.props.history;
-    history.replace(`/auth/login`);
   };
 
   async componentDidMount() {
     const store = this.props.store;
-    const history = this.props.history;
-    this.setState({...this.state, navigations: store.pages});
     console.log('componentDidMount, store.user:', store.userStore.user);
-    if (!(await store.userStore.isAuthenticated())) {
-      toast['error']('用户未登陆，请先登陆！', '消息');
-      history.replace(`/auth/login`);
-    }
-    this.refreshMenu();
+    // this.refreshMenu();
+    store.fetchPages();
   }
 
   async componentDidUpdate() {
     const store = this.props.store;
     let pathname = this.props.location.pathname;
+    this.setState({...this.state, navigations: store.pages});
     console.log('location:', pathname);
     console.log('store.user:', store.userStore.user);
-    const isAuthenticated = await store.userStore.isAuthenticated();
     // await this.refreshMenu();
   }
 
@@ -239,9 +232,11 @@ export default class Admin extends React.Component<AdminProps, any> {
       />
     );
   }
-  RenderSchema = () => {
+
+  renderSchema() {
     let pathKey = location?.pathname as string;
     const store = this.props.store;
+    console.log('store.pages: ', store.pages);
     if (store.pages && store.pages.length > 0) {
       const menuConfig = treeFind(
         store.pages,
@@ -261,18 +256,22 @@ export default class Admin extends React.Component<AdminProps, any> {
       }
     }
     return <Redirect to={`/404`} />;
-  };
+  }
+
   render() {
     const store = this.props.store;
     let pathname = this.props.location.pathname;
-    console.log('location:', pathname);
-    if (pathname == 'auth/login' || pathname == '/') {
-      return (
-        <Switch>
-          <Redirect to={`/404`} />
-        </Switch>
-      );
-    } else {
+    // if (
+    //   (! && pathname == 'auth/login') ||
+    //   pathname == '/'
+    // ) {
+    //   return (
+    //     <Switch>
+    //       <Redirect to={`/404`} />
+    //     </Switch>
+    //   );
+    // }
+    {
       return (
         <Layout
           aside={this.renderAside()}
@@ -281,8 +280,8 @@ export default class Admin extends React.Component<AdminProps, any> {
           offScreen={store.offScreen}
         >
           <Switch>
-            {this.RenderSchema()}
-            <Redirect to={`/404`} />
+            {this.renderSchema()}
+            {/* <Redirect to={`/404`} /> */}
           </Switch>
         </Layout>
       );

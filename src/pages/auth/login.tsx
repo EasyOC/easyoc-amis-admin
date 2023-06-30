@@ -4,7 +4,9 @@ import {LoginForm, LoginFormPage} from '@ant-design/pro-components';
 import {inject, observer} from 'mobx-react';
 import React from 'react';
 
-function Lgoin() {
+function Login({store}) {
+  console.log('store: ', store);
+
   const goLogin = async () => {
     await authService.goLogin('/');
   };
@@ -20,4 +22,4 @@ function Lgoin() {
     </div>
   );
 }
-export default Lgoin;
+export default inject('store')(observer(Login));

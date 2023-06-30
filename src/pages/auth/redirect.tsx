@@ -4,21 +4,20 @@ import {PageLoading} from '@ant-design/pro-components';
 import {toast} from 'amis-ui';
 
 import {History} from 'history';
-import {translate} from 'i18n-runtime';
 import {inject, observer} from 'mobx-react';
 import React from 'react';
 import {useEffect, useState} from 'react';
 import {IMainStore} from '@/stores';
 import confirm from 'antd/es/modal/confirm';
+import _t from '@/services/amis/translate';
+import {useHistory} from 'react-router-dom';
 
 const LoginCallBack: React.FC<{
-  history: History;
   store: IMainStore;
 }> = props => {
-  const {history} = props;
+  const {history} = useHistory();
   const [state, setState] = useState({mounted: false, loginTimeOut: false});
   const returnUrl = localStorage.getItem('returnUrl');
-  debugger;
   useEffect(() => {
     if (state.mounted) {
       return;
@@ -34,18 +33,14 @@ const LoginCallBack: React.FC<{
       }
       await authService.completeLogin();
       try {
-        console.log('props: ', props);
-        debugger;
         const userInfo = await props.store.userStore.fetchUserInfo();
-        console.log('res: ', userInfo);
-        console.log('userInfo: ', userInfo);
         if (userInfo) {
           // UserStore.updateUser(userInfo); // 更新当前用户信息
           // if (props.store.pages.length == 0) {
           //   props.store.initPages();
           // }
           console.log('monitor: after login fetchServerSideSettings');
-          toast.success(translate('pages.login.success'));
+          toast.success(_t('pages.login.success'));
           localStorage.removeItem('returnUrl');
           history.push(returnUrl || '/');
         }
@@ -55,7 +50,7 @@ const LoginCallBack: React.FC<{
         confirm({
           title: 'Confirm',
           icon: <ExclamationCircleOutlined />,
-          content: translate('pages.login.loginFaild'),
+          content: _t('pages.login.loginFaild'),
           okText: 'Retry',
           onOk: () => {
             history.push('/');
@@ -87,4 +82,4 @@ const LoginCallBack: React.FC<{
   return <div>{RenderText()}</div>;
 };
 // export default LoginCallBack;
-export default inject('MainStore')(observer(LoginCallBack));
+export default inject('store')(observer(LoginCallBack));

@@ -54,7 +54,7 @@ if ('document' in self) {
           this.code = DOMException[type];
           this.message = message;
         },
-        checkTokenAndGetIndex = function (classList, token) {
+        checkTokenAndGetIndex = function (classList, token = '') {
           if (token === '') {
             throw new DOMEx('SYNTAX_ERR', 'The token must not be empty.');
           }

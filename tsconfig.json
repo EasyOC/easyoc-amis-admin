@@ -21,15 +21,22 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
+    "downlevelIteration": true,
     "strictNullChecks": false,
+    // "composite": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "typeRoots": ["./node_modules/@types", "./typings"],
+    // "typeRoots": ["./node_modules/@types", "./typings"],
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["./**/*.d.ts", "./src/*.ts", "./**/*.tsx"]
+  "include": [
+    "./**/*.d.ts",
+    "./src/*.ts",
+    "./**/*.tsx",
+    "./src/amislib/polyfills/class.js"
+  ]
   // "exclude": ["./src/amislib/polyfills/*"]
 }

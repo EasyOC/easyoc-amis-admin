@@ -26,7 +26,7 @@ import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
 import AppSettings from '@/services/appSettings';
 import Navigations2routeComponents from './Components/Navigations2routeComponents';
-import {translate} from 'i18n-runtime';
+import _t from '@/services/amis/translate';
 const _hmt: any = [];
 
 let ContextPath = AppSettings.PUBLIC_PATH;
@@ -454,7 +454,7 @@ export default class extends React.PureComponent<
         <SearchBox
           className="m-b m-r-md justify-center"
           style={{paddingLeft: '20px'}}
-          placeholder={translate('搜索菜单')}
+          placeholder={_t('搜索菜单')}
           value={this.state.filter}
           onSearch={this.setNavigationFilter}
           onChange={this.setNavigationFilter}
