@@ -5,6 +5,7 @@ import {useEffect} from 'react';
 
 const GoLogin: React.FC = props => {
   console.log('login props', props);
+  
   const goLogin = async () => {
     await authService.goLogin('/');
   };
