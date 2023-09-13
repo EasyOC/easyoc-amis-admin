@@ -2,6 +2,7 @@ import {checkLogin} from '@/services/permissions';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import React, {useEffect} from 'react';
+import {History} from 'history';
 import {useHistory} from 'react-router-dom';
 
 //定义一个 react函数式组件，它可以包含其它组件//导出默认的组件
