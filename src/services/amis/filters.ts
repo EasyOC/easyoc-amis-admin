@@ -7,9 +7,9 @@ registerFilter('apiUrl', (input: string) => {
     return apiUrl(input)
 });
 registerFilter('absUrl', (input: string) => {
-    return buildUrl(AppSettings.CLIENT_ROOT, input)
+    return buildUrl(AppSettings.clientRoot, input)
 });
-registerFilter('toApiUrl', (input: string) => buildUrl(AppSettings.API_BASE_URL, input));
+registerFilter('toApiUrl', (input: string) => buildUrl(AppSettings.apiBaseUrl, input));
 
 registerFilter('deepMerge', (input: any, src: any) => (deepMerge(input, src)));
 

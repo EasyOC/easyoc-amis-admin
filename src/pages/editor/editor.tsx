@@ -23,7 +23,6 @@ import {Icon} from '@/icons/index';
 import {FullScreen, useFullScreenHandle} from 'react-full-screen';
 import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
 import {gql, useQuery} from '@apollo/client';
-import GenFromType from './Gencurd/GenFromType';
 import {CloudUploadOutlined, DownOutlined} from '@ant-design/icons';
 import {Switch, DatePicker as AMISDatePicker} from 'amis';
 import {isEqual, unset} from 'lodash';
@@ -33,6 +32,7 @@ import dayjs from 'dayjs';
 import {History} from 'history';
 import {currentLocale} from 'i18n-runtime';
 import AppSettings from '@/services/appSettings';
+import {IMainStore} from '@/stores';
 // import 'amis/schema.json';
 //禁用部分组件
 // import './components/DisabledEditorPlugin';
@@ -45,7 +45,7 @@ import AppSettings from '@/services/appSettings';
 //#endregion
 
 const schemaUrl =
-  mustEndsWith(AppSettings.PUBLIC_PATH as string, '/') + 'amis/schema.json';
+  mustEndsWith(AppSettings.publicPath as string, '/') + 'amis/schema.json';
 // @ts-ignore
 // __uri?.('amis/schema.json');
 console.log('schemaUrl: ', schemaUrl);
@@ -56,7 +56,7 @@ console.log('schemaUrl: ', schemaUrl);
 // @ts-ignore
 // __uri('amis/schema.json');
 
-const AmisEditor: React.FC<{history: History}> = props => {
+const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
   const curLanguage = currentLocale(); // 获取当前语料类型
 
   const [form] = Form.useForm();
@@ -396,7 +396,7 @@ const AmisEditor: React.FC<{history: History}> = props => {
           }}
           open={state.showGenModal}
         >
-          <GenFromType setSchemaHandle={handleGen} />
+          {/* <GenFromType setSchemaHandle={handleGen} /> */}
         </Modal>
         <div className="Editor-header">
           <div className="Editor-back">

@@ -5,7 +5,7 @@ import { toast } from 'amis'
 import { processResponseMessage } from './processResponseMessage'
 //创建一个 axios 对象
 const defaultRequest = axios.create({
-    baseURL: AppSettings.API_BASE_URL,
+    baseURL: AppSettings.apiBaseUrl,
     timeout: 5000//5秒超时
 });
 
@@ -17,7 +17,7 @@ defaultRequest.interceptors.request.use(async config => {
     if (config.withCredentials !== false) {
         if (!await authService.isLoggedIn()) {
             //@ts-ignore
-            window.location = AppSettings.LOGIN_URL;
+            window.location = AppSettings.loginPage;
         }
         const token = await authService.getAccessToken()
         // jwt token

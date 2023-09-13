@@ -1,22 +1,25 @@
 /* eslint-disable */
-import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import { UserManager, UserManagerSettingsStore, WebStorageStateStore } from 'oidc-client-ts';
 import AppSettings from '../appSettings';
+import { routerPathName } from '@/utils/urlHelper';
 
 
 export const initUserManager = () => {
-  var client = new UserManager({
-    userStore: new WebStorageStateStore({ prefix: `oidc_${AppSettings.CLIENT_ID}_` }),
-    authority: AppSettings.API_BASE_URL,
-    client_id: AppSettings.CLIENT_ID,
-    redirect_uri: AppSettings.CLIENT_ROOT + '/auth/redirect',
-    post_logout_redirect_uri: AppSettings.CLIENT_ROOT + '/auth/logout_redirect',
+  const config = {
+    userStore: new WebStorageStateStore({ prefix: `oidc_${AppSettings.clientId}_` }),
+    authority: AppSettings.apiBaseUrl,
+    client_id: AppSettings.clientId,
+    redirect_uri: AppSettings.clientRoot + '/auth/redirect',
+    post_logout_redirect_uri: AppSettings.clientRoot + '/auth/logout_redirect',
     scope: "openid profile email roles offline_access",
     filterProtocolClaims: true,
     loadUserInfo: true,
     automaticSilentRenew: true,
     response_type: 'code',
-  })
+  } as UserManagerSettingsStore
+  console.log('config: ', config);
 
+  var client = new UserManager({ ...config })
   client.events.addUserSignedIn(async function () {
     console.log('UserSignedIn :', arguments);
   })
@@ -62,14 +65,9 @@ let oidcClient: UserManager
 oidcClient = initUserManager()
 
 
-
 let authService = {
   get client() {
     return oidcClient;
-  },
-
-  async storeUser(user: any) {
-    oidcClient.storeUser(user)
   },
   async goLogin(redirect: string = '') {
     oidcClient.removeUser();
@@ -89,9 +87,9 @@ let authService = {
   }
   ,
   async completeLogin() {
-    console.log('user: ');
+    console.log('completeLogin user ');
     const user = await oidcClient.signinRedirectCallback(); // Returns promise to process response from the authorization endpoint. The result of the promise is the authenticated User
-    console.log('user: ', user);
+    console.log('completeLogin user: ', user);
     await oidcClient.storeUser(user);
     console.log('completeLogin', user)
     return user;

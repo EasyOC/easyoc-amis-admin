@@ -13,8 +13,8 @@ export const apiUrl = (path: string) => {
 export const routerPathName = () => {
 
     let pathname = window.location.pathname
-    if (AppSettings.PUBLIC_PATH != '/' && pathname.toLowerCase().startsWith(AppSettings.PUBLIC_PATH)) {
-        return pathname.slice(AppSettings.PUBLIC_PATH.length - 1)
+    if (AppSettings.publicPath != '/' && pathname.toLowerCase().startsWith(AppSettings.publicPath)) {
+        return pathname.slice(AppSettings.publicPath.length - 1)
     } else {
         return pathname;
     }
@@ -26,5 +26,5 @@ export const localPath = (pathname: string) => {
     if (pathname.startsWith("http")) {
         return pathname;
     }
-    return mustNotEndsWith(AppSettings.PUBLIC_PATH, '/') + mustStartsWith(pathname, '/')
+    return mustNotEndsWith(AppSettings.publicPath, '/') + mustStartsWith(pathname, '/')
 }

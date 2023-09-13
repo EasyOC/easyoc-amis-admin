@@ -4,10 +4,11 @@ import { NavItem } from "../../types";
 import { excuteGraphqlQuery } from "../graphql/graphqlApi";
 
 
-const GET_MENUS = gql`
- query {
-    userMenus {
-      items {
+export const loadMenus = async (): Promise<NavItem[]> => {
+
+  const { userMenus } = await excuteGraphqlQuery({
+    query: `query {
+      userMenus {
         contentItemId
         createdUtc
         hideInMenu
@@ -35,20 +36,13 @@ const GET_MENUS = gql`
           schemaId: firstValue
         }
       }
-    }
-  }           
-`
-
-
-export const loadMenus = async (): Promise<NavItem[]> => {
-
-  const { userMenus } = await excuteGraphqlQuery({
-    query: GET_MENUS
+    }`
   })
   // const { data: menuList } = useQuery(GET_MENUS)
   console.log('menuList: ', userMenus);
-  if (userMenus?.items) {
-    return convert2NavItem(userMenus?.items)
+  if (userMenus) {
+    debugger
+    return convert2NavItem(userMenus)
   } else {
     return []
   }
@@ -56,6 +50,7 @@ export const loadMenus = async (): Promise<NavItem[]> => {
 
 
 const convert2NavItem = (menuData): NavItem[] => {
+  debugger
   var navItems: NavItem[] = []
   const curLanguage = currentLocale(); // 获取当前语料类型
 

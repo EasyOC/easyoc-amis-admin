@@ -1,9 +1,8 @@
-import { toast } from "amis";
 import { History } from "history"
 import AppSettings from "./appSettings";
 import authService from "./auth/authService"
 import queryString from "qs";
-const loginPage = AppSettings.LOGIN_URL || '/user/login';
+const loginPage = AppSettings.loginPage || '/user/login';
 
 export const WITHELIST = [
     loginPage,

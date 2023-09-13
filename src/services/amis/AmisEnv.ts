@@ -9,83 +9,12 @@ import authService from '../auth/authService';
 //自定义过滤器
 import './filters'
 import { unset } from 'lodash';
-import AppSettings from '../appsettings';
+import AppSettings from '../appSettings';
 
 const amisRequest = axios.create({
-    baseURL: AppSettings.API_BASE_URL,
+    baseURL: AppSettings.apiBaseUrl,
     timeout: 10 * 1000,
 })
-// //@ts-ignore
-// export const amisAxios = async (api: any) => {
-//     if (api === false) {
-//         return await Promise.resolve()
-//     }
-//     console.log('amisAxios api: ', api);
-//     const {
-//         url, // 接口地址
-//         method, // 请求方法 get、post、put、delete
-//         responseType,
-//         headers,
-//         // 其他配置
-//     } = api
-//     let data = api.data // 请求数据
-//     const config = api.config || {}
-
-//     config.withCredentials = false;
-//     responseType && (config.responseType = responseType);
-
-//     if (config.cancelExecutor) {
-//         config.cancelToken = new axios.CancelToken(
-//             config.cancelExecutor
-//         );
-//     }
-//     config.headers = headers || {};
-//     if (!config.ignoreToken) {
-//         const token = await authService.getAccessToken()
-//         if (token) {
-//             if (!config.headers) {
-//                 config.headers = {}
-//             }
-//             // jwt token
-//             config.headers.Authorization = 'Bearer ' + token
-//         }
-//     }
-//     if (config.headers.authorization) {
-
-//         config.headers.Authorization = config.headers.authorization
-//         unset(config.headers, "authorization")
-//     }
-
-//     if (method !== 'post' && method !== 'put' && method !== 'patch') {
-
-//         if (data) {
-//             config.params = data;
-//         }
-//         const postResult = await (amisRequest as any)[method](url, config);
-//         console.log('amis env postResult.data :', postResult.data);
-//         return postResult.data
-//     } else if (data && data instanceof FormData) {
-
-//         config.headers = config.headers || {};
-//         config.headers['Content-Type'] = 'multipart/form-data';
-//     } else if (
-//         data &&
-//         typeof data !== 'string' &&
-//         !(data instanceof Blob) &&
-//         !(data instanceof ArrayBuffer)
-//     ) {
-
-//         data = JSON.stringify(data);
-//         config.headers = config.headers || {};
-//         config.headers['Content-Type'] = 'application/json';
-//     }
-
-//     const result = await (amisRequest as any)[method](url, data, config);
-//     console.log('amis env result.data: ', result.data);
-
-//     return result.data
-// }
-
 
 const AmisEnv = {
     theme: 'cxd',

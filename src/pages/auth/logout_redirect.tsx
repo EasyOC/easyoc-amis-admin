@@ -1,11 +1,16 @@
 import authService from '@/services/auth/authService';
+import {IMainStore} from '@/stores';
 import {History} from 'history';
+import {inject, observer} from 'mobx-react';
 import React from 'react';
 import {useEffect, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 
-const LoutCallBack: React.FC<{history: History}> = props => {
+function LoutCallBack(props: {store: IMainStore}) {
+  console.log('props: ', props);
+
   const [state, setState] = useState({mounted: false});
-  const {history} = props;
+  const history: History = useHistory();
 
   useEffect(() => {
     if (!state.mounted) {
@@ -13,11 +18,11 @@ const LoutCallBack: React.FC<{history: History}> = props => {
       const completeLogout = async () => {
         await authService.completeLogout();
 
-        const {search, pathname} = location;
+        const {pathname} = location;
         // const urlParams = queryString.parse(search);
         /** 此方法会跳转到 redirect 参数所在的位置 */
         // const redirect = urlParams.redirect;
-        const loginPage = '/user/login';
+        const loginPage = '/auth/login';
         // Note: There may be security issues, please note
         // if (pathname !== loginPage && !redirect) {
         if (pathname !== loginPage) {
@@ -34,6 +39,6 @@ const LoutCallBack: React.FC<{history: History}> = props => {
   }, [history, state.mounted]);
 
   return <div>Signing out... </div>;
-};
+}
 
-export default LoutCallBack;
+export default inject('store')(observer(LoutCallBack));
