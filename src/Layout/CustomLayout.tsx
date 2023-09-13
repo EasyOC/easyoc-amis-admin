@@ -13,6 +13,11 @@ import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import {toast} from 'amis';
 import {UserOutlined} from '@ant-design/icons';
+import axios from 'axios';
+import AppSettings from '@/services/appSettings';
+import {loadMenus} from '@/services/amis/menus';
+import {treeFind} from '@/utils';
+import {schema2component} from '@/components/AMISRenderer';
 
 type NavItem = {
   label: string;
@@ -41,53 +46,47 @@ export interface AdminProps extends RouteComponentProps<any> {
 @observer
 export default class Admin extends React.Component<AdminProps, any> {
   state = {
-    pathname: '',
     hasLoadMenu: false,
     navigations: []
   };
 
   logout = () => {
     const store = this.props.store;
-    store.user.logout();
-    const history = this.props.history;
-    history.replace(`/login`);
+    store.logout();
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const store = this.props.store;
-    const history = this.props.history;
-    console.log('componentDidMount, store.user:', store.user);
-    if (!store.user.isAuthenticated) {
-      toast['error']('用户未登陆，请先登陆！', '消息');
-      history.replace(`/login`);
-    }
-    this.refreshMenu();
+    console.log('componentDidMount, store.user:', store.userStore.user);
+    // this.refreshMenu();
+    store.fetchPages();
   }
 
-  componentDidUpdate() {
-    this.refreshMenu();
+  async componentDidUpdate() {
+    const store = this.props.store;
+    let pathname = this.props.location.pathname;
+    this.setState({...this.state, navigations: store.pages});
+    console.log('location:', pathname);
+    console.log('store.user:', store.userStore.user);
+    // await this.refreshMenu();
   }
 
-  refreshMenu = () => {
+  refreshMenu = async () => {
     const store = this.props.store;
     let pathname = this.props.location.pathname;
     console.log('location:', pathname);
-    console.log('store.user:', store.user);
+    console.log('store.user:', store.userStore.user);
+    const isAuthenticated = await store.userStore.isAuthenticated();
     if (
       pathname != 'login' &&
       pathname != '/' &&
       !this.state.hasLoadMenu &&
-      store.user.isAuthenticated
+      isAuthenticated
     ) {
-      request({
-        method: 'get',
-        url: '/api/menus'
-      }).then((res: any) => {
-        console.log('res:', res);
-        this.setState({
-          navigations: res.data.data,
-          hasLoadMenu: true
-        });
+      store.fetchPages();
+      this.setState({
+        navigations: store.pages,
+        hasLoadMenu: true
       });
     }
   };
@@ -234,18 +233,45 @@ export default class Admin extends React.Component<AdminProps, any> {
     );
   }
 
+  renderSchema() {
+    let pathKey = location?.pathname as string;
+    const store = this.props.store;
+    console.log('store.pages: ', store.pages);
+    if (store.pages && store.pages.length > 0) {
+      const menuConfig = treeFind(
+        store.pages,
+        node => node.fullPath == pathKey
+      );
+      if (menuConfig) {
+        const schemaInfo = menuConfig.schemaConfig?.schemaDetails;
+        if (schemaInfo?.schemaStr) {
+          const schema = JSON.parse(schemaInfo.schemaStr);
+          try {
+            return schema2component(schema);
+          } catch (error) {
+            console.error('页面加载失败', menuConfig, error);
+            return <Redirect to={`/404`} />;
+          }
+        }
+      }
+    }
+    return <Redirect to={`/404`} />;
+  }
+
   render() {
     const store = this.props.store;
     let pathname = this.props.location.pathname;
-    console.log('location:', pathname);
-    if (pathname == 'login' || pathname == '/') {
-      return (
-        <Switch>
-          <RouterGuard />
-          <Redirect to={`/404`} />
-        </Switch>
-      );
-    } else {
+    // if (
+    //   (! && pathname == 'auth/login') ||
+    //   pathname == '/'
+    // ) {
+    //   return (
+    //     <Switch>
+    //       <Redirect to={`/404`} />
+    //     </Switch>
+    //   );
+    // }
+    {
       return (
         <Layout
           aside={this.renderAside()}
@@ -254,8 +280,8 @@ export default class Admin extends React.Component<AdminProps, any> {
           offScreen={store.offScreen}
         >
           <Switch>
-            <RouterGuard />
-            <Redirect to={`/404`} />
+            {this.renderSchema()}
+            {/* <Redirect to={`/404`} /> */}
           </Switch>
         </Layout>
       );

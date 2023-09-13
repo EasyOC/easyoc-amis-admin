@@ -1,27 +1,49 @@
-import { action, decorate, observable } from 'mobx';
-import axios from 'axios';
+import { action, computed, decorate, observable } from 'mobx';
 import authService from '../services/auth/authService';
 import { CurrentUser } from '../types/src/CurrentUser';
-import { merge } from 'lodash';
-/**
- * 管理当前用户状态
-*/
+import { User } from 'oidc-client-ts';
+import { isArray } from '@/utils';
+import { getUserInfo } from '@/services/auth';
+
+
 class UserStore {
-  userInfo: CurrentUser
-  constructor() {
-    this.userInfo = new CurrentUser()
+
+  @observable
+  user: CurrentUser
+
+
+  @computed
+  get name() {
+    return this.user?.name || ""
+  };
+
+
+
+  @action
+  async isAuthenticated() {
+    return await authService.isLoggedIn();
   }
 
-  //更新用户
-  updateUser(userProps: Partial<CurrentUser>) {
-    merge(this.userInfo, userProps)
+  @action
+  async login() {
+    await authService.goLogin()
   }
+  // add your initial state properties here
+  /**
+   *  用于从服务获取当前登录的用户信息，获取完成后保存到 currentUser 属性里
+   */
+  @action
+  async fetchUserInfo() {
+    this.user = await getUserInfo();
+    return this.user;
+  }
+
+
+  @action
+  async logout() {
+    localStorage.setItem('authenticated', '');
+    await authService.logout();
+  }
+
 }
-
-decorate(UserStore, {
-  userInfo: observable,
-  updateUser: action
-});
-
-export default new UserStore();
-
+export default UserStore;

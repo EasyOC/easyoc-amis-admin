@@ -25,9 +25,8 @@ import {
 import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
 import AppSettings from '@/services/appSettings';
-import Components from './Components';
-import {translate} from 'i18n-runtime';
-import {schema2component} from '@/components/AMISRenderer';
+import Navigations2routeComponents from './Components/Navigations2routeComponents';
+import _t from '@/services/amis/translate';
 const _hmt: any = [];
 
 let ContextPath = AppSettings.PUBLIC_PATH;
@@ -455,7 +454,7 @@ export default class extends React.PureComponent<
         <SearchBox
           className="m-b m-r-md justify-center"
           style={{paddingLeft: '20px'}}
-          placeholder={translate('搜索菜单')}
+          placeholder={_t('搜索菜单')}
           value={this.state.filter}
           onSearch={this.setNavigationFilter}
           onChange={this.setNavigationFilter}
@@ -593,7 +592,7 @@ export default class extends React.PureComponent<
           <Route
             path={`${ContextPath}`}
             render={(props: any) => (
-              <Components
+              <Navigations2routeComponents
                 {...{
                   setNavigations: this.setNavigations,
                   navigations: this.state.navigations,
