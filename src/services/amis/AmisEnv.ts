@@ -12,7 +12,7 @@ import { unset } from 'lodash';
 import AppSettings from '../appSettings';
 
 const amisRequest = axios.create({
-    baseURL: AppSettings.API_BASE_URL,
+    baseURL: AppSettings.apiBaseUrl,
     timeout: 10 * 1000,
 })
 

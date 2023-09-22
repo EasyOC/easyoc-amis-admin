@@ -1,8 +1,8 @@
-import {History} from 'history';
-import AppSettings from './appSettings';
-import authService from './auth/authService';
-import queryString from 'qs';
-const loginPage = AppSettings.LOGIN_URL || '/user/login';
+import { History } from "history"
+import AppSettings from "./appSettings";
+import authService from "./auth/authService"
+import queryString from "qs";
+const loginPage = AppSettings.loginPage || '/user/login';
 
 export const WITHELIST = [
   loginPage,
@@ -15,7 +15,7 @@ export const checkLogin = async (history: History) => {
   if (await authService.isLoggedIn()) {
     return true;
   }
-  const {search, pathname} = history.location;
+  const { search, pathname } = history.location;
   if (!WITHELIST.includes(pathname)) {
     let query = queryString.parse(search) as any;
     console.log('search: ', search);
@@ -31,6 +31,6 @@ export const checkLogin = async (history: History) => {
 };
 
 export const needLogin = (history: History) => {
-  const {pathname} = history.location;
+  const { pathname } = history.location;
   return WITHELIST.includes(pathname);
 };

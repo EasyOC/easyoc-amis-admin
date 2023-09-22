@@ -29,7 +29,7 @@ import Navigations2routeComponents from './Components/Navigations2routeComponent
 import _t from '@/services/amis/translate';
 const _hmt: any = [];
 
-let ContextPath = AppSettings.PUBLIC_PATH;
+let ContextPath = AppSettings.publicPath;
 
 export function getContextPath() {
   return ContextPath;

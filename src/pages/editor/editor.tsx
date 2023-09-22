@@ -45,7 +45,7 @@ import {IMainStore} from '@/stores';
 //#endregion
 
 const schemaUrl =
-  mustEndsWith(AppSettings.PUBLIC_PATH as string, '/') + 'amis/schema.json';
+  mustEndsWith(AppSettings.publicPath as string, '/') + 'amis/schema.json';
 // @ts-ignore
 // __uri?.('amis/schema.json');
 console.log('schemaUrl: ', schemaUrl);

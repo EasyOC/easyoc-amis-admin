@@ -251,7 +251,7 @@ export const createAxios = (opt?: Partial<CreateAxiosOptions>) => {
         // authenticationScheme: '',
         timeout: 10 * 1000,
         // 基础接口地址
-        baseURL: AppSettings.API_BASE_URL,
+        baseURL: AppSettings.apiBaseUrl,
         headers: { 'Content-Type': ContentTypeEnum.JSON },
         // 如果是form-data格式
         // headers: { 'Content-Type': ContentTypeEnum.FORM_URLENCODED },

@@ -49,7 +49,7 @@ export default class Navigations2routeComponents extends React.PureComponent<any
   }
 }
 
-let ContextPath = AppSettings.PUBLIC_PATH;
+let ContextPath = AppSettings.publicPath;
 
 export function getContextPath() {
   return ContextPath;

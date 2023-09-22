@@ -6,11 +6,11 @@ import { routerPathName } from '@/utils/urlHelper';
 
 export const initUserManager = () => {
   const config = {
-    userStore: new WebStorageStateStore({ prefix: `oidc_${AppSettings.CLIENT_ID}_` }),
-    authority: AppSettings.API_BASE_URL,
-    client_id: AppSettings.CLIENT_ID,
-    redirect_uri: AppSettings.CLIENT_ROOT + '/auth/redirect',
-    post_logout_redirect_uri: AppSettings.CLIENT_ROOT + '/auth/logout_redirect',
+    userStore: new WebStorageStateStore({ prefix: `oidc_${AppSettings.clientId}_` }),
+    authority: AppSettings.apiBaseUrl,
+    client_id: AppSettings.clientId,
+    redirect_uri: AppSettings.clientRoot + '/auth/redirect',
+    post_logout_redirect_uri: AppSettings.clientRoot + '/auth/logout_redirect',
     scope: "openid profile email roles offline_access",
     filterProtocolClaims: true,
     loadUserInfo: true,
