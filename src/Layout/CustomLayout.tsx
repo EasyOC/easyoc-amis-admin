@@ -234,28 +234,45 @@ export default class Admin extends React.Component<AdminProps, any> {
   }
 
   renderSchema() {
+    // debugger;
     let pathKey = location?.pathname as string;
     const store = this.props.store;
+    // 是这个位置除了问题好像
     console.log('store.pages: ', store.pages);
-    if (store.pages && store.pages.length > 0) {
-      const menuConfig = treeFind(
-        store.pages,
-        node => node.fullPath == pathKey
-      );
-      if (menuConfig) {
-        const schemaInfo = menuConfig.schemaConfig?.schemaDetails;
-        if (schemaInfo?.schemaStr) {
-          const schema = JSON.parse(schemaInfo.schemaStr);
-          try {
-            return schema2component(schema);
-          } catch (error) {
-            console.error('页面加载失败', menuConfig, error);
-            return <Redirect to={`/404`} />;
-          }
-        }
-      }
+    // if (store.pages) {
+    // if (store.pages && store.pages.length > 0) {
+    // debugger;
+    const menuConfig = treeFind(store.pages, node => node.fullPath == pathKey);
+    console.log(
+      '🚀 ~ file: CustomLayout.tsx:246 ~ renderSchema ~ menuConfig:',
+      menuConfig
+    );
+    // if (menuConfig) {
+    const schemaInfo = menuConfig?.schemaConfig?.schemaDetails;
+    console.log(
+      '🚀 ~ file: CustomLayout.tsx:249 ~ renderSchema ~ schemaInfo:',
+      schemaInfo
+    );
+    // if (schemaInfo?.schemaStr) {
+    console.log(
+      '🚀 ~ file: CustomLayout.tsx:252 ~ renderSchema ~ schemaInfo.schemaStr:',
+      schemaInfo.schemaStr
+    );
+    const schema = JSON.parse(schemaInfo.schemaStr);
+    console.log(
+      '🚀 ~ file: CustomLayout.tsx:252 ~ renderSchema ~ schema:',
+      schema
+    );
+    try {
+      return schema2component(schema);
+    } catch (error) {
+      console.error('页面加载失败', menuConfig, error);
+      return <Redirect to={`/404`} />;
     }
-    return <Redirect to={`/404`} />;
+    // }
+    // }
+    // }
+    // return <Redirect to={`/404`} />;
   }
 
   render() {

@@ -1,5 +1,5 @@
-const { resolve } = require('path')
-import { defineConfig } from 'vite';
+const {resolve} = require('path');
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 // import monacoEditorPlugin from 'vite-plugin-monaco-editor';
 
@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   server: {
     port: 2688,
-    host: 'localhost'
+    host: '0.0.0.0'
   },
 
   resolve: {
@@ -18,23 +18,20 @@ export default defineConfig({
   },
   plugins: [
     // monacoEditorPlugin({}),
-    react(
-      {
-        babel: {
-          plugins: [
-            ["@babel/plugin-proposal-decorators", { legacy: true }],
-            ["@babel/plugin-proposal-class-properties", { loose: true }],
-          ],
-        }
+    react({
+      babel: {
+        plugins: [
+          ['@babel/plugin-proposal-decorators', {legacy: true}],
+          ['@babel/plugin-proposal-class-properties', {loose: true}]
+        ]
       }
-    ),
-
+    })
   ],
   build: {
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        editor: resolve(__dirname, 'src/editor/index.html'),
+        editor: resolve(__dirname, 'src/editor/index.html')
       }
     }
   }

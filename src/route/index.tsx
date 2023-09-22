@@ -36,12 +36,12 @@ export default observer(function (props: {store: IMainStore}) {
           <Route path="/auth/logout_redirect" component={logout_redirect} />
           <Route path="/404" component={PageNotFound} />
           {/* 需要授权的页面 */}
-          <PermissionWaper store={store}>
+          <PermissionWaper>
+            <Route path="/" component={Dashboard} />
             <Route
               path="/editor"
               component={React.lazy(() => import('../pages/editor/editor'))}
             />
-            <Route path="/" component={Dashboard} />
             <Route path="*" component={CustomLayout} />
           </PermissionWaper>
         </Switch>

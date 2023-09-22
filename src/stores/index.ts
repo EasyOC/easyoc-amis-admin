@@ -1,11 +1,10 @@
-
 import UserStore from './userStore';
-import SettingsStore from './settingsStore'
-import { types, getEnv, applySnapshot, getSnapshot } from 'mobx-state-tree';
-import { PageStore } from './Page';
-import { reaction, flow, runInAction } from 'mobx';
-import { NavItem } from '@/types/src/NavItem';
-import { loadMenus } from "@/services/amis/menus"
+import SettingsStore from './settingsStore';
+import {types, getEnv, applySnapshot, getSnapshot} from 'mobx-state-tree';
+import {PageStore} from './Page';
+import {reaction, flow, runInAction} from 'mobx';
+import {NavItem} from '@/types/src/NavItem';
+import {loadMenus} from '@/services/amis/menus';
 import authService from '@/services/auth/authService';
 
 let pagIndex = 1;
@@ -15,9 +14,7 @@ const _settingsStore = new SettingsStore();
 
 const MainStore = types
   .model('MainStore', {
-    pages: types.optional(types.array(PageStore)
-      , []
-    ),
+    pages: types.optional(types.array(PageStore), []),
     theme: 'cxd',
     asideFixed: true,
     asideFolded: false,
@@ -38,28 +35,39 @@ const MainStore = types
       return getEnv(self).alert;
     },
     get userStore() {
-      return _userStore
+      return _userStore;
     },
     get settings() {
-      return _settingsStore
+      return _settingsStore;
     },
     get copy() {
       return getEnv(self).copy;
     }
   }))
   .actions(self => {
+    // function fetchPages() {
+    //   flow(function* () {
+    //     const menus = yield loadMenus();
+    //     runInAction(() => {
+    //       self.pages = menus;
+    //     });
+    //   });
+    // }
     function fetchPages() {
-      flow(function* () {
-        const menus = yield loadMenus();
-        runInAction(() => {
-          self.pages = menus
-        })
-      })
+      const that = self;
+      loadMenus().then(menus => {
+        self.pages.push(
+          PageStore.create({
+            ...menus,
+            id: `${++pagIndex}`
+          })
+        );
+      });
     }
 
     function toggleAsideFolded() {
       self.asideFolded = !self.asideFolded;
-      localStorage.setItem('asideFolded', self.asideFolded ? '1' : '')
+      localStorage.setItem('asideFolded', self.asideFolded ? '1' : '');
     }
     function toggleAsideFixed() {
       self.asideFixed = !self.asideFixed;
@@ -69,13 +77,12 @@ const MainStore = types
       self.offScreen = !self.offScreen;
     }
 
-
     function setIsMobile(value: boolean) {
       self.isMobile = value;
     }
 
     function logout() {
-      authService.logout()
+      authService.logout();
     }
 
     return {
@@ -91,8 +98,6 @@ const MainStore = types
     };
   });
 
-export { MainStore }
+export {MainStore};
 
 export type IMainStore = typeof MainStore.Type;
-
-

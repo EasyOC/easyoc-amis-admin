@@ -13,7 +13,7 @@ import {
 } from 'amis';
 import {eachTree} from 'amis-core';
 import 'amis-ui/lib/locale/en-US';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {RouteComponentProps} from 'react-router';
 import {
   BrowserRouter as Router,
   Route,
