@@ -11,6 +11,7 @@ import { gql, useQuery } from '@apollo/client';
 import { DynamicMenuData, EocLayoutSettings } from '../../types/src/SiteGlobalSettings';
 import { CurrentUser } from '../../types/src/CurrentUser';
 import defaultRequest from '../requests';
+import { excuteGraphqlGetQuery, excuteGraphqlQuery } from '../graphql/graphqlApi';
 
 
 
@@ -158,7 +159,7 @@ const GET_MENUS = gql`
   }           
 `
 
-const getAntdMenus = async (): Promise<any[]> => {
+const getAntdMenus2 = async (): Promise<any[]> => {
     const { data: menuList } = useQuery(GET_MENUS)
     console.log('menuList: ', menuList);
     if (menuList.userMenus?.items) {
@@ -168,7 +169,51 @@ const getAntdMenus = async (): Promise<any[]> => {
     }
 }
 
+const getAntdMenus = async (): Promise<any[]> => {
+    const menuList = await excuteGraphqlGetQuery({
+        query: `{
+            userMenus {
+                contentItemId
+                displayText
+                createdUtc
+                hideInMenu
+                icon
+                locale
+                menuType
+                name
+                orderIndex
+                otherConfig
+                path
+                redirect
+                parent {
+                  firstValue
+                }
+                target
+                enUS
+                zhCN
+                schemaConfig: schemaId {
+                  schemaDetails: firstContentItem {
+                    ... on AmisSchema {
+                        useLayout
+                        displayText
+                        layoutName
+                        description
+                        schemaStr: schema
+                    }
+                  }
+                  schemaId: firstValue
+                }
+              
+            }
+          }     
+      `})
+    if (menuList.userMenus) {
+        return menuList.userMenus
+    } else {
+        return []
+    }
 
+}
 /**
  * 获取站点配置
  * ../..returns 
@@ -189,7 +234,7 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
         rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePublicSettings', { withCredentials: false })
     }
     console.log('AntdSettingsresult: ', rawResult);
-    const result = rawResult.data;
+    const result = rawResult.data.data;
     const siteConfig = {} as any;
     // siteConfig.enableLoginPage = result.enableLoginPage
     if (result?.siteSettingsData) {

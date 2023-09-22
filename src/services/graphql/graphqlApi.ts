@@ -1,6 +1,6 @@
 
 import { ContentTypeEnum } from "@/utils/http"
-import defaultRequest from "../requests/defaultRequest"
+import defaultRequest from "../requests"
 
 export const GraphqlServiceAPI = '/api/graphql'
 export type GraphQLQueryParams = {
@@ -16,7 +16,7 @@ export const excuteGraphqlQuery = async (query: GraphQLQueryParams) => {
   })
   console.log('excuteGraphqlQuery result: ', result);
   // return result.data
-  return result.data;
+  return result.data.data;
 
 }
 
@@ -29,7 +29,7 @@ export const excuteGraphqlGetQuery = async (params: { query: string }) => {
   })
 
   console.log('excuteGraphqlQuery result: ', result);
-  return result.data
+  return result.data.data
 }
 
 export type SqlCommonQueryParams = {
