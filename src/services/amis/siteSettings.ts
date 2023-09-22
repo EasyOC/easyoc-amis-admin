@@ -4,11 +4,13 @@ import { apiUrl } from '../../utils/urlHelper';
 import { JSONC } from '../../utils/json';
 import { listToTree, treeMap } from '../../utils/helper/tree';
 import { deepMerge } from '../../utils/deep-merge';
-import { safeEval } from '../../utils';
+import { mustStartsWith, safeEval } from '../../utils';
 import { NavItem } from '../../types'
 import { currentLocale, extendLocale, translate } from 'i18n-runtime';
 import { gql, useQuery } from '@apollo/client';
 import defaultRequest from '../requests/defaultRequest';
+import { DynamicMenuData, EocLayoutSettings } from '../../types/src/SiteGlobalSettings';
+import { CurrentUser } from '../../types/src/CurrentUser';
 
 
 
@@ -38,7 +40,7 @@ export const loadMenuData = async (serverMenus: any): Promise<NavItem> => {
     const dynamicMenuDict: { [key: string]: string } = {}
 
     console.log('begin loadMenuData: ', serverMenus);
-    let result = treeMap(serverMenus || [], {
+    let menus = treeMap(serverMenus || [], {
         children: 'routes',
         conversion: (item: any) => {
             // if (item.layout === false || item.hideInMenu || item.redirect || !item.name) {
@@ -77,13 +79,12 @@ export const loadMenuData = async (serverMenus: any): Promise<NavItem> => {
             return item;
         },
     });
-    result = result.sort((a, b) => a.orderIndex - b.orderIndex)
-    console.log('loadMenuData result: ', result);
+    menus = menus.sort((a, b) => a.orderIndex - b.orderIndex)
+    console.log('loadMenuData result: ', menus);
 
     return {
         //修复图标
-        menuData: menus,
-        dynamicMenuDict: dynamicMenuDict
+        menuData: menus
     } as DynamicMenuData;
 };
 
@@ -173,7 +174,7 @@ const getAntdMenus = async (): Promise<any[]> => {
  * ../..returns 
  */
 
-export const getSiteGlobalSettings = async (currentUser?: API.CurrentUser): Promise<SiteGlobalSettings> => {
+export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<EocLayoutSettings> => {
     //站点全局设置，不需要授权 { withToken: false }
     const isLoggedIn = await authService.isLoggedIn();
     let rawResult: {
@@ -229,25 +230,24 @@ export const getSiteGlobalSettings = async (currentUser?: API.CurrentUser): Prom
 
 
 
-export const updateSiteGlobalSettings = async (configData: SiteGlobalSettings): Promise<SiteGlobalSettings> => {
+export const updateSiteGlobalSettings = async (configData: EocLayoutSettings): Promise<EocLayoutSettings> => {
 
     const data: any = {}
     // if (configData.menuData) {
     //     data.menuData = JSON.stringify(configData.menuData, null, 2)
     // }
 
-    if (configData.siteSettingsData) {
-        const settings = clone(configData.siteSettingsData)
+    if (configData.dynamicMenuData) {
+        const settings = clone(configData.dynamicMenuData)
         unset(settings, "menuData")
         data.siteSettingsData = JSON.stringify(settings, null, 2)
     }
+
 
     const result = await wrapedResultRequest.put({
         url: '/api/AntdSettings/UpdateSiteSettings', method: 'PUT', data
     });
     return result;
 }
-
-
 
 

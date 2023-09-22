@@ -17,7 +17,7 @@ type AppSettings = {
     disable_langselect: boolean,
 }
 
-let appSettings: AppSettings = {
+let localAppSettings: AppSettings = {
     publicPath: runtime.VITE_publicPathPrefix as string || '',
     clientRoot: runtime.VITE_clientRoot as string,
     apiBaseUrl: runtime.VITE_apiRoot as string,
@@ -57,7 +57,7 @@ let cachedSettings: AppSettings
 
 const getAppSettings = () => {
     if (!cachedSettings) {
-        cachedSettings = appSettings;
+        cachedSettings = localAppSettings;
         const url = window.location;
         switch (cloudSettings.clientUrlMode) {
             case "SubFolder":
@@ -73,7 +73,7 @@ const getAppSettings = () => {
                 //     && has(cloudSettings.tenantNameMapping, publicPath)) {
                 //     serverFolder = cloudSettings.tenantNameMapping[publicPath];
                 // }
-                cachedSettings.apiBaseUrl = appSettings.apiBaseUrl.replace("[tenatName]", serverFolder)
+                cachedSettings.apiBaseUrl = localAppSettings.apiBaseUrl.replace("[tenatName]", serverFolder)
                 break;
             case "TenantNameRegExp"://从正则匹配租户地址
 
@@ -90,10 +90,10 @@ const getAppSettings = () => {
                     //     tname = cloudSettings.tenantNameMapping[tname];
                     // }
 
-                    if (!tname && appSettings.apiBaseUrl.endsWith('/')) {
-                        cachedSettings.apiBaseUrl = appSettings.apiBaseUrl.slice(0, -1)
+                    if (!tname && localAppSettings.apiBaseUrl.endsWith('/')) {
+                        cachedSettings.apiBaseUrl = localAppSettings.apiBaseUrl.slice(0, -1)
                     } else {
-                        cachedSettings.apiBaseUrl = cachedSettings.apiBaseUrl = appSettings.apiBaseUrl.slice(0, -1)
+                        cachedSettings.apiBaseUrl = cachedSettings.apiBaseUrl = localAppSettings.apiBaseUrl.slice(0, -1)
                             .replace("[tenatName]", tname)
                     }
                 }
@@ -105,5 +105,5 @@ const getAppSettings = () => {
     }
     return cachedSettings
 }
-const loadedAppSettings = getAppSettings()
-export default loadedAppSettings
+const appSettings = getAppSettings()
+export default appSettings

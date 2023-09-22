@@ -11,7 +11,6 @@ class UserStore {
   @observable
   user: CurrentUser
 
-
   @computed
   get name() {
     return this.user?.name || ""

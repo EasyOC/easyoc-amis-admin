@@ -1,4 +1,5 @@
-export class CurrentUser {
+
+export type CurrentUser = {
     displayName: string;
     name: string;
     avatar: string;

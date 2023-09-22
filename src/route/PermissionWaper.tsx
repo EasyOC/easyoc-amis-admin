@@ -13,7 +13,6 @@ const PermissionWaper: React.FC<{
   const history = useHistory();
   useEffect(() => {
     const init = async () => {
-      alert('3');
       console.log('history', history);
 
       // if (await checkLogin(history)) {

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Dashboard from '../pages/Dashboard';
 import Hello from '@/pages/Hello';
 const path2components = [

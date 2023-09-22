@@ -9,8 +9,7 @@ import logout_redirect from '@/pages/auth/logout_redirect';
 import redirect from '@/pages/auth/redirect';
 import PageNotFound from '@/pages/PageNotFound';
 import CustomLayout from '@/Layout/CustomLayout';
-import Dashboard from '@/pages/Dashboard';
-import {History} from 'history';
+import ProLayout from '@/Layout/ProLayout';
 // const mainLayout = React.lazy(() => import('@/Layout/Index'));
 // const mainLayout = React.lazy(() => import('@/App1'));
 // const Editor = React.lazy(() => import('../pages/editor/editor'));
@@ -37,12 +36,11 @@ export default observer(function (props: {store: IMainStore}) {
           <Route path="/404" component={PageNotFound} />
           {/* 需要授权的页面 */}
           <PermissionWaper>
-            <Route path="/" component={Dashboard} />
             <Route
               path="/editor"
               component={React.lazy(() => import('../pages/editor/editor'))}
             />
-            <Route path="*" component={CustomLayout} />
+            <Route path="*" component={ProLayout} />
           </PermissionWaper>
         </Switch>
       </div>

@@ -1,10 +1,6 @@
 import UserStore from './userStore';
 import SettingsStore from './settingsStore';
-import {types, getEnv, applySnapshot, getSnapshot} from 'mobx-state-tree';
-import {PageStore} from './Page';
-import {reaction, flow, runInAction} from 'mobx';
-import {NavItem} from '@/types/src/NavItem';
-import {loadMenus} from '@/services/amis/menus';
+import { types, getEnv } from 'mobx-state-tree';
 import authService from '@/services/auth/authService';
 
 let pagIndex = 1;
@@ -14,15 +10,12 @@ const _settingsStore = new SettingsStore();
 
 const MainStore = types
   .model('MainStore', {
-    pages: types.optional(types.array(PageStore), []),
     theme: 'cxd',
     asideFixed: true,
     asideFolded: false,
     offScreen: false,
     addPageIsOpen: false,
-    preview: false,
     isMobile: false,
-    schema: types.frozen()
   })
   .views(self => ({
     get fetcher() {
@@ -34,37 +27,17 @@ const MainStore = types
     get alert() {
       return getEnv(self).alert;
     },
+    get copy() {
+      return getEnv(self).copy;
+    },
     get userStore() {
       return _userStore;
     },
     get settings() {
       return _settingsStore;
     },
-    get copy() {
-      return getEnv(self).copy;
-    }
   }))
   .actions(self => {
-    // function fetchPages() {
-    //   flow(function* () {
-    //     const menus = yield loadMenus();
-    //     runInAction(() => {
-    //       self.pages = menus;
-    //     });
-    //   });
-    // }
-    function fetchPages() {
-      const that = self;
-      loadMenus().then(menus => {
-        self.pages.push(
-          PageStore.create({
-            ...menus,
-            id: `${++pagIndex}`
-          })
-        );
-      });
-    }
-
     function toggleAsideFolded() {
       self.asideFolded = !self.asideFolded;
       localStorage.setItem('asideFolded', self.asideFolded ? '1' : '');
@@ -86,7 +59,6 @@ const MainStore = types
     }
 
     return {
-      fetchPages,
       toggleAsideFolded,
       toggleAsideFixed,
       toggleOffScreen,
@@ -98,6 +70,6 @@ const MainStore = types
     };
   });
 
-export {MainStore};
+export { MainStore };
 
 export type IMainStore = typeof MainStore.Type;
