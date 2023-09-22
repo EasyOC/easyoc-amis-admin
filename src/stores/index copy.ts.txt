@@ -1,0 +1,49 @@
+import UserStore from './userStore';
+import SettingsStore from './settingsStore';
+import { types, getEnv } from 'mobx-state-tree';
+import authService from '@/services/auth/authService';
+import { EocLayoutSettings } from '@/types/src/SiteGlobalSettings';
+
+let pagIndex = 1;
+
+const _userStore = new UserStore();
+const _settingsStore = new SettingsStore();
+
+const MainStore = types
+  .model('MainStore', {
+    settings: types.optional(EocLayoutSettings, {}),
+
+
+  })
+  .views(self => ({
+    get fetcher() {
+      return getEnv(self).fetcher;
+    },
+    get notify() {
+      return getEnv(self).notify;
+    },
+    get alert() {
+      return getEnv(self).alert;
+    },
+    get copy() {
+      return getEnv(self).copy;
+    },
+    get userStore() {
+      return _userStore;
+    },
+    get settingsStore() {
+      return _settingsStore;
+    },
+  }))
+  .actions(self => {
+
+    return {
+
+      afterCreate() {
+      }
+    };
+  });
+
+export { MainStore };
+
+export type IMainStore = typeof MainStore.Type;

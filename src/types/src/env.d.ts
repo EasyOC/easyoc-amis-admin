@@ -8,6 +8,7 @@ interface ImportMetaEnv {
     VITE_clientId: string
     VITE_title: string
     VITE_locale: string
+    DevServer: string
     // 更多环境变量...
 }
 

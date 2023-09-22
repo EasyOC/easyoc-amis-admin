@@ -1,12 +1,15 @@
-const {resolve} = require('path');
-import {defineConfig} from 'vite';
+const { resolve } = require('path');
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import runtime from './src/utils/helper/envHelper';
 // import monacoEditorPlugin from 'vite-plugin-monaco-editor';
+// const env = loadEnv('development', process.cwd(), '')
 
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
     port: 2688,
+    // host: '0.0.0.0'
     host: '0.0.0.0'
   },
 
@@ -21,8 +24,8 @@ export default defineConfig({
     react({
       babel: {
         plugins: [
-          ['@babel/plugin-proposal-decorators', {legacy: true}],
-          ['@babel/plugin-proposal-class-properties', {loose: true}]
+          ['@babel/plugin-proposal-decorators', { legacy: true }],
+          ['@babel/plugin-proposal-class-properties', { loose: true }]
         ]
       }
     })

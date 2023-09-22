@@ -6,3 +6,5 @@ export type CurrentUser = {
     email: string;
     roles: string[];
 }
+
+export default CurrentUser

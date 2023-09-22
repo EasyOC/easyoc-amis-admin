@@ -2,6 +2,8 @@
 import { UserManager, UserManagerSettingsStore, WebStorageStateStore } from 'oidc-client-ts';
 import AppSettings from '../appSettings';
 import { routerPathName } from '@/utils/urlHelper';
+import CurrentUser from '@/types/src/CurrentUser';
+import { isArray } from 'lodash';
 
 
 export const initUserManager = () => {
@@ -84,6 +86,30 @@ let authService = {
 
   async getUserInfo() {
     return await oidcClient.getUser();
+  },
+  async getLocalUserInfo() {
+    const oidcUser = await oidcClient.getUser();
+    let currentUser: CurrentUser = {
+      displayName: oidcUser?.profile?.name,
+      name: oidcUser?.profile?.name,
+      avatar: '',//url?.length > 0 ? url[0] : '',
+      // userid:  oidcUser?.profile
+      email: oidcUser?.profile?.email,
+      roles: []
+    };
+    // if (me.userProfile?.lastName && me.userProfile.lastName) {
+    //     currentUser.displayName = `${me.userProfile.firstName}, ${me.userProfile.lastName} - ${me.userName}`;
+    // }
+    ////
+
+    if (oidcUser?.profile?.roles) {
+      if (isArray(oidcUser?.profile.roles)) {
+        currentUser.roles?.push(...(oidcUser?.profile.roles as Array<string>))
+      } else {
+        currentUser.roles?.push(oidcUser?.profile?.roles as string)
+      }
+    }
+    return currentUser;
   }
   ,
   async completeLogin() {

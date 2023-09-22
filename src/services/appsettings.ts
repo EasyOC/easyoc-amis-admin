@@ -1,11 +1,5 @@
-let isVite = true;
-let runtime: any = null;
-if (typeof process != 'undefined') {
-    isVite = process?.env?.npm_lifecycle_script?.includes('vite');
-    runtime = process?.env
-} else {
-    runtime = import.meta.env
-}
+import { mustNotEndsWith } from "@/utils"
+import runtime from "@/utils/helper/envHelper"
 
 type AppSettings = {
     publicPath: string,
@@ -22,7 +16,7 @@ let localAppSettings: AppSettings = {
     clientRoot: runtime.VITE_clientRoot as string,
     apiBaseUrl: runtime.VITE_apiRoot as string,
     clientId: runtime.VITE_clientId as string,
-    loginPage: '/user/login',
+    loginPage: '/auth/login',
     // skip_login_page: SKIP_LOGIN_PAGE
     disable_langselect: runtime.VITE_disable_langselect as boolean,
 }
@@ -49,8 +43,8 @@ export type CloudSettings = {
 const cloudSettings: CloudSettings = {
     //@ts-ignore
     clientUrlMode: runtime.VITE_clientUrlMode as string,
-    exp: runtime.VITE_tenantNameRegExp as string,
-    matchGroupIdx: runtime.VITE_matchGroupIdx as number,
+    exp: runtime.VITE_tenantNameRegExp,
+    matchGroupIdx: parseInt(runtime.VITE_matchGroupIdx),
 }
 
 let cachedSettings: AppSettings
@@ -79,22 +73,25 @@ const getAppSettings = () => {
 
                 cachedSettings.clientRoot = window.location.origin
                 cachedSettings.publicPath = '/'
-                // eslint-disable-next-line no-case-declarations
-                const exp = !!cloudSettings.exp ? new RegExp(cloudSettings.exp) : /http[s]?:\/\/(\w+)\./
-                // eslint-disable-next-line no-case-declarations
-                const mResult = window.location.origin.match(exp);
-                if (mResult) {
-                    let tname = mResult[cloudSettings.matchGroupIdx || 1]
+                let exp = "http[s]?:\\/\\/(\\w+)\."
+                if (cloudSettings.exp) {
+                    exp = cloudSettings.exp
+                }
+                const matchResult = cachedSettings.clientRoot.match("http[s]?:\\/\\/(\\w+)\.");
+                //TODO:修复正则问题
+                // const mResult = window.origin.toString().match(/http[s]?:\/\/(\w+)\./);
+                if (matchResult) {
+                    let tname = matchResult[cloudSettings.matchGroupIdx || 1]
                     // if (cloudSettings.tenantNameMapping
                     //     && has(cloudSettings.tenantNameMapping, tname)) {
                     //     tname = cloudSettings.tenantNameMapping[tname];
                     // }
 
                     if (!tname && localAppSettings.apiBaseUrl.endsWith('/')) {
-                        cachedSettings.apiBaseUrl = localAppSettings.apiBaseUrl.slice(0, -1)
+                        cachedSettings.apiBaseUrl = mustNotEndsWith(localAppSettings.apiBaseUrl, '/')
                     } else {
-                        cachedSettings.apiBaseUrl = cachedSettings.apiBaseUrl = localAppSettings.apiBaseUrl.slice(0, -1)
-                            .replace("[tenatName]", tname)
+                        cachedSettings.apiBaseUrl
+                            = mustNotEndsWith(localAppSettings.apiBaseUrl, '/').replace("[tenatName]", tname)
                     }
                 }
                 break;
@@ -107,3 +104,4 @@ const getAppSettings = () => {
 }
 const appSettings = getAppSettings()
 export default appSettings
+

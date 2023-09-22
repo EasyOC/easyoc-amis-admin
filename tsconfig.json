@@ -34,7 +34,7 @@
   },
   "include": [
     "./**/*.d.ts",
-    "./src/*.ts",
+    "./**/*.ts",
     "./**/*.tsx",
     "./src/amislib/polyfills/class.js"
   ]

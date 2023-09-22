@@ -16,7 +16,7 @@ import {
   Select
 } from 'antd';
 
-import {defaultRequest} from '@/services/requests';
+import defaultRequest from '@/services/requests';
 // import 'amis-editor-core/lib/style.css';
 import './style.less';
 import {Icon} from '@/icons/index';

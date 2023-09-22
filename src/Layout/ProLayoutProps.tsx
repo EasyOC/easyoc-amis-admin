@@ -1,98 +1,229 @@
-import {
-  ChromeFilled,
-  CrownFilled,
-  SmileFilled,
-  TabletFilled
-} from '@ant-design/icons';
-import React from 'react';
+import {ProLayoutProps} from '@ant-design/pro-components';
 
 export default {
   route: {
     path: '/',
-
+    //https://ant.design/components/icon-cn
     routes: [
       {
-        path: '/welcome',
-        name: '欢迎',
-        icon: <SmileFilled />,
-        component: './Hello'
+        path: '/',
+        name: 'home',
+        locale: 'menu.home',
+        orderIndex: -100,
+        lang: {
+          'zh-CN': '首页',
+          'en-US': 'Home'
+        },
+        routes: [{redirect: '/SEA/BACalculate'}]
       },
       {
-        path: '/admin',
-        name: '管理页',
-        icon: <CrownFilled />,
-        access: 'canAdmin',
-        component: './Admin',
+        name: 'system',
+        icon: 'setting',
+        //使用 管理员 筛选策略
+        access: 'adminRouteFilter',
+        locale: 'menu.system',
+        lang: {
+          'zh-CN': '系统',
+          'en-US': 'Settings'
+        },
+        path: '/sys',
+        icon: 'setting',
+        redirect: '/sys/dev/ManagePages',
         routes: [
           {
-            path: '/admin/sub-page1',
-            name: '一级页面',
-            icon: 'https://gw.alipayobjects.com/zos/antfincdn/upvrAjAPQX/Logo_Tech%252520UI.svg',
-            component: './Welcome'
+            name: 'account',
+            lang: {
+              'zh-CN': '用户管理',
+              'en-US': 'Accounts'
+            },
+            path: 'account'
           },
           {
-            path: '/admin/sub-page2',
-            name: '二级页面',
-            icon: <CrownFilled />,
-            component: './Welcome'
+            name: 'rolesAndPermission',
+            lang: {
+              'zh-CN': '角色与权限',
+              'en-US': 'Roles & Permissions'
+            },
+            path: 'rolesAndPermission'
           },
           {
-            path: '/admin/sub-page3',
-            name: '三级页面',
-            icon: <CrownFilled />,
-            component: './Welcome'
-          }
-        ]
-      },
-      {
-        name: '列表页',
-        icon: <TabletFilled />,
-        path: '/list',
-        component: './ListTableList',
-        routes: [
-          {
-            path: '/list/sub-page',
-            name: '列表页面',
-            icon: <CrownFilled />,
+            name: 'develop',
+            path: 'dev',
+            access: 'adminRouteFilter',
+            icon: 'CodepenOutlined',
+            lang: {
+              'zh-CN': '开发',
+              'en-US': 'Develop'
+            },
             routes: [
               {
-                path: 'sub-sub-page1',
-                name: '一一级列表页面',
-                icon: <CrownFilled />,
-                component: './Welcome'
+                name: 'ManagePages',
+                access: 'adminRouteFilter',
+                path: 'ManagePages',
+                lang: {
+                  'zh-CN': '页面管理',
+                  'en-US': 'ManagePages'
+                }
               },
               {
-                path: 'sub-sub-page2',
-                name: '一二级列表页面',
-                icon: <CrownFilled />,
-                component: './Welcome'
+                name: 'SchemaVersions',
+                access: 'adminRouteFilter',
+                path: 'SchemaVersions',
+                hideInMenu: true,
+                lang: {
+                  'zh-CN': '页面版本',
+                  'en-US': 'Page History'
+                }
               },
               {
-                path: 'sub-sub-page3',
-                name: '一三级列表页面',
-                icon: <CrownFilled />,
-                component: './Welcome'
+                name: 'page-editor',
+                menuHeaderRender: false,
+                path: 'page-editor',
+                access: 'adminRouteFilter',
+                hideInMenu: 'true',
+                lang: {
+                  'zh-CN': '页面编辑器',
+                  'en-US': 'Develop'
+                }
+              },
+              {
+                name: 'menus',
+                path: 'menus',
+                access: 'adminRouteFilter',
+                lang: {
+                  'zh-CN': '菜单管理',
+                  'en-US': 'Menus'
+                }
+              },
+              {
+                name: 'dynamicIndex',
+                access: 'adminRouteFilter',
+                lang: {
+                  'zh-CN': '动态索引',
+                  'en-US': 'Dynamic Index'
+                },
+                path: 'dynamicIndex'
               }
             ]
           },
           {
-            path: '/list/sub-page2',
-            name: '二级列表页面',
-            icon: <CrownFilled />,
-            component: './Welcome'
-          },
-          {
-            path: '/list/sub-page3',
-            name: '三级列表页面',
-            icon: <CrownFilled />,
-            component: './Welcome'
+            name: 'type-management',
+            path: 'type-management',
+            redirect: '/sys/type-management/contentTypeList',
+            icon: 'UnorderedListOutlined',
+            lang: {
+              'zh-CN': '模型管理',
+              'en-US': 'Models'
+            },
+            routes: [
+              {
+                name: 'contentTypeList',
+                path: 'contentTypeList',
+                hideInMenu: false,
+                lang: {
+                  'zh-CN': '模型列表',
+                  'en-US': 'Model List'
+                }
+              },
+              {
+                name: 'genTypeFromRDBMS',
+                path: 'genTypeFromRDBMS',
+                hideInMenu: false,
+                lang: {
+                  'zh-CN': '从关系型数据库导入',
+                  'en-US': 'Gen Model From RDBMS'
+                }
+              },
+              {
+                name: 'editModel',
+                path: 'editmodel',
+                access: 'adminRouteFilter',
+                hideInMenu: true,
+                lang: {
+                  'zh-CN': '编辑模型',
+                  'en-US': 'Edit Model'
+                }
+              },
+              {
+                name: 'ModelsER',
+                access: 'adminRouteFilter',
+                lang: {
+                  'zh-CN': 'ER图',
+                  'en-US': 'ER'
+                },
+                path: 'ModelsER'
+              },
+              {
+                name: 'workflow',
+                access: 'adminRouteFilter',
+                lang: {
+                  'zh-CN': '流程实例',
+                  'en-US': 'Instance'
+                },
+                path: 'workflow'
+              },
+              {
+                name: 'xflow',
+                access: 'adminRouteFilter',
+                lang: {
+                  'zh-CN': 'xflow流程图',
+                  'en-US': 'xflow'
+                },
+                path: 'xflow'
+              }
+            ]
           }
+          // {
+          //     path: 'account',
+          //     name: 'Account',
+          //     lang: {
+          //         "zh-CN": "账号管理",
+          //         "en-US": "Account",
+          //     },
+          //     icon: 'smile',
+          //     component: './sys/account',
+          // }
         ]
       },
       {
-        path: 'https://ant.design',
-        name: 'Ant Design 官网外链',
-        icon: <ChromeFilled />
+        name: 'Editors',
+        icon: 'highlight',
+        path: '/editor',
+        redirect: '/editor/flow',
+        routes: [
+          // {
+          //     name: 'EChartEditor',
+          //     icon: 'smile',
+          //     lang: {
+          //         "zh-CN": "EChartEditor",
+          //         "en-US": "EChartEditor",
+          //     },
+          //     path: '/editor/EChartEditor',
+          // },
+          // {
+          //     name: 'flowchart',
+          //     lang: {
+          //         "zh-CN": "flowchart",
+          //         "en-US": "flowchart",
+          //     },
+          //     icon: 'smile',
+          //     path: '/editor/flow',
+          // },
+          // {
+          //     name: 'gg-editor-flow',
+          //     lang: {
+          //         "zh-CN": "gg-editor-flow",
+          //         "en-US": "gg-editor-flow",
+          //     },
+          //     icon: 'smile',
+          //     path: '/editor/flow',
+          // },
+          // {
+          //     name: 'koni',
+          //     icon: 'smile',
+          //     path: '/editor/koni',
+          // },
+        ]
       }
     ]
   },
@@ -150,5 +281,27 @@ export default {
       desc: '为组件开发场景而生的文档工具',
       url: 'https://d.umijs.org/zh-CN'
     }
-  ]
-};
+  ],
+  token: {
+    navTheme: 'light',
+    colorPrimary: '#1890ff',
+    layout: 'mix',
+    title: 'SalesPortal',
+    loginPageSubTitle: '欢迎来到对抗路',
+    contentWidth: 'Fluid',
+    footerRender: false,
+    fixedHeader: false,
+    fixSiderbar: true,
+    pwa: true,
+    logo: '/media/siteassets/jz-logo.svg',
+    loginBg: '/media/siteassets/loginbg.png',
+    locale: {
+      default: 'zh-CN'
+    },
+    amis: {
+      theme: 'cxd'
+    },
+    siderMenuType: 'group',
+    splitMenus: true
+  }
+} as ProLayoutProps;

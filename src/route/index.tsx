@@ -1,7 +1,7 @@
 import React from 'react';
 import {ToastComponent, AlertComponent, Spinner} from 'amis';
 import {Route, Switch, BrowserRouter as Router} from 'react-router-dom';
-import {observer} from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import {IMainStore} from '../stores';
 import PermissionWaper from './PermissionWaper';
 import login from '@/pages/auth/login';
@@ -15,18 +15,18 @@ import ProLayout from '@/Layout/ProLayout';
 // const Editor = React.lazy(() => import('../pages/editor/editor'));
 // import '@/Layout/styles/autolayout.less';
 
-export default observer(function (props: {store: IMainStore}) {
+const route = function (props: {store: IMainStore}) {
   const {store} = props;
-
   return (
     <Router>
       <div className="routes-wrapper">
         <ToastComponent
           key="toast"
           position={'top-right'}
-          theme={store.theme}
+          theme={store.amisEnv.theme}
+          closeButton={true}
         />
-        <AlertComponent key="alert" theme={store.theme} />
+        <AlertComponent key="alert" theme={store.amisEnv.theme} />
 
         <Switch>
           {/* 不需要授权的页面 */}
@@ -35,15 +35,16 @@ export default observer(function (props: {store: IMainStore}) {
           <Route path="/auth/logout_redirect" component={logout_redirect} />
           <Route path="/404" component={PageNotFound} />
           {/* 需要授权的页面 */}
-          <PermissionWaper>
+          <PermissionWaper store={store}>
             <Route
               path="/editor"
               component={React.lazy(() => import('../pages/editor/editor'))}
             />
-            <Route path="*" component={ProLayout} />
+            <Route component={ProLayout} />
           </PermissionWaper>
         </Switch>
       </div>
     </Router>
   );
-});
+};
+export default inject('store')(observer(route));

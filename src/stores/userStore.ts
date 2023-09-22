@@ -1,6 +1,6 @@
 import { action, computed, decorate, observable } from 'mobx';
 import authService from '../services/auth/authService';
-import { CurrentUser } from '../types/src/CurrentUser';
+import type { CurrentUser } from '../types/src/CurrentUser';
 import { User } from 'oidc-client-ts';
 import { isArray } from '@/utils';
 import { getUserInfo } from '@/services/auth';
@@ -16,12 +16,8 @@ class UserStore {
     return this.user?.name || ""
   };
 
-
-
-  @action
-  async isAuthenticated() {
-    return await authService.isLoggedIn();
-  }
+  @observable
+  isAuthenticated: boolean = false
 
   @action
   async login() {
@@ -33,7 +29,11 @@ class UserStore {
    */
   @action
   async fetchUserInfo() {
-    this.user = await getUserInfo();
+    const result = await getUserInfo();
+    this.isAuthenticated = await authService.isLoggedIn();
+    if (this.isAuthenticated) {
+      this.user = result;
+    }
     return this.user;
   }
 

@@ -8,9 +8,9 @@ import { mustStartsWith, safeEval } from '../../utils';
 import { NavItem } from '../../types'
 import { currentLocale, extendLocale, translate } from 'i18n-runtime';
 import { gql, useQuery } from '@apollo/client';
-import defaultRequest from '../requests/defaultRequest';
 import { DynamicMenuData, EocLayoutSettings } from '../../types/src/SiteGlobalSettings';
 import { CurrentUser } from '../../types/src/CurrentUser';
+import defaultRequest from '../requests';
 
 
 
@@ -186,41 +186,35 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
     }
     else {
         //未登录用户专用，不需要授权 , { withCredentials: false }
-        rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePublicSettings', { withCredentials: false });
+        rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePublicSettings', { withCredentials: false })
     }
     console.log('AntdSettingsresult: ', rawResult);
     const result = rawResult.data;
     const siteConfig = {} as any;
+    // siteConfig.enableLoginPage = result.enableLoginPage
+    if (result?.siteSettingsData) {
+        const tempSiteSettingsData = JSONC.parse(result.siteSettingsData);
+    }
 
-    try {
-        // siteConfig.enableLoginPage = result.enableLoginPage
-        if (result?.siteSettingsData) {
-            const tempSiteSettingsData = JSONC.parse(result.siteSettingsData);
+    if (isLoggedIn) {
+
+        let IsAdmin = false;
+        if (currentUser?.roles && currentUser?.roles.length > 0) {
+            IsAdmin = currentUser?.roles?.includes("Administrator")
         }
-
-        if (isLoggedIn) {
-
-            let IsAdmin = false;
-            if (currentUser?.roles && currentUser?.roles.length > 0) {
-                IsAdmin = currentUser?.roles?.includes("Administrator")
-            }
-            const serverMenus = await getAntdMenus();
-            const antdMenus = buildDynamicMenus(serverMenus);
-            let menuData = [...antdMenus];
-            if (IsAdmin) {
-                let menuDataObj = safeEval(result.menuData)
-                console.log('menuDataObj: ', menuDataObj);
-                menuData.push(...menuDataObj)
-            }
-            const dynamicMenuData = await loadMenuData(menuData);
-            siteConfig.menuData = dynamicMenuData.menuData
-            siteConfig.serverMenus = serverMenus
-            siteConfig.dynamicMenuDict = dynamicMenuData.dynamicMenuDict
-
+        const serverMenus = await getAntdMenus();
+        const antdMenus = buildDynamicMenus(serverMenus);
+        let menuData = [...antdMenus];
+        if (IsAdmin) {
+            let menuDataObj = safeEval(result.menuData)
+            console.log('menuDataObj: ', menuDataObj);
+            menuData.push(...menuDataObj)
         }
+        const dynamicMenuData = await loadMenuData(menuData);
+        siteConfig.menuData = dynamicMenuData.menuData
+        siteConfig.serverMenus = serverMenus
+        siteConfig.dynamicMenuDict = dynamicMenuData.dynamicMenuDict
 
-    } catch (error) {
-        console.error('GetSettings siteSettingsData faild: ', result);
     }
     console.log('GetSettings result: ', siteConfig);
 
@@ -233,10 +227,6 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
 export const updateSiteGlobalSettings = async (configData: EocLayoutSettings): Promise<EocLayoutSettings> => {
 
     const data: any = {}
-    // if (configData.menuData) {
-    //     data.menuData = JSON.stringify(configData.menuData, null, 2)
-    // }
-
     if (configData.dynamicMenuData) {
         const settings = clone(configData.dynamicMenuData)
         unset(settings, "menuData")
@@ -244,10 +234,10 @@ export const updateSiteGlobalSettings = async (configData: EocLayoutSettings): P
     }
 
 
-    const result = await wrapedResultRequest.put({
-        url: '/api/AntdSettings/UpdateSiteSettings', method: 'PUT', data
+    const result = await defaultRequest.put('/api/AntdSettings/UpdateSiteSettings', {
+        method: 'PUT', data
     });
-    return result;
+    return result.data;
 }
 
 
