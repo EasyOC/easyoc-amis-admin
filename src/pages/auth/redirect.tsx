@@ -8,7 +8,7 @@ import {inject, observer} from 'mobx-react';
 import React from 'react';
 import {useEffect, useState} from 'react';
 import {IMainStore} from '@/stores';
-import confirm from 'antd/es/modal/confirm';
+import confirm from 'antd';
 import _t from '@/services/amis/translate';
 import {useHistory} from 'react-router-dom';
 
