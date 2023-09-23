@@ -229,34 +229,63 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
     console.log('AntdSettingsresult: ', rawResult);
     const result = rawResult.data.data;
     let siteConfig = {} as EocLayoutSettings;
-    // siteConfig.enableLoginPage = result.enableLoginPage
-    if (result?.siteSettingsData) {
-        siteConfig = JSONC.parse(result.siteSettingsData);
-    }
-    if (isLoggedIn) {
+    try {
+        // siteConfig.enableLoginPage = result.enableLoginPage
+        if (result?.siteSettingsData) {
+            let tempSiteSettingsData = JSONC.parse(result.siteSettingsData) as EocLayoutSettings;
+            tempSiteSettingsData = deepMerge(defaultSettings, tempSiteSettingsData)
 
-        currentUser ??= await authService.getLocalUserInfo();
-        let IsAdmin = false;
-        if (currentUser?.roles && currentUser?.roles.length > 0) {
-            IsAdmin = currentUser?.roles?.includes("Administrator")
+            siteConfig = deepMerge(tempSiteSettingsData,
+                {
+                    logo: tempSiteSettingsData?.logo ? apiUrl(tempSiteSettingsData?.logo) :
+                        defaultSettings.logo,
+                    loginBg: tempSiteSettingsData?.loginBg ? apiUrl(tempSiteSettingsData?.loginBg) :
+                        defaultSettings.loginBg
+                })
+            //解决 title 覆盖问题
+            siteConfig.serverTitle = siteConfig.title
+            if (window.__POWERED_BY_WUJIE__) {
+                deepMerge(siteConfig, {
+                    "navTheme": "light",
+                    "layout": "side",
+                    "fixedHeader": false,
+                    "fixSiderbar": false,
+                    "splitMenus": false,
+                    "headerRender": false,
+                    "footerRender": false,
+                    "menuRender": false,
+                    "menuHeaderRender": false
+                })
+            }
         }
-        const serverMenus = await getAntdMenus();
-        const antdMenus = buildDynamicMenus(serverMenus);
-        let menuData = [...antdMenus];
-        if (IsAdmin) {
-            let menuDataObj = safeEval(result.menuData)
-            console.log('menuDataObj: ', menuDataObj);
-            menuData.push(...menuDataObj)
+
+        if (isLoggedIn) {
+            let IsAdmin = false;
+            if (currentUser?.roles && currentUser?.roles.length > 0) {
+                IsAdmin = currentUser?.roles?.includes("Administrator")
+            }
+            const serverMenus = await getAntdMenus();
+            const antdMenus = buildDynamicMenus(serverMenus);
+            let menuData = [...antdMenus];
+            if (IsAdmin) {
+                let menuDataObj = []
+                if (result.menuData) {
+                    try {
+                        menuDataObj = safeEval(result.menuData)
+                    } catch (error) {
+                        console.error("服务器端菜单加载失败，使用默认菜单", menuData, error)
+                    }
+                }
+                menuData.push(...menuDataObj)
+            }
+            const dynamicMenuData = await loadMenuData(menuData);
+            siteConfig.dynamicMenuData = dynamicMenuData
+            siteConfig.menuData = dynamicMenuData.menuData;
         }
-        const dynamicMenuData = await loadMenuData(menuData);
-        siteConfig.menuData = dynamicMenuData.menuData
-        // siteConfig.serverMenus = serverMenus
-        // siteConfig.dynamicMenuData = dynamicMenuData
 
+    } catch (error) {
+        console.error('GetSettings siteSettingsData faild: ', result, error);
     }
-    console.log('GetSettings result: ', siteConfig);
-
-
     return siteConfig;
 }
 

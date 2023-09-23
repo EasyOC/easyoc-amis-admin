@@ -1,8 +1,8 @@
 import { AmisExt } from './src/AmisExt'
-
+import { IMainStore } from '@/stores'
 declare global {
     interface Window {
-        $wujie: any
+        store: IMainStore
         __POWERED_BY_WUJIE__: boolean
         amisExt: Partial<AmisExt>
     }

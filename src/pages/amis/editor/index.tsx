@@ -33,6 +33,7 @@ import {History} from 'history';
 import {currentLocale} from 'i18n-runtime';
 import AppSettings from '@/services/appSettings';
 import {IMainStore} from '@/stores';
+import {inject, observer} from 'mobx-react';
 // import 'amis/schema.json';
 //禁用部分组件
 // import './components/DisabledEditorPlugin';
@@ -526,4 +527,4 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
     </FullScreen>
   );
 };
-export default AmisEditor;
+export default inject('store')(observer(AmisEditor));

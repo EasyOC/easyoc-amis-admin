@@ -1,95 +1,51 @@
-import {
-  CaretDownFilled,
-  DoubleRightOutlined,
-  GithubFilled,
-  InfoCircleFilled,
-  LogoutOutlined,
-  PlusCircleFilled,
-  QuestionCircleFilled,
-  SearchOutlined
-} from '@ant-design/icons';
-import type {ProSettings} from '@ant-design/pro-components';
+import {LogoutOutlined} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   ProConfigProvider,
-  ProLayout,
-  SettingDrawer
+  ProLayout
 } from '@ant-design/pro-components';
-import {css} from '@emotion/css';
-import {
-  Button,
-  ConfigProvider,
-  Divider,
-  Dropdown,
-  Input,
-  Popover,
-  theme
-} from 'antd';
-import React, {FC, useEffect, useState} from 'react';
-import defaultProps from './ProLayoutProps';
-import Hello from '@/pages/Hello';
+import {ConfigProvider, Dropdown} from 'antd';
+import React, {FC} from 'react';
 import {eachTree} from 'amis';
 import {Route, useHistory} from 'react-router';
 import appSettings from '@/services/appSettings';
-import {getSiteGlobalSettings} from '@/services/amis/siteSettings';
-import {getUserInfo} from '@/services/auth';
-import {EocInitialState} from '@/types/src/SiteGlobalSettings';
 import authService from '@/services/auth/authService';
-import {deepMerge} from '@/utils';
-import {CurrentUser} from '@/types/src/CurrentUser';
-import queryString from 'query-string';
-import {routerPathName} from '@/utils/urlHelper';
+import {mustStartsWith} from '@/utils';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
+import Footer from './Components/Footer';
+import routeConfig from '@/route/routeConfig';
 let ContextPath = appSettings.publicPath;
-const RenderContent = () => {
-  let routes: any = [];
-
-  [defaultProps.route].forEach((root: any) => {
-    root.routes &&
-      eachTree(root.routes, (item: any) => {
-        if (item.path && item.component) {
-          routes.push(
-            <Route
-              key={routes.length + 1}
-              path={
-                item.path[0] === '/'
-                  ? ContextPath + item.path
-                  : `${ContextPath}/${item.path}`
-              }
-              render={(props: any) => <item.component {...props} />}
-            />
-          );
-        }
-      });
-  });
-  return routes;
-};
-const loginPage = appSettings.loginPage;
-
-const WITHELIST = [
-  loginPage,
-  '/auth/login',
-  '/auth/redirect',
-  '/auth/logout_redirect'
-];
 
 const Layout: FC<{store: IMainStore; history: History}> = props => {
   const {store} = props;
-  const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({
-    fixSiderbar: true,
-    layout: 'mix',
-    splitMenus: true
-  });
+
   const history = useHistory();
-  const showLayout = () => {
-    const currentPath = routerPathName();
-    return !WITHELIST.includes(currentPath);
+  const RenderContent = () => {
+    let routes: any = [];
+
+    [routeConfig].forEach((routeItem: any) => {
+      const subFolder = ContextPath == '/' ? '' : ContextPath;
+      routeItem &&
+        eachTree(routeItem, (item: any) => {
+          if (item.path) {
+            routes.push(
+              <Route
+                key={routes.length + 1}
+                path={subFolder + mustStartsWith(item.path, '/')}
+                render={(props: any) => <item.component {...props} />}
+              />
+            );
+          }
+        });
+    });
+    return routes.find(
+      x =>
+        x.props.path?.toLowerCase() == history.location.pathname.toLowerCase()
+    );
   };
 
-  const [pathname, setPathname] = useState('/list/sub-page/sub-sub-page1');
-  const [num, setNum] = useState(40);
   if (typeof document === 'undefined') {
     return <div />;
   }
@@ -102,100 +58,77 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
       }}
     >
       <ProConfigProvider hashed={false}>
-        <ConfigProvider
-          getTargetContainer={() => {
-            return document.getElementById('test-pro-layout') || document.body;
-          }}
-        >
+        <ConfigProvider>
           <ProLayout
-            loading={store.loading}
-            prefixCls="my-prefix"
-            bgLayoutImgList={[
-              {
-                src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
-                left: 85,
-                bottom: 100,
-                height: '303px'
+            //默认ProLayout属性全部采用store 中的配置
+            {...{
+              ...store.settings,
+              menuHeaderRender: undefined,
+              route: store.settings.menuData,
+              menuData: store.settings.menuData,
+              token: store.settings.token,
+              loading: store.loading,
+              prefixCls: 'my-prefix',
+              bgLayoutImgList: [
+                {
+                  src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
+                  left: 85,
+                  bottom: 100,
+                  height: '303px'
+                },
+                {
+                  src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
+                  bottom: -68,
+                  right: -45,
+                  height: '303px'
+                },
+                {
+                  src: 'https://img.alicdn.com/imgextra/i3/O1CN018NxReL1shX85Yz6Cx_!!6000000005798-2-tps-884-496.png',
+                  bottom: 0,
+                  left: 0,
+                  width: '331px'
+                }
+              ],
+              location: {
+                pathname: history.location.pathname
               },
-              {
-                src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
-                bottom: -68,
-                right: -45,
-                height: '303px'
-              },
-              {
-                src: 'https://img.alicdn.com/imgextra/i3/O1CN018NxReL1shX85Yz6Cx_!!6000000005798-2-tps-884-496.png',
-                bottom: 0,
-                left: 0,
-                width: '331px'
-              }
-            ]}
-            {...defaultProps}
-            location={{
-              pathname
-            }}
-            token={{
-              header: {
-                colorBgMenuItemSelected: 'rgba(0,0,0,0.04)'
-              }
-            }}
-            siderMenuType="group"
-            menu={{
-              collapsedShowGroupTitle: true
-            }}
-            avatarProps={{
-              src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
-              size: 'small',
-              title: '七妮妮',
-              render: (props, dom) => {
-                return (
-                  <Dropdown
-                    menu={{
-                      items: [
-                        {
-                          key: 'logout',
-                          icon: <LogoutOutlined />,
-                          label: '退出登录'
-                        }
-                      ]
-                    }}
-                  >
-                    {dom}
-                  </Dropdown>
-                );
+              avatarProps: {
+                src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
+                size: 'small',
+                title: store.userStore.name,
+                render: (props, dom) => {
+                  return (
+                    <Dropdown
+                      menu={{
+                        items: [
+                          {
+                            key: 'logout',
+                            icon: <LogoutOutlined />,
+                            onClick: async () => {
+                              await authService.logout();
+                            },
+                            label: '退出登录'
+                          }
+                        ]
+                      }}
+                    >
+                      {dom}
+                    </Dropdown>
+                  );
+                }
               }
             }}
-            menuFooterRender={props => {
-              if (props?.collapsed) return undefined;
-              return (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    paddingBlockStart: 12
-                  }}
-                >
-                  <div>© 2021 Made with love</div>
-                  <div>by Ant Design</div>
-                </div>
-              );
+            footerRender={() => {
+              if (store?.settings?.footerRender !== false) {
+                return <Footer />;
+              } else {
+                return <></>;
+              }
             }}
-            onMenuHeaderClick={e => console.log(e)}
-            menuItemRender={(item, dom) => (
-              <div
-                onClick={() => {
-                  setPathname(item.path || '/welcome');
-                }}
-              >
-                {dom}
-              </div>
-            )}
-            {...settings}
           >
             <PageContainer
-              token={{
-                paddingInlinePageContainerContent: num
-              }}
-              subTitle="简单的描述"
+              loading={store.loading}
+              subTitle={store.settings.subTitle}
             >
               <ProCard
                 style={{
@@ -203,23 +136,23 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
                   minHeight: 800
                 }}
               >
-                <RenderContent></RenderContent>
+                <RenderContent />
               </ProCard>
             </PageContainer>
 
-            <SettingDrawer
+            {/* <SettingDrawer
               pathname={pathname}
               enableDarkTheme
               getContainer={(e: any) => {
                 if (typeof window === 'undefined') return e;
                 return document.getElementById('test-pro-layout');
               }}
-              settings={settings}
+              settings={store.settings}
               onSettingChange={changeSetting => {
                 setSetting(changeSetting);
               }}
               disableUrlParams={false}
-            />
+            /> */}
           </ProLayout>
         </ConfigProvider>
       </ProConfigProvider>

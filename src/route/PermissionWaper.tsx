@@ -8,6 +8,7 @@ import appSettings from '@/services/appSettings';
 import {routerPathName} from '@/utils/urlHelper';
 import queryString from 'query-string';
 import {PageLoading} from '@ant-design/pro-components';
+import authService from '@/services/auth/authService';
 const loginPage = appSettings.loginPage;
 
 const WITHELIST = [
@@ -37,18 +38,18 @@ const PermissionWaper: React.FC<{
   //使用 useEffect hook，检查登录状态
   const history = useHistory();
   useEffect(() => {
-    debugger;
     const init = async () => {
-      const currentPath = routerPathName();
-      if (!WITHELIST.includes(currentPath)) {
-        store.loading = false;
-        doLogin();
+      store.userStore.isAuthenticated = await authService.isLoggedIn();
+      if (!store.userStore.isAuthenticated) {
+        const currentPath = routerPathName();
+        if (!WITHELIST.includes(currentPath)) {
+          store.loading = false;
+          doLogin();
+        }
       }
     };
-    if (!store.userStore.isAuthenticated) {
-      init();
-    }
-  }, [history, store.userStore.isAuthenticated]);
+    init();
+  }, [history]);
 
   //返回包含子组件的 JSX
   return (
