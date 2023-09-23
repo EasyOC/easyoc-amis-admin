@@ -13,22 +13,16 @@ import routeConfig from './routeConfig';
 const route = function (props: {store: IMainStore}) {
   const {store} = props;
   let toastPosition = store.settings?.amis?.toastConf?.position || 'top-center';
-  const theme = store.settings?.amis?.theme || 'cxd';
   return (
     <Router>
       <div className="routes-wrapper">
         <ToastComponent
           key="toast"
           position={toastPosition}
-          theme={theme}
-          locale={store.settings.locale}
+          {...store.amisEnv}
           closeButton={true}
         />
-        <AlertComponent
-          key="alert"
-          locale={store.settings.locale}
-          theme={theme}
-        />
+        <AlertComponent key="alert" {...store.amisEnv} />
 
         <Switch>
           {/* 不需要授权的页面 */}

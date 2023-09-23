@@ -1,5 +1,5 @@
 import React from 'react';
-import {RouteComponentProps, withRouter} from 'react-router';
+import {RouteComponentProps, useHistory, withRouter} from 'react-router';
 import {inject, observer} from 'mobx-react';
 import {getEnv} from 'mobx-state-tree';
 import {IMainStore} from '../stores';
@@ -29,7 +29,7 @@ export function schema2component(
 
       const props = this.props;
       const store = props.store;
-      const rootEnv = getEnv(store);
+      const rootEnv = getEnv(store.amisEnv);
 
       const normalizeLink = (to: string, preserveHash?: boolean) => {
         if (/^\/api\//.test(to)) {
@@ -37,7 +37,7 @@ export function schema2component(
         }
 
         to = to || '';
-        const history = this.props.history;
+        const history = props.history;
         const location = history.location;
         const currentQuery = qs.parse(location.search.substring(1));
         to = filter(
@@ -120,9 +120,9 @@ export function schema2component(
         updateLocation:
           props.updateLocation ||
           ((location: string, replace: boolean) => {
-            const history = this.props.history;
+            const history = props.history;
             if (location === 'goBack') {
-              return history.back();
+              return history.goBack();
             } else if (/^https?\:\/\//.test(location)) {
               return (window.location.href = location);
             }
@@ -134,9 +134,9 @@ export function schema2component(
         jumpTo:
           props.jumpTo ||
           ((to: string, action?: any) => {
-            const history = this.props.history;
+            const history = useHistory();
             if (to === 'goBack') {
-              return history.back();
+              return history.goBack();
             }
 
             to = normalizeLink(to);
@@ -162,7 +162,7 @@ export function schema2component(
             }
           }),
         affixOffsetTop: props.embedMode ? 0 : 50,
-        theme: store.theme
+        theme: store.amisEnv?.theme
       });
     }
 
@@ -187,7 +187,7 @@ export function schema2component(
       body = render(
         finalSchema,
         {
-          location,
+          location: window.location,
           data: utils.createObject({
             ...match.params,
             amisStore: store,
@@ -195,10 +195,10 @@ export function schema2component(
             params: match.params
           }),
           ...rest,
-          fetcher: store.fetcher,
-          notify: store.notify,
-          alert: store.alert,
-          copy: store.copy,
+          fetcher: store.amisEnv.fetcher,
+          notify: store.amisEnv.notify,
+          alert: store.amisEnv.alert,
+          copy: store.amisEnv.copy,
           propsTransform: transform
         },
         this.getEnv()

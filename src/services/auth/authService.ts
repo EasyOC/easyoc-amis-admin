@@ -1,18 +1,18 @@
 /* eslint-disable */
 import { User, UserManager, UserManagerSettingsStore, WebStorageStateStore } from 'oidc-client-ts';
-import AppSettings from '../appSettings';
 import { routerPathName } from '@/utils/urlHelper';
 import CurrentUser from '@/types/src/CurrentUser';
 import { isArray } from 'lodash';
+import appSettings from '../appsettings';
 
 
 export const initUserManager = () => {
   const config = {
-    userStore: new WebStorageStateStore({ prefix: `oidc_${AppSettings.clientId}_` }),
-    authority: AppSettings.apiBaseUrl,
-    client_id: AppSettings.clientId,
-    redirect_uri: AppSettings.clientRoot + '/auth/redirect',
-    post_logout_redirect_uri: AppSettings.clientRoot + '/auth/logout_redirect',
+    userStore: new WebStorageStateStore({ prefix: `oidc_${appSettings.clientId}_` }),
+    authority: appSettings.apiBaseUrl,
+    client_id: appSettings.clientId,
+    redirect_uri: appSettings.clientRoot + '/auth/redirect',
+    post_logout_redirect_uri: appSettings.clientRoot + '/auth/logout_redirect',
     scope: "openid profile email roles offline_access",
     filterProtocolClaims: true,
     loadUserInfo: true,

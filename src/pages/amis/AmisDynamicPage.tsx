@@ -1,12 +1,7 @@
 import AMISComponent from '@/components/AMISComponent';
 import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
 import {IMainStore} from '@/stores';
-import type {
-  EocMenuDataItem,
-  EocLayoutSettings,
-  DynamicMenuData
-} from '@/types/src/SiteGlobalSettings';
-import {deepFind, mustNotStartsWith, mustStartsWith, treeFind} from '@/utils';
+import {treeFind} from '@/utils';
 import {PageContainer} from '@ant-design/pro-components';
 import {inject, observer} from 'mobx-react';
 import React, {useEffect, useState} from 'react';

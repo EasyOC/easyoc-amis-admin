@@ -2,86 +2,100 @@ import { clone, has, merge, unset } from 'lodash';
 import authService from '../auth/authService';
 import { JSONC } from '../../utils/json';
 import { listToTree, treeMap } from '../../utils/helper/tree';
-import { mustStartsWith, safeEval } from '../../utils';
+import { deepMerge, mustStartsWith, safeEval } from '../../utils';
 import { currentLocale, extendLocale, translate } from 'i18n-runtime';
 import { gql, useQuery } from '@apollo/client';
-import { DynamicMenuData, EocLayoutSettings } from '../../types/src/SiteGlobalSettings';
+import { DynamicMenuData, EocLayoutSettings, EocMenuDataItem } from '../../types/src/SiteGlobalSettings';
 import { CurrentUser } from '../../types/src/CurrentUser';
 import defaultRequest from '../requests';
 import { excuteGraphqlGetQuery, excuteGraphqlQuery } from '../graphql/graphqlApi';
+import ProLayoutProps from '@/Layout/ProLayoutProps';
+import { apiUrl } from '@/utils/urlHelper';
+import { fixMenuItemIcon } from '@/utils/helper/iconHelper';
 
 
 
 
-const addTranslate = (element) => {
+const addTranslateToDict = (element, menuLang: { [langKey: string]: { [transKey: string]: string } }) => {
 
     const currlang = currentLocale();
-
+    if (!element.keyPath) {
+        return;
+    }
+    const tryAddMenu = (langName: string, key: string, text: string) => {
+        menuLang[langName] ??= {}
+        menuLang[langName][key] = text
+    }
     //菜单多语言处理
     if (currlang == "zh-CN" && element.zhCN) {
-        extendLocale(currlang, { [element.keyPath]: element.zhCN || element.name })
-        console.log('element.keyPath:zhCN ', element.keyPath, element.zhCN, element);
-    } else if (currlang == "en-US" && element.enUS) {
-        extendLocale(currlang, { [element.keyPath]: element.enUS })
-        console.log('element.keyPath: en-US', element.keyPath, element.enUS, element);
-    } else if (element.lang && element.lang[currlang]) {
-        extendLocale(currlang, { [element.keyPath]: element.lang[currlang] })
-        console.log('element.keyPath: lang', element.keyPath, element.lang, element);
-    } else {
-        extendLocale(currlang, { [element.keyPath]: element.name })
-    }
+        tryAddMenu(currlang, element.keyPath, element.zhCN || element.displayText || element.name)
 
+        // console.log('element.keyPath:zhCN ', element.keyPath, element.zhCN, element);
+    } else if (currlang == "en-US" && element.enUS) {
+        tryAddMenu(currlang, element.keyPath, element.enUS || element.displayText || element.name)
+        // console.log('element.keyPath: en-US', element.keyPath, element.enUS, element);
+    } else if (element.lang && element.lang[currlang]) {
+        tryAddMenu(currlang, element.keyPath, element.lang[currlang] || element.displayText || element.name)
+    }
 }
 
 
 export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> => {
-    const dynamicMenuDict: { [key: string]: string } = {}
-
-    console.log('begin loadMenuData: ', serverMenus);
-    let menus = treeMap(serverMenus || [], {
+    const currlang = currentLocale();
+    const menuLang: {
+        [langKey: string]: { [transKey: string]: string }
+    } = {}
+    let result = treeMap(serverMenus || [], {
         children: 'routes',
         conversion: (item: any) => {
-            // if (item.layout === false || item.hideInMenu || item.redirect || !item.name) {
-            //     return item
-            // }
+            item.fullPath = item.path;
 
             if (item.routes) {
                 // item.children.push(...rItem)//.sort((a, b) => a.order - b.order);
                 item.routes.forEach((element: any) => {
                     element.parentNode = item;
-                    // if (item.contentItemId) {
-                    //     dynamicMenuDict[`${element.parentNode.path}/${element.path}`] = element.contentItemId
-                    // }
                 });
             }
             if (!!item.locale) {
                 item.keyPath = item.locale
             } else {
-                console.log('item: ', item);
 
                 if (!item.parentNode) {
                     item.keyPath = 'menu.' + item.name;
                 } else {
                     item.keyPath = item.parentNode.keyPath + (item.name ? '.' + item.name : "")
-                    if (item.contentItemId) {
-                        dynamicMenuDict[`${item.parentNode.path.toLowerCase()}/${item.path.toLowerCase()}`] = item.contentItemId
-                    }
                 }
                 item.locale = item.keyPath
             }
-            addTranslate(item)
-            if (item.contentItemId) {
-                dynamicMenuDict[item.path.toLowerCase()] = item.contentItemId
+            if (item.parentNode?.fullPath) {
+                item.fullPath = `${item.parentNode?.fullPath}/${item.path}`;
+            } else {
+                item.fullPath = mustStartsWith(item.path, '/')
             }
+            // if (item.contentItemId) {
+            // dynamicMenuDict[item.fullPath] = {
+            //     contentItemId: item.contentItemId,
+            //     schemaStr: item.schemaConfig?.schemaDetails?.schemaStr,
+            //     useLayout: item.schemaConfig?.schemaDetails?.useLayout,
+            //     description: item.schemaConfig?.schemaDetails?.description,
+            //     displayText: item.schemaConfig?.schemaDetails?.displayText
+            // }
+            // }
+
+            addTranslateToDict(item, menuLang)
             return item;
         },
     });
-    menus = menus.sort((a, b) => a.orderIndex - b.orderIndex)
-    console.log('loadMenuData result: ', menus);
-
+    console.log('menuLang: ', menuLang);
+    extendLocale(currlang, menuLang[currlang])
+    result = result.sort((a, b) => a.orderIndex - b.orderIndex)
+    //修复图标
+    const menus = fixMenuItemIcon(result as EocMenuDataItem[])
+    console.log('menus: ', menus);
     return {
-        //修复图标
-        menuData: menus
+        menuData: menus,
+        serverMenus,
+        // dynamicMenuDict: dynamicMenuDict
     } as DynamicMenuData;
 };
 
@@ -233,15 +247,17 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
         // siteConfig.enableLoginPage = result.enableLoginPage
         if (result?.siteSettingsData) {
             let tempSiteSettingsData = JSONC.parse(result.siteSettingsData) as EocLayoutSettings;
-            tempSiteSettingsData = deepMerge(defaultSettings, tempSiteSettingsData)
-
+            tempSiteSettingsData = deepMerge(ProLayoutProps, tempSiteSettingsData)
             siteConfig = deepMerge(tempSiteSettingsData,
                 {
                     logo: tempSiteSettingsData?.logo ? apiUrl(tempSiteSettingsData?.logo) :
-                        defaultSettings.logo,
+                        ProLayoutProps.logo,
                     loginBg: tempSiteSettingsData?.loginBg ? apiUrl(tempSiteSettingsData?.loginBg) :
-                        defaultSettings.loginBg
+                        ProLayoutProps.loginBg
                 })
+            siteConfig = {
+                ...siteConfig,
+            }
             //解决 title 覆盖问题
             siteConfig.serverTitle = siteConfig.title
             if (window.__POWERED_BY_WUJIE__) {
@@ -260,6 +276,7 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
         }
 
         if (isLoggedIn) {
+            currentUser ??= await authService.getLocalUserInfo()
             let IsAdmin = false;
             if (currentUser?.roles && currentUser?.roles.length > 0) {
                 IsAdmin = currentUser?.roles?.includes("Administrator")

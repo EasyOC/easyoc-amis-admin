@@ -1,21 +1,26 @@
-import {LogoutOutlined} from '@ant-design/icons';
+import {
+  CaretDownFilled,
+  InfoCircleFilled,
+  LogoutOutlined
+} from '@ant-design/icons';
 import {
   PageContainer,
+  ProBreadcrumb,
   ProCard,
   ProConfigProvider,
   ProLayout
 } from '@ant-design/pro-components';
-import {ConfigProvider, Dropdown} from 'antd';
+import {ConfigProvider, Dropdown, Popover} from 'antd';
 import React, {FC} from 'react';
 import {eachTree} from 'amis';
 import {Route, useHistory} from 'react-router';
-import appSettings from '@/services/appSettings';
 import authService from '@/services/auth/authService';
 import {mustStartsWith} from '@/utils';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import Footer from './Components/Footer';
 import routeConfig from '@/route/routeConfig';
+import appSettings from '@/services/appsettings';
 let ContextPath = appSettings.publicPath;
 
 const Layout: FC<{store: IMainStore; history: History}> = props => {
@@ -27,8 +32,8 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
 
     [routeConfig].forEach((routeItem: any) => {
       const subFolder = ContextPath == '/' ? '' : ContextPath;
-      routeItem &&
-        eachTree(routeItem, (item: any) => {
+      routeItem.routes &&
+        eachTree(routeItem.routes, (item: any) => {
           if (item.path) {
             routes.push(
               <Route
@@ -125,6 +130,35 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
                 return <></>;
               }
             }}
+            actionsRender={props => {
+              return [];
+            }}
+            headerTitleRender={(logo, title, _) => {
+              const defaultDom = (
+                <a>
+                  {logo}
+                  {title}
+                </a>
+              );
+              if (typeof window === 'undefined') return defaultDom;
+              if (document.body.clientWidth < 1400) {
+                return defaultDom;
+              }
+              if (_.isMobile) return defaultDom;
+              return <>{defaultDom}</>;
+            }}
+            menuItemRender={(item, dom) => (
+              <div
+                onClick={() => {
+                  history.push(item.path || '/');
+                }}
+              >
+                {dom}
+              </div>
+            )}
+            headerContentRender={() => {
+              return <ProBreadcrumb />;
+            }}
           >
             <PageContainer
               loading={store.loading}
@@ -136,7 +170,7 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
                   minHeight: 800
                 }}
               >
-                <RenderContent />
+                {/* <RenderContent /> */}
               </ProCard>
             </PageContainer>
 
