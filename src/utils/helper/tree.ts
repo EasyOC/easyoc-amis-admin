@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable no-param-reassign */
 import { get, has } from "lodash"
 import { deepMerge } from "../deep-merge"
 

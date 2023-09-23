@@ -7,6 +7,7 @@ import {useHistory} from 'react-router-dom';
 import appSettings from '@/services/appSettings';
 import {routerPathName} from '@/utils/urlHelper';
 import queryString from 'query-string';
+import {PageLoading} from '@ant-design/pro-components';
 const loginPage = appSettings.loginPage;
 
 const WITHELIST = [
@@ -36,29 +37,24 @@ const PermissionWaper: React.FC<{
   //使用 useEffect hook，检查登录状态
   const history = useHistory();
   useEffect(() => {
-    if (!store.loading) {
-      store.loading = true;
-      const init = async () => {
-        const currentPath = routerPathName();
-        if (!WITHELIST.includes(currentPath)) {
-          store.loading = false;
-          doLogin();
-        }
-      };
-      if (!store.userStore.isAuthenticated) {
-        init().then(() => (store.loading = false));
-      } else {
-        store.fetchServerSideSettings().then(() => (store.loading = false));
+    debugger;
+    const init = async () => {
+      const currentPath = routerPathName();
+      if (!WITHELIST.includes(currentPath)) {
+        store.loading = false;
+        doLogin();
       }
-    }
-    return () => {
-      store.loading = false;
     };
+    if (!store.userStore.isAuthenticated) {
+      init();
+    }
   }, [history, store.userStore.isAuthenticated]);
 
   //返回包含子组件的 JSX
   return (
-    <>{store.userStore.isAuthenticated ? props.children : <>loading...</>}</>
+    <>{store.userStore.isAuthenticated ? props.children : <PageLoading />}</>
   );
 };
 export default inject('store')(observer(PermissionWaper));
+//observer 会在store变化时重新渲染，此处移除
+// export default inject('store')(PermissionWaper);

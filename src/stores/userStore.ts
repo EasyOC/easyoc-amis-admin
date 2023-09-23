@@ -9,7 +9,7 @@ import { getUserInfo } from '@/services/auth';
 class UserStore {
 
   @observable
-  user: CurrentUser
+  user: CurrentUser = null
 
   @computed
   get name() {
@@ -29,19 +29,14 @@ class UserStore {
    */
   @action
   async fetchUserInfo() {
-    const result = await getUserInfo();
-    this.isAuthenticated = await authService.isLoggedIn();
-    if (this.isAuthenticated) {
-      this.user = result;
-    }
-    return this.user;
+    return await getUserInfo();
   }
 
 
   @action
-  async logout() {
-    localStorage.setItem('authenticated', '');
-    await authService.logout();
+  resetUserInfo() {
+    this.user = null
+    this.isAuthenticated = false
   }
 
 }

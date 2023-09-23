@@ -1,39 +1,35 @@
+import appSettings from '@/services/appSettings';
 import authService from '@/services/auth/authService';
 import {IMainStore} from '@/stores';
-import {History} from 'history';
 import {inject, observer} from 'mobx-react';
 import React from 'react';
 import {useEffect, useState} from 'react';
-import { useHistory } from 'react-router-dom';
-
+import {useHistory} from 'react-router-dom';
 
 function LoutCallBack(props: {store: IMainStore}) {
   console.log('props: ', props);
 
   const [state, setState] = useState({mounted: false});
-  const history: History = useHistory();
+  const history = useHistory();
 
   useEffect(() => {
     if (!state.mounted) {
       setState({mounted: true});
       const completeLogout = async () => {
         await authService.completeLogout();
-
+        //重置登录信息
+        props.store.userStore.resetUserInfo();
+        props.store.settingsLoaded = false;
+        await props.store.ensureServerSideSettingsLoaded();
         const {pathname} = location;
         // const urlParams = queryString.parse(search);
         /** 此方法会跳转到 redirect 参数所在的位置 */
         // const redirect = urlParams.redirect;
-        const loginPage = '/auth/login';
+        const loginPage = appSettings.loginPage;
         // Note: There may be security issues, please note
-        // if (pathname !== loginPage && !redirect) {
         if (pathname !== loginPage) {
           history.push(loginPage);
         }
-        // if (!!SKIP_LOGIN_PAGE) {
-        //   history.push('/');
-        // } else {
-        // history.push(LOGIN_PAGE || '/user/login');
-        // }
       };
       completeLogout();
     }

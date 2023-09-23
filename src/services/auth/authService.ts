@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { UserManager, UserManagerSettingsStore, WebStorageStateStore } from 'oidc-client-ts';
+import { User, UserManager, UserManagerSettingsStore, WebStorageStateStore } from 'oidc-client-ts';
 import AppSettings from '../appSettings';
 import { routerPathName } from '@/utils/urlHelper';
 import CurrentUser from '@/types/src/CurrentUser';
@@ -87,8 +87,8 @@ let authService = {
   async getUserInfo() {
     return await oidcClient.getUser();
   },
-  async getLocalUserInfo() {
-    const oidcUser = await oidcClient.getUser();
+  async getLocalUserInfo(oidcUser?: User) {
+    oidcUser ??= await oidcClient.getUser();
     let currentUser: CurrentUser = {
       displayName: oidcUser?.profile?.name,
       name: oidcUser?.profile?.name,
@@ -97,10 +97,7 @@ let authService = {
       email: oidcUser?.profile?.email,
       roles: []
     };
-    // if (me.userProfile?.lastName && me.userProfile.lastName) {
-    //     currentUser.displayName = `${me.userProfile.firstName}, ${me.userProfile.lastName} - ${me.userName}`;
-    // }
-    ////
+
 
     if (oidcUser?.profile?.roles) {
       if (isArray(oidcUser?.profile.roles)) {

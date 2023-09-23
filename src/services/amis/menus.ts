@@ -41,7 +41,6 @@ export const loadMenus = async (): Promise<NavItem[]> => {
   // const { data: menuList } = useQuery(GET_MENUS)
   console.log('menuList: ', userMenus);
   if (userMenus) {
-    debugger
     return convert2NavItem(userMenus)
   } else {
     return []
@@ -50,7 +49,6 @@ export const loadMenus = async (): Promise<NavItem[]> => {
 
 
 const convert2NavItem = (menuData): NavItem[] => {
-  debugger
   var navItems: NavItem[] = []
   const curLanguage = currentLocale(); // 获取当前语料类型
 

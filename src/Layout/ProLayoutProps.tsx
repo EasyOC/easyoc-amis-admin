@@ -1,3 +1,4 @@
+import {EocLayoutSettings} from '@/types/src/SiteGlobalSettings';
 import {ProLayoutProps} from '@ant-design/pro-components';
 
 export default {
@@ -304,4 +305,4 @@ export default {
     siderMenuType: 'group',
     splitMenus: true
   }
-} as ProLayoutProps;
+} as Partial<EocLayoutSettings>;

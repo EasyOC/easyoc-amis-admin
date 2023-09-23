@@ -1,14 +1,12 @@
 import UserStore from './userStore';
-import SettingsStore from './settingsStore';
-import { types, getEnv } from 'mobx-state-tree';
-import authService from '@/services/auth/authService';
 import { action, computed, observable } from 'mobx';
 import { EocLayoutSettings } from '@/types/src/SiteGlobalSettings';
 import { type RenderOptions } from 'amis';
 import type CurrentUser from '@/types/src/CurrentUser';
 import { getSiteGlobalSettings } from '@/services/amis/siteSettings';
 import { deepMerge } from '@/utils';
-import AmisEnv from '@/services/amis/AmisEnv';
+import defaultAmisEnv from '@/services/amis/AmisEnv';
+import ProLayoutProps from '@/Layout/ProLayoutProps';
 
 // let pagIndex = 1;
 
@@ -84,16 +82,13 @@ const _userStore = new UserStore();
 
 class IMainStore {
   @observable
-  settings?: Partial<EocLayoutSettings>;
+  settings?: Partial<EocLayoutSettings> = { ...ProLayoutProps };
 
   @observable
-  amisEnv?: RenderOptions = AmisEnv as RenderOptions
+  amisEnv?: RenderOptions = { ...defaultAmisEnv } as RenderOptions
 
   @observable
   showSettingsDrawer?: boolean;
-
-  @observable
-  accessToken?: string;
 
   @observable
   loading?: boolean;
@@ -104,17 +99,24 @@ class IMainStore {
   }
 
   /**
-  * 用于 从服务器获取站点配置，获取完成后保存 到settings 里
+   * 标记站点设置是否已加载
+   */
+  @observable
+  settingsLoaded: boolean = false;
+
+  /**
+  * 确保已从服务器获取站点配置，获取完成后保存 到settings 里
+  * 配合 store.settingsLoaded=false 重置加载
   */
   @action
-  async fetchServerSideSettings(
-  ): Promise<Partial<EocLayoutSettings> | undefined> {
-    const serverConfig = await getSiteGlobalSettings(this.userStore.user);
+  async ensureServerSideSettingsLoaded(userInfo?: CurrentUser
+  ): Promise<Partial<EocLayoutSettings>> {
+    const serverConfig = await getSiteGlobalSettings(userInfo);
     console.log('fetchServerSideSettings: from server ', serverConfig);
-    this.settings = serverConfig
-    this.amisEnv = deepMerge({ ...AmisEnv }, serverConfig?.amis);
-
-    return serverConfig;
+    deepMerge(this.settings, serverConfig)
+    deepMerge(this.amisEnv, serverConfig?.amis);
+    this.settingsLoaded = true
+    return this.settings;
   }
 }
 

@@ -47,8 +47,4 @@ export type EocInitialState = {
   currentUser?: CurrentUser;
   accessToken?: string;
   loading?: boolean;
-  fetchServerSideSettings?: (
-    currentUser?: CurrentUser,
-  ) => Promise<Partial<EocLayoutSettings> | undefined>;
-  fetchUserInfo?: () => Promise<CurrentUser | undefined>;
 };

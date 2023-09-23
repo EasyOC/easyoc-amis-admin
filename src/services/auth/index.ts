@@ -1,5 +1,5 @@
 import { CurrentUser } from '@/types/src/CurrentUser';
-import { isArray } from 'lodash';
+import { isArray, merge } from 'lodash';
 import { User } from 'oidc-client-ts';
 import authService from './authService';
 
@@ -8,10 +8,12 @@ import authService from './authService';
 export async function getUserInfo(user?: User) {
 
     const oidcUser = user || await authService.getUserInfo();
-    window.amisExt ??= {}
-    window.amisExt.session = {
-        user: oidcUser
-    };
-    const currentUser = await authService.getLocalUserInfo()
+    const currentUser = await authService.getLocalUserInfo(oidcUser)
+    window.amisExt = merge({ ...window.amisExt },
+        {
+            session: {
+                user: oidcUser
+            }
+        });
     return currentUser
 }

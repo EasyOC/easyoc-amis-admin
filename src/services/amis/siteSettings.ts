@@ -1,11 +1,8 @@
 import { clone, has, merge, unset } from 'lodash';
 import authService from '../auth/authService';
-import { apiUrl } from '../../utils/urlHelper';
 import { JSONC } from '../../utils/json';
 import { listToTree, treeMap } from '../../utils/helper/tree';
-import { deepMerge } from '../../utils/deep-merge';
 import { mustStartsWith, safeEval } from '../../utils';
-import { NavItem } from '../../types'
 import { currentLocale, extendLocale, translate } from 'i18n-runtime';
 import { gql, useQuery } from '@apollo/client';
 import { DynamicMenuData, EocLayoutSettings } from '../../types/src/SiteGlobalSettings';
@@ -37,7 +34,7 @@ const addTranslate = (element) => {
 }
 
 
-export const loadMenuData = async (serverMenus: any): Promise<NavItem> => {
+export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> => {
     const dynamicMenuDict: { [key: string]: string } = {}
 
     console.log('begin loadMenuData: ', serverMenus);
@@ -65,7 +62,6 @@ export const loadMenuData = async (serverMenus: any): Promise<NavItem> => {
                 if (!item.parentNode) {
                     item.keyPath = 'menu.' + item.name;
                 } else {
-                    // debugger
                     item.keyPath = item.parentNode.keyPath + (item.name ? '.' + item.name : "")
                     if (item.contentItemId) {
                         dynamicMenuDict[`${item.parentNode.path.toLowerCase()}/${item.path.toLowerCase()}`] = item.contentItemId
@@ -92,7 +88,6 @@ export const loadMenuData = async (serverMenus: any): Promise<NavItem> => {
 const buildDynamicMenus = (antdMenuItems) => {
     const menuData = antdMenuItems?.map((x: any) => {
         if (x.menuType == "DynamicPage") {
-            const schemaConfigName = x.schemaConfig?.schemaDetails?.name
             x.path = x.name
         }
         if (x.otherConfig) {
@@ -220,29 +215,27 @@ const getAntdMenus = async (): Promise<any[]> => {
  */
 
 export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<EocLayoutSettings> => {
-    //站点全局设置，不需要授权 { withToken: false }
     const isLoggedIn = await authService.isLoggedIn();
     let rawResult: {
         data: any
     }
-    console.log('monitor: getInitialState.fetchServerSideSettings.isLoggedIn: ', isLoggedIn);
     if (isLoggedIn) {
-        rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePrivateSettings', { withCredentials: true });
+        rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePrivateSettings');
     }
     else {
         //未登录用户专用，不需要授权 , { withCredentials: false }
-        rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePublicSettings', { withCredentials: false })
+        rawResult = await defaultRequest.get('/api/AntdSettings/GetSitePublicSettings')
     }
     console.log('AntdSettingsresult: ', rawResult);
     const result = rawResult.data.data;
-    const siteConfig = {} as any;
+    let siteConfig = {} as EocLayoutSettings;
     // siteConfig.enableLoginPage = result.enableLoginPage
     if (result?.siteSettingsData) {
-        const tempSiteSettingsData = JSONC.parse(result.siteSettingsData);
+        siteConfig = JSONC.parse(result.siteSettingsData);
     }
-
     if (isLoggedIn) {
 
+        currentUser ??= await authService.getLocalUserInfo();
         let IsAdmin = false;
         if (currentUser?.roles && currentUser?.roles.length > 0) {
             IsAdmin = currentUser?.roles?.includes("Administrator")
@@ -257,8 +250,8 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
         }
         const dynamicMenuData = await loadMenuData(menuData);
         siteConfig.menuData = dynamicMenuData.menuData
-        siteConfig.serverMenus = serverMenus
-        siteConfig.dynamicMenuDict = dynamicMenuData.dynamicMenuDict
+        // siteConfig.serverMenus = serverMenus
+        // siteConfig.dynamicMenuData = dynamicMenuData
 
     }
     console.log('GetSettings result: ', siteConfig);
