@@ -9,7 +9,7 @@ import { DynamicMenuData, EocLayoutSettings, EocMenuDataItem } from '../../types
 import { CurrentUser } from '../../types/src/CurrentUser';
 import defaultRequest from '../requests';
 import { excuteGraphqlGetQuery, excuteGraphqlQuery } from '../graphql/graphqlApi';
-import ProLayoutProps from '@/Layout/ProLayoutProps';
+import ProLayoutProps from '@/Layout/AntdProLayout/defaultProps';
 import { apiUrl } from '@/utils/urlHelper';
 import { fixMenuItemIcon } from '@/utils/helper/iconHelper';
 

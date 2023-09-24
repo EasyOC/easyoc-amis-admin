@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Children} from 'react';
 import {ToastComponent, AlertComponent, Spinner} from 'amis';
 import {Route, Switch, BrowserRouter as Router} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
@@ -8,7 +8,7 @@ import login from '@/pages/auth/login';
 import logout_redirect from '@/pages/auth/logout_redirect';
 import redirect from '@/pages/auth/redirect';
 import PageNotFound from '@/pages/PageNotFound';
-import ProLayout from '@/Layout/ProLayout';
+import ProLayout from '@/Layout/AntdProLayout';
 import routeConfig from './routeConfig';
 const route = function (props: {store: IMainStore}) {
   const {store} = props;
@@ -36,7 +36,6 @@ const route = function (props: {store: IMainStore}) {
               path="/editor"
               component={React.lazy(() => import('../pages/editor/editor'))}
             /> */}
-            <Route component={ProLayout} />
           </PermissionWaper>
         </Switch>
       </div>

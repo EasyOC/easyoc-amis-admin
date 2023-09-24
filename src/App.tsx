@@ -14,7 +14,7 @@ export default function (): JSX.Element {
   const store = (window.store = MainStore);
   useEffect(() => {
     if (!store.settingsLoaded && !store.settingsLoading) {
-      store.ensureServerSideSettingsLoaded();
+      store.loadServerSideSettings();
     }
   });
   return (

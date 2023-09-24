@@ -6,14 +6,13 @@ import type CurrentUser from '@/types/src/CurrentUser';
 import { getSiteGlobalSettings } from '@/services/amis/siteSettings';
 import { deepMerge } from '@/utils';
 import defaultAmisEnv from '@/services/amis/AmisEnv';
-import ProLayoutProps from '@/Layout/ProLayoutProps';
 
 const _userStore = new UserStore();
 
 class IMainStore {
 
   @observable
-  settings: Partial<EocLayoutSettings> = { ...ProLayoutProps };
+  settings: Partial<EocLayoutSettings> = {};
 
   @observable
   amisEnv: RenderOptions = { ...defaultAmisEnv } as RenderOptions
@@ -40,7 +39,7 @@ class IMainStore {
   * 确保已从服务器获取站点配置，获取完成后保存 到settings 里
   * 配合 store.settingsLoaded=false 重置加载
   */
-  ensureServerSideSettingsLoaded = flow(function* (this: IMainStore, userInfo?: CurrentUser) { // <- 注意*号，这是生成器函数！
+  loadServerSideSettings = flow(function* (this: IMainStore, userInfo?: CurrentUser) { // <- 注意*号，这是生成器函数！
     // flows 相关文档https://cn.mobx.js.org/best/actions.html#flows
     this.settingsLoading = true;
     try {
@@ -51,6 +50,7 @@ class IMainStore {
       this.settingsLoaded = true
       return this.settings;
     } catch (error) {
+      console.log("ensureServerSideSettings Faild.", error)
     } finally {
       this.settingsLoading = false;
       return this.settings;

@@ -1,13 +1,13 @@
-import {checkLogin} from '@/services/permissions';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
-import React, {useEffect} from 'react';
-import {useHistory} from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Route, useHistory} from 'react-router-dom';
 import {routerPathName} from '@/utils/urlHelper';
 import queryString from 'query-string';
 import {PageLoading} from '@ant-design/pro-components';
 import authService from '@/services/auth/authService';
 import appSettings from '@/services/appsettings';
+import AntdProLayout from '@/Layout/AntdProLayout';
 const loginPage = appSettings.loginPage;
 
 const WITHELIST = [
@@ -49,10 +49,25 @@ const PermissionWaper: React.FC<{
     };
     init();
   }, [history]);
+  /**
+   * 配置未加载完成或配置加载中 显示一个loading
+   */
+  const [showLoading, setShowLoading] = useState(
+    store.settingsLoading || !store.settingsLoaded
+  );
+  useEffect(() => {
+    setShowLoading(store.settingsLoading || !store.settingsLoaded);
+  }, [store.settingsLoaded, store.settingsLoading]);
 
   //返回包含子组件的 JSX
   return (
-    <>{store.userStore.isAuthenticated ? props.children : <PageLoading />}</>
+    <>
+      {showLoading ? (
+        <PageLoading />
+      ) : (
+        <Route component={AntdProLayout}></Route>
+      )}
+    </>
   );
 };
 export default inject('store')(observer(PermissionWaper));

@@ -1,4 +1,4 @@
-import appSettings from '@/services/appSettings';
+import appSettings from '@/services/appsettings';
 import authService from '@/services/auth/authService';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
@@ -18,9 +18,9 @@ function LoutCallBack(props: {store: IMainStore}) {
       const completeLogout = async () => {
         await authService.completeLogout();
         //重置登录信息
-        props.store.userStore.resetUserInfo();
+        props.store.userStore.afterLogout();
         props.store.settingsLoaded = false;
-        await props.store.ensureServerSideSettingsLoaded();
+        await props.store.loadServerSideSettings();
         const {pathname} = location;
         // const urlParams = queryString.parse(search);
         /** 此方法会跳转到 redirect 参数所在的位置 */
