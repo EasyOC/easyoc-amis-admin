@@ -2,13 +2,12 @@ import {checkLogin} from '@/services/permissions';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import React, {useEffect} from 'react';
-import {History} from 'history';
 import {useHistory} from 'react-router-dom';
-import appSettings from '@/services/appSettings';
 import {routerPathName} from '@/utils/urlHelper';
 import queryString from 'query-string';
 import {PageLoading} from '@ant-design/pro-components';
 import authService from '@/services/auth/authService';
+import appSettings from '@/services/appsettings';
 const loginPage = appSettings.loginPage;
 
 const WITHELIST = [

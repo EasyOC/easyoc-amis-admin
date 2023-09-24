@@ -1,5 +1,5 @@
 import UserStore from './userStore';
-import { action, computed, flow, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { EocLayoutSettings } from '@/types/src/SiteGlobalSettings';
 import { type RenderOptions } from 'amis';
 import type CurrentUser from '@/types/src/CurrentUser';
@@ -9,23 +9,29 @@ import defaultAmisEnv from '@/services/amis/AmisEnv';
 import ProLayoutProps from '@/Layout/ProLayoutProps';
 
 const _userStore = new UserStore();
-
+const _settings: Partial<EocLayoutSettings> = { ...ProLayoutProps };
+const _amisEnv: RenderOptions = { ...defaultAmisEnv } as RenderOptions
 class IMainStore {
+  @computed
+  get settings() {
+    return _settings
+  }
 
-  @observable
-  settings: Partial<EocLayoutSettings> = { ...ProLayoutProps };
-
-  @observable
-  amisEnv: RenderOptions = { ...defaultAmisEnv } as RenderOptions
-
-  @observable
-  userStore = _userStore
+  @computed
+  get amisEnv() {
+    return _amisEnv;
+  }
 
   @observable
   showSettingsDrawer?: boolean;
 
   @observable
   loading?: boolean;
+
+  @computed
+  get userStore() {
+    return _userStore;
+  }
 
   /**
    * 标记站点设置是否已加载
@@ -35,27 +41,21 @@ class IMainStore {
 
   @observable
   settingsLoading: boolean = false;
-
   /**
   * 确保已从服务器获取站点配置，获取完成后保存 到settings 里
   * 配合 store.settingsLoaded=false 重置加载
   */
-  ensureServerSideSettingsLoaded = flow(function* (this: IMainStore, userInfo?: CurrentUser) { // <- 注意*号，这是生成器函数！
-    // flows 相关文档https://cn.mobx.js.org/best/actions.html#flows
+  @action
+  async ensureServerSideSettingsLoaded(userInfo?: CurrentUser
+  ): Promise<Partial<EocLayoutSettings>> {
     this.settingsLoading = true;
-    try {
-      const serverConfig = yield getSiteGlobalSettings(userInfo); //使用 yield 代替 await
-      console.log('fetchServerSideSettings: from server ', serverConfig);
-      this.settings = deepMerge(this.settings, serverConfig)
-      this.amisEnv = deepMerge(this.amisEnv, serverConfig?.amis);
-      this.settingsLoaded = true
-      return this.settings;
-    } catch (error) {
-    } finally {
-      this.settingsLoading = false;
-      return this.settings;
-    }
-  })
+    const serverConfig = await getSiteGlobalSettings(userInfo);
+    console.log('fetchServerSideSettings: from server ', serverConfig);
+    deepMerge(_settings, serverConfig)
+    deepMerge(_amisEnv, serverConfig?.amis);
+    this.settingsLoaded = true
+    return _settings;
+  }
 }
 
 const mainStore = new IMainStore()

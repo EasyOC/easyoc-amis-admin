@@ -12,7 +12,11 @@ extendLocale('en-US', enUS);
 export default function (): JSX.Element {
   const MainStore = new IMainStore();
   const store = (window.store = MainStore);
-  store.userStore.fetchUserInfo();
+  useEffect(() => {
+    if (!store.settingsLoaded && !store.settingsLoading) {
+      store.ensureServerSideSettingsLoaded();
+    }
+  });
   return (
     <Provider store={store}>
       <RootRoute store={store} />

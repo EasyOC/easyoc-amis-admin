@@ -1,44 +1,41 @@
-import {
-  CaretDownFilled,
-  InfoCircleFilled,
-  LogoutOutlined
-} from '@ant-design/icons';
+import {LogoutOutlined} from '@ant-design/icons';
 import {
   PageContainer,
   ProBreadcrumb,
   ProCard,
   ProConfigProvider,
-  ProLayout
+  ProLayout,
+  SettingDrawer
 } from '@ant-design/pro-components';
-import {ConfigProvider, Dropdown, Popover} from 'antd';
-import React, {FC} from 'react';
+import {ConfigProvider, Dropdown} from 'antd';
+import React, {FC, useEffect} from 'react';
 import {eachTree} from 'amis';
 import {Route, useHistory} from 'react-router';
 import authService from '@/services/auth/authService';
-import {mustStartsWith} from '@/utils';
+import {deepMerge} from '@/utils';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import Footer from './Components/Footer';
 import routeConfig from '@/route/routeConfig';
 import appSettings from '@/services/appsettings';
+import ProLayoutProps from './ProLayoutProps';
 let ContextPath = appSettings.publicPath;
 
 const Layout: FC<{store: IMainStore; history: History}> = props => {
-  const {store} = props;
-
   const history = useHistory();
+  const {store} = props;
+  useEffect(() => {}, [store]);
   const RenderContent = () => {
     let routes: any = [];
-
     [routeConfig].forEach((routeItem: any) => {
-      const subFolder = ContextPath == '/' ? '' : ContextPath;
+      // const subFolder = ContextPath == '/' ? '' : ContextPath;
       routeItem.routes &&
         eachTree(routeItem.routes, (item: any) => {
           if (item.path) {
             routes.push(
               <Route
                 key={routes.length + 1}
-                path={subFolder + mustStartsWith(item.path, '/')}
+                path={item.path}
                 render={(props: any) => <item.component {...props} />}
               />
             );
@@ -69,7 +66,8 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
             {...{
               ...store.settings,
               menuHeaderRender: undefined,
-              route: store.settings.menuData,
+              // route: store.settings.route,
+              route: ProLayoutProps.route,
               menuData: store.settings.menuData,
               token: store.settings.token,
               loading: store.loading,
@@ -174,19 +172,19 @@ const Layout: FC<{store: IMainStore; history: History}> = props => {
               </ProCard>
             </PageContainer>
 
-            {/* <SettingDrawer
-              pathname={pathname}
+            <SettingDrawer
+              pathname={history.location.pathname}
               enableDarkTheme
               getContainer={(e: any) => {
                 if (typeof window === 'undefined') return e;
                 return document.getElementById('test-pro-layout');
               }}
-              settings={store.settings}
+              settings={{...store.settings} as any}
               onSettingChange={changeSetting => {
-                setSetting(changeSetting);
+                deepMerge(store.settings, changeSetting);
               }}
               disableUrlParams={false}
-            /> */}
+            />
           </ProLayout>
         </ConfigProvider>
       </ProConfigProvider>
