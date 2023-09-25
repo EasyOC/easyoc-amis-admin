@@ -19,7 +19,6 @@ const WITHELIST = [
 //定义一个 react函数式组件，它可以包含其它组件//导出默认的组件
 const PermissionWaper: React.FC<{
   store: IMainStore;
-  children: React.ReactNode;
 }> = props => {
   const {store} = props;
   const doLogin = async () => {
@@ -70,6 +69,6 @@ const PermissionWaper: React.FC<{
     </>
   );
 };
-export default inject('store')(observer(PermissionWaper));
+// export default PermissionWaper;
 //observer 会在store变化时重新渲染，此处移除
-// export default inject('store')(PermissionWaper);
+export default inject('store')(observer(PermissionWaper));

@@ -1,0 +1,696 @@
+{
+    "type": "page",
+    "regions": [
+        "body",
+        "header"
+    ],
+    "id": "u:23a9b0dfb67a",
+    "body": [
+        {
+            "type": "crud",
+            "id": "curdList",
+            "api": {
+                "method": "post",
+                "url": "/api/graphql",
+                "data": {
+                    "&": "$$"
+                },
+                "dataType": "json",
+                "requestAdaptor": "\r\nconsole.log(\"api.发送适配器\",api)\r\nconst filterParams=[`status: ${api.data.status}`]\r\nif(api.data.displayText){\r\n     filterParams.push(`where: {displayText_contains: \"${api.data.displayText}\"}`)\r\n}\r\nif(api.data.orderBy){\r\n    filterParams.push(`orderBy: { ${ api.body.orderBy }: ${ api.body.orderDir.toUpperCase() }}`)\r\n} else {\r\n    filterParams.push(`orderBy: {modifiedUtc: DESC}`)\r\n filterParams.push(`first: 1000`)\r\n}\r\nconsole.log(\"filterParams.join(',')\",filterParams.join(','))\r\nconst  query=`\r\n    {   items: amisSchema(\r\n        ${filterParams.join(',')}\r\n        )\r\n         {contentItemVersionId displayText   \r\n           createdUtc\r\n           contentItemId\r\n           latest\r\n           name\r\n           published\r\n           publishedUtc\r\n           modifiedUtc\r\n           author\r\n           useLayout\r\n        } \r\n    }\r\n    ` \r\napi.data={query}\r\nconsole.log(\"api.发送适配器2\",api)\r\nreturn api"
+            },
+            "perPageAvailable": [
+                10
+            ],
+            "footerToolbar": [
+                {
+                    "type": "statistics"
+                },
+                {
+                    "type": "pagination"
+                },
+                {
+                    "type": "load-more",
+                    "align": "right",
+                    "tpl": "内容"
+                }
+            ],
+            "columns": [
+                {
+                    "label": "操作",
+                    "type": "operation",
+                    "width": 180,
+                    "buttons": [
+                        {
+                            "type": "button",
+                            "label": "编辑",
+                            "level": "link",
+                            "id": "u:2092c97dfe00",
+                            "onEvent": {
+                                "click": {
+                                    "actions": [
+                                        {
+                                            "actionType": "dialog",
+                                            "dialog": {
+                                                "type": "dialog",
+                                                "title": "编辑",
+                                                "body": [
+                                                    {
+                                                        "type": "property",
+                                                        "id": "u:1577f3084cdd",
+                                                        "className": "m-b-md",
+                                                        "items": [
+                                                            {
+                                                                "label": "编号",
+                                                                "content": "${contentItemId}",
+                                                                "span": 1
+                                                            },
+                                                            {
+                                                                "label": "版本号",
+                                                                "content": "${contentItemVersionId}",
+                                                                "span": 1
+                                                            },
+                                                            {
+                                                                "label": "创建人",
+                                                                "content": "${author}",
+                                                                "span": 1
+                                                            },
+                                                            {
+                                                                "label": "创建时间",
+                                                                "content": "${createdUtc | date:YYYY-MM-DD HH\\:mm}",
+                                                                "span": 1
+                                                            },
+                                                            {
+                                                                "span": 1,
+                                                                "label": "修改时间",
+                                                                "content": "${modifiedUtc}"
+                                                            },
+                                                            {
+                                                                "span": 1,
+                                                                "label": "发布时间",
+                                                                "content": "${publishedUtc}"
+                                                            },
+                                                            {
+                                                                "span": 1,
+                                                                "label": "最新版本",
+                                                                "content": "${latest?\"是\":\"否\"}"
+                                                            }
+                                                        ],
+                                                        "title": "",
+                                                        "column": 3,
+                                                        "mode": "table",
+                                                        "closeOnEsc": false,
+                                                        "closeOnOutside": false,
+                                                        "showCloseButton": true
+                                                    },
+                                                    {
+                                                        "type": "form",
+                                                        "api": {
+                                                            "method": "post",
+                                                            "url": "/api/ContentManagement/PostContent?draft=${isDraft}",
+                                                            "dataType": "json"
+                                                        },
+                                                        "body": [
+                                                            {
+                                                                "name": "contentType",
+                                                                "label": "ContentType",
+                                                                "type": "hidden",
+                                                                "value": "AmisSchema",
+                                                                "id": "u:9c47e093ce3c"
+                                                            },
+                                                            {
+                                                                "type": "hidden",
+                                                                "label": "isDraft",
+                                                                "name": "isDraft",
+                                                                "id": "u:5bf2c293890f"
+                                                            },
+                                                            {
+                                                                "type": "hidden",
+                                                                "label": "contentItemId",
+                                                                "name": "contentItemId",
+                                                                "id": "u:c709ff74e370"
+                                                            },
+                                                            {
+                                                                "type": "input-text",
+                                                                "label": "显示名称",
+                                                                "name": "displayText",
+                                                                "required": true,
+                                                                "id": "u:e5514a239011"
+                                                            },
+                                                            {
+                                                                "type": "input-text",
+                                                                "label": "页面名称",
+                                                                "name": "name",
+                                                                "id": "u:344a4699b814",
+                                                                "required": true
+                                                            },
+                                                            {
+                                                                "type": "input-text",
+                                                                "name": "moduleName",
+                                                                "id": "u:344a4699b814",
+                                                                "label": "模块",
+                                                                "required": false
+                                                            },
+                                                            {
+                                                                "type": "switch",
+                                                                "name": "useLayout",
+                                                                "option": "使用页面容器",
+                                                                "optionAtLeft": false,
+                                                                "trueValue": true,
+                                                                "falseValue": false,
+                                                                "id": "u:8fc5ffc3976b"
+                                                            },
+                                                            {
+                                                                "type": "switch",
+                                                                "name": "reuseable",
+                                                                "option": "可复用",
+                                                                "id": "u:a1e7cbebc6dc",
+                                                                "optionAtLeft": false,
+                                                                "trueValue": true,
+                                                                "falseValue": false
+                                                            },
+                                                            {
+                                                                "type": "switch",
+                                                                "label": "发布状态",
+                                                                "name": "published",
+                                                                "id": "u:079f8569c6bd",
+                                                                "option": "",
+                                                                "optionAtLeft": false,
+                                                                "trueValue": true,
+                                                                "falseValue": false,
+                                                                "onText": "已发布",
+                                                                "offText": "未发布",
+                                                                "readOnly": true,
+                                                                "disabled": true
+                                                            },
+                                                            {
+                                                                "type": "textarea",
+                                                                "label": "描述",
+                                                                "name": "description",
+                                                                "id": "u:0690776d4a73"
+                                                            },
+                                                            {
+                                                                "type": "editor",
+                                                                "id": "u:b5dfdecaac8a",
+                                                                "label": "JSON Schema",
+                                                                "name": "schema",
+                                                                "language": "json",
+                                                                "minRows": 3,
+                                                                "maxRows": 20,
+                                                                "minLength": 5,
+                                                                "maxLength": "",
+                                                                "showCounter": true,
+                                                                "mode": "",
+                                                                "inline": false
+                                                            },
+                                                            {
+                                                                "type": "container",
+                                                                "id": "u:4db12b8df64c",
+                                                                "style": {
+                                                                    "textAlign": "right"
+                                                                },
+                                                                "body": [
+                                                                    {
+                                                                        "type": "button-toolbar",
+                                                                        "buttons": [
+                                                                            {
+                                                                                "type": "button",
+                                                                                "label": "发布",
+                                                                                "actionType": "submit",
+                                                                                "level": "primary",
+                                                                                "id": "u:07c2d0957bac",
+                                                                                "onEvent": {
+                                                                                    "click": {
+                                                                                        "weight": 0,
+                                                                                        "actions": [
+                                                                                            {
+                                                                                                "componentId": "form_edit",
+                                                                                                "args": {
+                                                                                                    "value": {
+                                                                                                        "isDraft": "false"
+                                                                                                    }
+                                                                                                },
+                                                                                                "actionType": "setValue"
+                                                                                            },
+                                                                                            {
+                                                                                                "componentId": "form_edit",
+                                                                                                "args": {},
+                                                                                                "actionType": "submit"
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "type": "button",
+                                                                                "label": "草稿",
+                                                                                "id": "u:6109cbd92bf1",
+                                                                                "onEvent": {
+                                                                                    "click": {
+                                                                                        "weight": 0,
+                                                                                        "actions": [
+                                                                                            {
+                                                                                                "componentId": "form_edit",
+                                                                                                "args": {
+                                                                                                    "value": {
+                                                                                                        "isDraft": "true"
+                                                                                                    }
+                                                                                                },
+                                                                                                "actionType": "setValue"
+                                                                                            },
+                                                                                            {
+                                                                                                "componentId": "form_edit",
+                                                                                                "args": {},
+                                                                                                "actionType": "submit"
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        ],
+                                                                        "id": "u:f4244cf1ad06"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "initApi": {
+                                                            "method": "get",
+                                                            "url": "/api/graphql?query={  contentItem: contentItemByVersion(contentItemVersionId:  \"${contentItemVersionId}\") {     ... on AmisSchema {      createdUtc    useLayout   description       displayText     schema       contentItemId    name   contentType    useLayout       latest owner published reuseable moduleName    contentItemVersionId     }   } }",
+                                                            "dataType": "json",
+                                                            "replaceData": true,
+                                                            "adaptor": "console.log(response,'responseresponseresponse') \nreturn { data: response.data.contentItem}",
+                                                            "sendOn": "!!this.contentItemVersionId",
+                                                            "messages": {}
+                                                        },
+                                                        "name": "EditForm",
+                                                        "debug": false,
+                                                        "optionAtLeft": false,
+                                                        "trueValue": true,
+                                                        "falseValue": false,
+                                                        "id": "form_edit",
+                                                        "onEvent": {
+                                                            "submitSucc": {
+                                                                "weight": 0,
+                                                                "actions": [
+                                                                    {
+                                                                        "componentId": "curdList",
+                                                                        "args": {
+                                                                            "resetPage": true
+                                                                        },
+                                                                        "actionType": "reload",
+                                                                        "dataMergeMode": "merge"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                ],
+                                                "showCloseButton": true,
+                                                "id": "u:af535dc25ee7",
+                                                "closeOnEsc": true,
+                                                "closeOnOutside": false,
+                                                "size": "md",
+                                                "data": null,
+                                                "actions": []
+                                            }
+                                        }
+                                    ],
+                                    "weight": 0
+                                }
+                            }
+                        },
+                        {
+                            "label": "设计器",
+                            "type": "button",
+                            "level": "link",
+                            "id": "btnOpenDesign",
+                            "onEvent": {
+                                "click": {
+                                    "actions": [
+                                        {
+                                            "actionType": "url",
+                                            "args": {
+                                                "url": "/sys/dev/page-editor",
+                                                "params": {
+                                                    "id": "${contentItemId}"
+                                                },
+                                                "blank": false
+                                            },
+                                            "expression": "this.published"
+                                        },
+                                        {
+                                            "actionType": "url",
+                                            "expression": "!this.published",
+                                            "args": {
+                                                "url": "/sys/dev/page-editor",
+                                                "params": {
+                                                    "vId": "${contentItemVersionId}"
+                                                },
+                                                "blank": false
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "label": "历史",
+                            "type": "button",
+                            "level": "link",
+                            "id": "bthOpenHistory",
+                            "onEvent": {
+                                "click": {
+                                    "actions": [
+                                        {
+                                            "actionType": "url",
+                                            "args": {
+                                                "url": "/sys/dev/SchemaVersions",
+                                                "params": {
+                                                    "category": "Content",
+                                                    "correlationId": "${contentItemId}"
+                                                },
+                                                "blank": false
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "type": "button",
+                            "label": "删除",
+                            "actionType": "ajax",
+                            "level": "link",
+                            "className": "text-danger",
+                            "confirmText": "确定要删除？",
+                            "api": {
+                                "method": "delete",
+                                "url": "/api/ContentManagement/Delete?contentItemId=${contentItemId}",
+                                "adaptor": "return {\r\n  data:response.data,\r\n  status:0,\r\n  msg:\"删除成功\"\r\n}"
+                            },
+                            "disabledOn": "!this.latest",
+                            "id": "u:265c6a84c450"
+                        }
+                    ],
+                    "fixed": "left",
+                    "popOver": false,
+                    "copyable": false,
+                    "id": "u:b8b59c1ff8e0"
+                },
+                {
+                    "type": "operation",
+                    "name": "displayText",
+                    "label": "显示名称",
+                    "placeholder": "-",
+                    "sortable": true,
+                    "popOver": false,
+                    "quickEdit": false,
+                    "inline": true,
+                    "copyable": false,
+                    "buttons": [
+                        {
+                            "type": "button",
+                            "label": "${displayText}",
+                            "actionType": "url",
+                            "id": "u:ae7c76370ed4",
+                            "placeholder": "-",
+                            "level": "link",
+                            "url": "/sys/dev/Preview/${contentItemVersionId}",
+                            "blank": false
+                        }
+                    ],
+                    "id": "u:345ce81afbc1"
+                },
+                {
+                    "type": "text",
+                    "label": "模块",
+                    "name": "moduleName",
+                    "id": "u:99bf348e53ef",
+                    "placeholder": "-"
+                },
+                {
+                    "type": "text",
+                    "label": "页面名称",
+                    "name": "name",
+                    "id": "u:2d2fea1c36c8"
+                },
+                {
+                    "type": "status",
+                    "label": "可复用",
+                    "name": "reuseable",
+                    "id": "u:e5e3a1f3c439",
+                    "placeholder": "-"
+                },
+                {
+                    "name": "published",
+                    "label": "published",
+                    "type": "status",
+                    "placeholder": "-",
+                    "id": "u:4853d4b4c95f"
+                },
+                {
+                    "name": "publishedUtc",
+                    "label": "发布时间",
+                    "type": "date",
+                    "placeholder": "-",
+                    "sortable": true,
+                    "format": "YYYY-MM-DD HH:mm",
+                    "fixed": "",
+                    "id": "u:783626026622"
+                },
+                {
+                    "name": "modifiedUtc",
+                    "label": "修改时间",
+                    "type": "date",
+                    "sortable": true,
+                    "placeholder": "-",
+                    "valueFormat": "X",
+                    "format": "YYYY-MM-DD HH:mm",
+                    "id": "u:bccf9f59d181"
+                },
+                {
+                    "label": "创建时间",
+                    "type": "date",
+                    "name": "createdUtc",
+                    "placeholder": "-",
+                    "sortable": true,
+                    "id": "u:7061d7a3b57a"
+                },
+                {
+                    "label": "创建人",
+                    "type": "text",
+                    "name": "author",
+                    "sortable": true,
+                    "placeholder": "-",
+                    "id": "u:8e57925c2f50"
+                }
+            ],
+            "placeholder": "-",
+            "itemActions": [],
+            "features": [
+                "filter",
+                "create",
+                "update",
+                "view",
+                "delete"
+            ],
+            "headerToolbar": [
+                {
+                    "type": "button",
+                    "label": "新增",
+                    "level": "primary",
+                    "id": "u:fb568bae51db",
+                    "onEvent": {
+                        "click": {
+                            "actions": [
+                                {
+                                    "actionType": "dialog",
+                                    "dialog": {
+                                        "type": "dialog",
+                                        "title": "新增",
+                                        "body": [
+                                            {
+                                                "type": "form",
+                                                "id": "u:22a56fee65bf",
+                                                "api": {
+                                                    "method": "post",
+                                                    "url": "/api/ContentManagement/PostContent?draft=true",
+                                                    "dataType": "json"
+                                                },
+                                                "body": [
+                                                    {
+                                                        "name": "contentType",
+                                                        "label": "ContentType",
+                                                        "type": "hidden",
+                                                        "value": "AmisSchema",
+                                                        "id": "u:0089e5ac605b"
+                                                    },
+                                                    {
+                                                        "name": "isDraft",
+                                                        "label": "isDraft",
+                                                        "type": "hidden",
+                                                        "id": "u:388f23582542"
+                                                    },
+                                                    {
+                                                        "name": "displayText",
+                                                        "label": "显示名称",
+                                                        "type": "input-text",
+                                                        "required": true,
+                                                        "id": "u:bde388b06083"
+                                                    },
+                                                    {
+                                                        "name": "name",
+                                                        "label": "页面名称",
+                                                        "type": "input-text",
+                                                        "required": true,
+                                                        "id": "u:344a4699b814"
+                                                    },
+                                                    {
+                                                        "name": "moduleName",
+                                                        "label": "模块",
+                                                        "type": "input-text",
+                                                        "id": "u:1da73723f1c4",
+                                                        "value": ""
+                                                    },
+                                                    {
+                                                        "name": "useLayout",
+                                                        "type": "switch",
+                                                        "option": "使用页面容器",
+                                                        "falseValue": false,
+                                                        "trueValue": true,
+                                                        "id": "u:94e4ecfd8942",
+                                                        "optionAtLeft": false,
+                                                        "value": false
+                                                    },
+                                                    {
+                                                        "name": "reuseable",
+                                                        "type": "switch",
+                                                        "option": "可复用",
+                                                        "falseValue": false,
+                                                        "trueValue": true,
+                                                        "id": "u:eb3ce2990f70",
+                                                        "optionAtLeft": false,
+                                                        "value": false
+                                                    },
+                                                    {
+                                                        "name": "description",
+                                                        "label": "描述",
+                                                        "type": "textarea",
+                                                        "id": "u:3b44edb23aec"
+                                                    },
+                                                    {
+                                                        "name": "schema",
+                                                        "label": "JSON Schema",
+                                                        "type": "editor",
+                                                        "language": "json",
+                                                        "minRows": 3,
+                                                        "maxRows": 20,
+                                                        "minLength": 5,
+                                                        "maxLength": "",
+                                                        "showCounter": true,
+                                                        "mode": "",
+                                                        "inline": false,
+                                                        "id": "u:4c533e5cfc50"
+                                                    }
+                                                ],
+                                                "initApi": "",
+                                                "name": "EditForm",
+                                                "actions": [],
+                                                "onEvent": {
+                                                    "submitSucc": {
+                                                        "weight": 0,
+                                                        "actions": [
+                                                            {
+                                                                "componentId": "curdList",
+                                                                "args": {
+                                                                    "resetPage": true
+                                                                },
+                                                                "actionType": "reload",
+                                                                "dataMergeMode": "merge"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "showCloseButton": true,
+                                        "id": "u:01eed03480fa",
+                                        "closeOnEsc": false,
+                                        "closeOnOutside": false,
+                                        "size": "md"
+                                    }
+                                }
+                            ],
+                            "weight": 0
+                        }
+                    }
+                },
+                {
+                    "type": "bulk-actions"
+                }
+            ],
+            "bulkActions": [],
+            "messages": {},
+            "affixHeader": false,
+            "primaryField": "contentItemId",
+            "keepItemSelectionOnPageChange": true,
+            "labelTpl": "${displayText}",
+            "filterTogglable": true,
+            "filterColumnCount": 3,
+            "name": "contentmange",
+            "syncLocation": false,
+            "defaultParams": {},
+            "filter": {
+                "title": "查询条件",
+                "body": [
+                    {
+                        "type": "input-text",
+                        "name": "displayText",
+                        "label": "名称",
+                        "size": "lg",
+                        "id": "u:ea98219ea06b"
+                    },
+                    {
+                        "type": "select",
+                        "label": "状态",
+                        "name": "status",
+                        "options": [
+                            {
+                                "label": "只看最新版",
+                                "value": "LATEST"
+                            },
+                            {
+                                "label": "所有发布版",
+                                "value": "PUBLISHED"
+                            },
+                            {
+                                "label": "所有草稿",
+                                "value": "DRAFT"
+                            }
+                        ],
+                        "id": "u:b1a90587336d",
+                        "perPageAvailable": [
+                            10
+                        ],
+                        "checkAll": false,
+                        "value": "LATEST",
+                        "searchable": false,
+                        "size": "md",
+                        "multiple": false
+                    }
+                ],
+                "checkAll": false,
+                "submitOnChange": true,
+                "perPageAvailable": [
+                    10
+                ],
+                "mode": "inline",
+                "panelClassName": "",
+                "id": "u:0cd53834f323"
+            }
+        }
+    ],
+    "messages": {},
+    "style": {},
+    "title": "动态页管理",
+    "definitions": {}
+}

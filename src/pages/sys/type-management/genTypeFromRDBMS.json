@@ -1,0 +1,192 @@
+{
+    "type": "page",
+    "id": "u:32f99e059891",
+    "asideResizor": false,
+    "style": {
+        "boxShadow": " 0px 0px 0px 0px transparent"
+    },
+    "regions": [
+        "body",
+        "toolbar",
+        "header"
+    ],
+    "body": [
+        {
+            "type": "form",
+            "title": "RDBMS 类型生成",
+            "body": [
+                {
+                    "label": "数据库",
+                    "type": "select",
+                    "name": "connectionConfigId",
+                    "id": "u:e2f523b786ae",
+                    "multiple": false,
+                    "source": {
+                        "url": "/api/RDBMS/GetAllDbConnection",
+                        "method": "get",
+                        "messages": {}
+                    },
+                    "labelField": "configName",
+                    "valueField": "configId"
+                },
+                {
+                    "type": "select",
+                    "name": "tableName",
+                    "label": "来源表",
+                    "id": "u:9e8be6991011",
+                    "multiple": false,
+                    "source": {
+                        "url": "/api/RDBMS/GetAllTables?DisableCache=true&maxResultCount=9999&connectionConfigId=${connectionConfigId}",
+                        "method": "get",
+                        "messages": {},
+                        "sendOn": "this.connectionConfigId",
+                        "adaptor": "console.log(\"response  .data.data\", response)\r\nvar options=[]\r\nif (response.data) {\r\n    options= response.data.map(x => {\r\n        item = {\r\n            label: `${x.schema}.${x.name}`,\r\n            value: `${x.schema}.${x.name}`,\r\n            ...x\r\n        }\r\n        return item;\r\n    })\r\n} else {\r\n    options= []\r\n}\r\n\r\nconsole.log(\"tables:\", options)\r\nreturn { options}",
+                        "responseData": {
+                            "&": "$$"
+                        }
+                    },
+                    "menuTpl": "",
+                    "themeConfig": {},
+                    "searchable": true,
+                    "onEvent": {
+                        "change": {
+                            "weight": 0,
+                            "actions": [
+                                {
+                                    "args": {
+                                        "options": {},
+                                        "api": {
+                                            "url": "/api/rdbms/ConvertDefaultTypeInfo",
+                                            "method": "post",
+                                            "messages": {},
+                                            "data": {
+                                                "selectedItems": "${selectedItems}"
+                                            },
+                                            "requestAdaptor": "console.log(\"apiaaaaa\", api)\r\napi.data = {\r\n  tableName:api.body.selectedItems.name,\r\n  schema: api.body.selectedItems.schema,\r\n}\r\nreturn api",
+                                            "adaptor": "",
+                                            "responseData": {
+                                                "&": "$$"
+                                            },
+                                            "dataType": "json"
+                                        }
+                                    },
+                                    "actionType": "ajax",
+                                    "outputVar": "convertedTypeInfo"
+                                },
+                                {
+                                    "componentId": "u:80b50a4daaa9",
+                                    "args": {
+                                        "value": {
+                                            "contentTypeName": "${event.data.convertedTypeInfo.responseData.name}",
+                                            "displayName": "${event.data.convertedTypeInfo.responseData.displayName}"
+                                        },
+                                        "fromPage": true
+                                    },
+                                    "actionType": "setValue"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "grid",
+                    "columns": [
+                        {
+                            "body": [
+                                {
+                                    "type": "input-text",
+                                    "label": "类型名称",
+                                    "name": "contentTypeName",
+                                    "id": "u:ff17c4f30daf",
+                                    "required": true
+                                }
+                            ],
+                            "id": "u:67f78d4d41c8"
+                        },
+                        {
+                            "body": [
+                                {
+                                    "type": "input-text",
+                                    "label": "类型显示名",
+                                    "name": "displayName",
+                                    "id": "u:8c383aad4ce7"
+                                }
+                            ],
+                            "id": "u:9b0738233042"
+                        }
+                    ],
+                    "id": "u:6e6d8d91eff1"
+                },
+                {
+                    "type": "button",
+                    "label": "生成配方",
+                    "onEvent": {
+                        "click": {
+                            "actions": [
+                                {
+                                    "componentId": "u:80b50a4daaa9",
+                                    "args": {},
+                                    "actionType": "submit"
+                                }
+                            ]
+                        }
+                    },
+                    "id": "u:b33de9a9fcbc",
+                    "level": "primary"
+                },
+                {
+                    "type": "button",
+                    "label": "执行配方",
+                    "onEvent": {
+                        "click": {
+                            "actions": [
+                                {
+                                    "args": {
+                                        "options": {},
+                                        "api": {
+                                            "url": "/api/ContentTypeManagement/ImportDeploymentPackage",
+                                            "method": "post",
+                                            "messages": {},
+                                            "data": {
+                                                "recipeContent": "${recipeContent}"
+                                            },
+                                            "requestAdaptor": "console.log(\"post recipe\", api)\r\nreturn api"
+                                        }
+                                    },
+                                    "actionType": "ajax",
+                                    "outputVar": "responseResult"
+                                }
+                            ]
+                        }
+                    },
+                    "id": "u:3e974bc732ef",
+                    "level": "success"
+                },
+                {
+                    "type": "editor",
+                    "label": "代码编辑器",
+                    "name": "recipeContent",
+                    "id": "u:1defc0e7d5d8",
+                    "language": "json",
+                    "size": "xxl",
+                    "autoFill": {}
+                }
+            ],
+            "api": {
+                "url": "/api/RDBMS/GenerateRecipe",
+                "method": "post",
+                "messages": {},
+                "data": {
+                    "&": "$$"
+                }
+            },
+            "id": "u:80b50a4daaa9",
+            "debug": false,
+            "wrapWithPanel": false
+        }
+    ],
+    "pullRefresh": {
+        "disabled": true
+    },
+    "title": "RDBMS 类型生成"
+}

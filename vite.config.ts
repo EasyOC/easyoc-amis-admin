@@ -7,6 +7,7 @@ import runtime from './src/utils/helper/envHelper';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  publicDir: "./public",
   server: {
     port: 2688,
     // host: '0.0.0.0'

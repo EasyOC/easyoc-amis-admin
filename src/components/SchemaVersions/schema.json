@@ -1,0 +1,227 @@
+{
+    "type": "page",
+    "id": "u:a22c082f4eef",
+    "asideResizor": false,
+    "pullRefresh": {
+        "disabled": true
+    },
+    "regions": [
+        "body",
+        "toolbar",
+        "header"
+    ],
+    "title": "内容版本管理",
+    "body": [
+        {
+            "type": "crud",
+            "syncLocation": false,
+            "api": {
+                "method": "get",
+                "url": "/api/AuditTrail/GetHistory"
+            },
+            "columns": [
+                {
+                    "label": "操作名称",
+                    "type": "text",
+                    "name": "name",
+                    "id": "u:71291dd0b854",
+                    "placeholder": "-"
+                },
+                {
+                    "label": "Comments",
+                    "type": "text",
+                    "name": "properties.AuditTrailContentEvent.ContentItem.AuditTrailPart.Comment",
+                    "id": "u:68bd5ec24f0d",
+                    "placeholder": "-"
+                },
+                {
+                    "label": "category",
+                    "type": "text",
+                    "name": "category",
+                    "id": "u:faec8f2a53b3"
+                },
+                {
+                    "label": "userId",
+                    "type": "text",
+                    "name": "userId",
+                    "id": "u:e4a41d6843f6"
+                },
+                {
+                    "label": "userName",
+                    "type": "text",
+                    "name": "userName",
+                    "id": "u:774951145c1e"
+                },
+                {
+                    "label": "createdUtc",
+                    "type": "text",
+                    "name": "createdUtc",
+                    "id": "u:1b48e24562b6"
+                },
+                {
+                    "type": "operation",
+                    "label": "操作",
+                    "buttons": [
+                        {
+                            "label": "查看",
+                            "type": "button",
+                            "actionType": "dialog",
+                            "level": "link",
+                            "dialog": {
+                                "type": "dialog",
+                                "title": "编辑",
+                                "body": [
+                                    {
+                                        "type": "form",
+                                        "api": "",
+                                        "body": [
+                                            {
+                                                "label": "eventId",
+                                                "name": "eventId",
+                                                "type": "input-text",
+                                                "id": "u:06bf5d350305"
+                                            },
+                                            {
+                                                "label": "name",
+                                                "name": "name",
+                                                "type": "input-text",
+                                                "id": "u:cdbdfd3fad2f"
+                                            },
+                                            {
+                                                "label": "category",
+                                                "name": "category",
+                                                "type": "input-text",
+                                                "id": "u:72bb0ebdb5f4"
+                                            },
+                                            {
+                                                "label": "correlationId",
+                                                "name": "correlationId",
+                                                "type": "input-text",
+                                                "id": "u:6ac598e24aeb"
+                                            },
+                                            {
+                                                "label": "userId",
+                                                "name": "userId",
+                                                "type": "input-text",
+                                                "id": "u:daa12d60c7aa"
+                                            },
+                                            {
+                                                "label": "userName",
+                                                "name": "userName",
+                                                "type": "input-text",
+                                                "id": "u:f9a535938bb6"
+                                            },
+                                            {
+                                                "label": "normalizedUserName",
+                                                "name": "normalizedUserName",
+                                                "type": "input-text",
+                                                "id": "u:416f6fb1eb39"
+                                            },
+                                            {
+                                                "label": "clientIpAddress",
+                                                "name": "clientIpAddress",
+                                                "type": "input-text",
+                                                "id": "u:11965b375533"
+                                            },
+                                            {
+                                                "label": "createdUtc",
+                                                "name": "createdUtc",
+                                                "type": "input-text",
+                                                "id": "u:20c269ed1dba"
+                                            },
+                                            {
+                                                "label": "properties",
+                                                "name": "properties",
+                                                "type": "editor",
+                                                "id": "u:81accbe2f954",
+                                                "language": "json"
+                                            }
+                                        ],
+                                        "id": "u:62e1d0e8f000",
+                                        "static": true
+                                    }
+                                ],
+                                "id": "u:e6bed63720bd",
+                                "showCloseButton": true,
+                                "closeOnEsc": true,
+                                "showErrorMsg": true,
+                                "showLoading": true
+                            },
+                            "id": "u:f623a7e122dc"
+                        }
+                    ],
+                    "id": "u:25b37641a898"
+                }
+            ],
+            "bulkActions": [
+                {
+                    "label": "对比",
+                    "type": "button",
+                    "id": "u:fdb301372c4d",
+                    "tooltip": "对比两个版本区别"
+                }
+            ],
+            "itemActions": [],
+            "features": [
+                "filter",
+                "update",
+                "view"
+            ],
+            "filterColumnCount": 3,
+            "filterSettingSource": [
+                "eventId",
+                "name",
+                "category",
+                "correlationId",
+                "userId",
+                "userName",
+                "normalizedUserName",
+                "clientIpAddress",
+                "createdUtc",
+                "properties"
+            ],
+            "id": "u:a492485a028a",
+            "perPageAvailable": [
+                10
+            ],
+            "messages": {},
+            "perPageField": "pageSize",
+            "filter": {
+                "title": "查询条件",
+                "body": [
+                    {
+                        "type": "input-text",
+                        "name": "displayText",
+                        "label": "关键字",
+                        "id": "u:2e9d52a04fce",
+                        "value": ""
+                    },
+                    {
+                        "type": "hidden",
+                        "name": "correlationId",
+                        "id": "u:94f930ad704e"
+                    },
+                    {
+                        "type": "hidden",
+                        "name": "category",
+                        "id": "u:191abc02412e"
+                    }
+                ],
+                "id": "u:39d79e2ffaae",
+                "mode": "horizontal"
+            },
+            "keepItemSelectionOnPageChange": true,
+            "maxKeepItemSelectionLength": 2,
+            "name": "list",
+            "autoJumpToTopOnPagerChange": true
+        }
+    ],
+    "data": {
+        "$": "&&"
+    },
+    "subTitle": "",
+    "initApi": {
+        "url": "",
+        "method": "get"
+    }
+}

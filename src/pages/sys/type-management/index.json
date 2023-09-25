@@ -1,0 +1,221 @@
+{
+    "type": "page",
+    "regions": [
+        "body",
+        "toolbar"
+    ],
+    "id": "u:c197d1ecafdc",
+    "body": [
+        {
+            "type": "crud",
+            "syncLocation": false,
+            "api": {
+                "method": "get",
+                "url": "/api/ContentTypeManagement/GetAllTypes?name=${typeName}",
+                "messages": {},
+                "data": {
+                    "&": "$$",
+                    "pageSize": "${perPage}"
+                }
+            },
+            "columns": [
+                {
+                    "name": "displayName",
+                    "label": "显示名称",
+                    "type": "text",
+                    "id": "u:35fd0e93d1cb"
+                },
+                {
+                    "name": "name",
+                    "label": "模型名称",
+                    "type": "text",
+                    "id": "u:8a0968131c76"
+                },
+                {
+                    "type": "text",
+                    "name": "stereotype",
+                    "label": "模型类型",
+                    "id": "u:f771e57be232"
+                },
+                {
+                    "type": "operation",
+                    "label": "操作",
+                    "buttons": [
+                        {
+                            "type": "button",
+                            "id": "btnEdit",
+                            "label": "编辑",
+                            "actionType": "url",
+                            "placeholder": "-",
+                            "level": "link",
+                            "url": "./edit?typeName=${name}",
+                            "blank": false
+                        },
+                        {
+                            "label": "删除",
+                            "type": "button",
+                            "actionType": "dialog",
+                            "level": "link",
+                            "dialog": {
+                                "title": "编辑",
+                                "body": {
+                                    "type": "form",
+                                    "api": "xxx/update",
+                                    "body": [
+                                        {
+                                            "name": "displayName",
+                                            "label": "显示名称",
+                                            "type": "input-text"
+                                        },
+                                        {
+                                            "name": "name",
+                                            "label": "模型名称",
+                                            "type": "input-text"
+                                        },
+                                        {
+                                            "name": "stereotype",
+                                            "label": "模型类型",
+                                            "type": "select"
+                                        }
+                                    ]
+                                }
+                            },
+                            "id": "u:9a37ba1d0f68",
+                            "className": "text-danger"
+                        }
+                    ],
+                    "id": "u:c71f236f9b75"
+                }
+            ],
+            "bulkActions": [],
+            "itemActions": [],
+            "features": [
+                "filter",
+                "create",
+                "update",
+                "delete"
+            ],
+            "filterColumnCount": 3,
+            "headerToolbar": [
+                {
+                    "label": "新增",
+                    "type": "button",
+                    "actionType": "dialog",
+                    "level": "primary",
+                    "dialog": {
+                        "title": "新增",
+                        "body": {
+                            "type": "form",
+                            "api": {
+                                "method": "post",
+                                "url": "/api/ContentTypeManagement/GetAllTypes?name=${typeName}",
+                                "messages": {},
+                                "data": {
+                                    "&": "$$",
+                                    "pageSize": "${perPage}"
+                                }
+                            },
+                            "body": [
+                                {
+                                    "type": "input-text",
+                                    "name": "displayName",
+                                    "label": "显示名称"
+                                },
+                                {
+                                    "type": "input-text",
+                                    "name": "name",
+                                    "label": "模型名称"
+                                },
+                                {
+                                    "type": "select",
+                                    "name": "stereotype",
+                                    "label": "模型类型"
+                                },
+                                {
+                                    "type": "input-operation",
+                                    "label": "操作"
+                                }
+                            ]
+                        }
+                    },
+                    "id": "u:33bdb06b6071"
+                },
+                "bulkActions"
+            ],
+            "id": "u:c32b7ff254ef",
+            "perPageAvailable": [
+                10,
+                20
+            ],
+            "messages": {},
+            "defaultParams": {},
+            "title": "类型列表",
+            "filter": {
+                "title": "查询条件",
+                "body": [
+                    {
+                        "type": "grid",
+                        "columns": [
+                            {
+                                "body": [
+                                    {
+                                        "type": "input-text",
+                                        "name": "filter",
+                                        "label": "关键字",
+                                        "id": "u:d5ef7f843771",
+                                        "size": "full",
+                                        "mode": "horizontal"
+                                    }
+                                ],
+                                "md": "",
+                                "id": "u:e6d725fbe08f"
+                            },
+                            {
+                                "body": [
+                                    {
+                                        "type": "select",
+                                        "label": "类型",
+                                        "name": "stereotype",
+                                        "options": [
+                                            {
+                                                "label": "数据容器",
+                                                "value": "OnlyEmpty"
+                                            },
+                                            {
+                                                "label": "所有",
+                                                "value": "All"
+                                            },
+                                            {
+                                                "label": "Widget",
+                                                "value": "Widget"
+                                            },
+                                            {
+                                                "label": "CustomUserSettings",
+                                                "value": "CustomUserSettings"
+                                            },
+                                            {
+                                                "label": "MenuItem",
+                                                "value": "MenuItem"
+                                            }
+                                        ],
+                                        "multiple": false,
+                                        "value": "OnlyEmpty",
+                                        "id": "u:77381e6fc489",
+                                        "mode": "horizontal"
+                                    }
+                                ],
+                                "id": "u:5bbe1001c91c"
+                            }
+                        ],
+                        "id": "u:8a3f0184fd88"
+                    }
+                ],
+                "id": "u:5ccb2bbaed1f",
+                "submitOnChange": true,
+                "preventEnterSubmit": false
+            },
+            "initFetch": true,
+            "affixHeader": false
+        }
+    ]
+}

@@ -1,0 +1,392 @@
+{
+    "type": "page",
+    "id": "u:b75cd5806d82",
+    "asideResizor": false,
+    "style": {
+        "boxShadow": " 0px 0px 0px 0px transparent"
+    },
+    "pullRefresh": {
+        "disabled": true
+    },
+    "regions": [
+        "body",
+        "toolbar",
+        "header"
+    ],
+    "body": [
+        {
+            "type": "form",
+            "id": "u:7b8342979968",
+            "title": "表单",
+            "body": [
+                {
+                    "type": "flex",
+                    "className": "p-1",
+                    "items": [
+                        {
+                            "type": "container",
+                            "body": [
+                                {
+                                    "type": "picker",
+                                    "id": "u:e0ee0dc1b3c7",
+                                    "label": "列表选取",
+                                    "name": "roleSelected",
+                                    "inline": true,
+                                    "multiple": false,
+                                    "source": {
+                                        "method": "get",
+                                        "url": "/api/Roles/GetRoles",
+                                        "data": {
+                                            "&": "$$"
+                                        },
+                                        "dataType": "json"
+                                    },
+                                    "embed": true,
+                                    "valueField": "roleName",
+                                    "pickerSchema": {
+                                        "mode": "table",
+                                        "id": "u:f58f44fd958c",
+                                        "columns": [
+                                            {
+                                                "id": "u:ab207338d41e",
+                                                "name": "roleName",
+                                                "label": "角色名称",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "name": "roleDescription",
+                                                "label": "角色描述",
+                                                "id": "u:a2effe819386",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "type": "operation",
+                                                "label": "操作",
+                                                "id": "u:6ece47143a1e",
+                                                "buttons": [
+                                                    {
+                                                        "type": "button",
+                                                        "label": "编辑",
+                                                        "id": "u:fbdb2ce17f7d",
+                                                        "actionType": "dialog",
+                                                        "level": "link",
+                                                        "dialog": {
+                                                            "title": "编辑",
+                                                            "body": {
+                                                                "type": "form",
+                                                                "api": "xxx/update",
+                                                                "body": [
+                                                                    {
+                                                                        "label": "角色名称",
+                                                                        "name": "roleName",
+                                                                        "type": "input-text",
+                                                                        "id": "u:6a4eb3ce08a4"
+                                                                    },
+                                                                    {
+                                                                        "label": "角色描述",
+                                                                        "name": "roleDescription",
+                                                                        "type": "input-text",
+                                                                        "id": "u:02312e6fe5ff"
+                                                                    }
+                                                                ],
+                                                                "id": "u:c1ace3f25377"
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "button",
+                                                        "label": "删除",
+                                                        "actionType": "ajax",
+                                                        "level": "link",
+                                                        "className": "text-danger",
+                                                        "confirmText": "确定要删除？",
+                                                        "api": {
+                                                            "method": "post",
+                                                            "url": "/api/Roles/GetRoles"
+                                                        },
+                                                        "id": "u:7beaadf115ef"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "headerToolbar": [
+                                            {
+                                                "label": "新增",
+                                                "type": "button",
+                                                "actionType": "dialog",
+                                                "level": "primary",
+                                                "dialog": {
+                                                    "title": "新增",
+                                                    "body": {
+                                                        "type": "form",
+                                                        "api": {
+                                                            "method": "post",
+                                                            "url": "/api/Roles/GetRoles"
+                                                        },
+                                                        "body": [
+                                                            {
+                                                                "type": "input-text",
+                                                                "name": "roleName",
+                                                                "label": "角色名称",
+                                                                "id": "u:0c440c97836d"
+                                                            },
+                                                            {
+                                                                "type": "input-text",
+                                                                "name": "roleDescription",
+                                                                "label": "角色描述",
+                                                                "id": "u:e1440c0fb5fb"
+                                                            }
+                                                        ],
+                                                        "id": "u:234bb14cc3f0"
+                                                    }
+                                                },
+                                                "id": "u:27fc294a063c"
+                                            },
+                                            "bulkActions"
+                                        ],
+                                        "perPageAvailable": [
+                                            10
+                                        ],
+                                        "messages": {},
+                                        "primaryField": "roleName"
+                                    },
+                                    "labelField": "roleDescription",
+                                    "modalMode": "dialog"
+                                }
+                            ],
+                            "size": "xs",
+                            "style": {
+                                "position": "static",
+                                "display": "block",
+                                "flex": "0 0 150px",
+                                "flexBasis": "500px",
+                                "overflowX": "auto"
+                            },
+                            "wrapperBody": false,
+                            "isFixedHeight": false,
+                            "isFixedWidth": false,
+                            "id": "u:8ae6beccd99b"
+                        },
+                        {
+                            "type": "container",
+                            "body": [
+                                {
+                                    "type": "form",
+                                    "title": "角色权限",
+                                    "body": [
+                                        {
+                                            "type": "select",
+                                            "label": "当前角色",
+                                            "name": "roleSelected",
+                                            "id": "u:e7bf9d366b06",
+                                            "multiple": false,
+                                            "source": {
+                                                "method": "get",
+                                                "url": "/api/Roles/GetRoles"
+                                            },
+                                            "valueField": "roleName",
+                                            "labelField": "roleName",
+                                            "required": true
+                                        },
+                                        {
+                                            "type": "input-tree",
+                                            "label": "权限",
+                                            "name": "permissions",
+                                            "id": "u:2ed29e393022",
+                                            "multiple": true,
+                                            "enableNodePath": false,
+                                            "hideRoot": true,
+                                            "showIcon": true,
+                                            "initiallyOpen": true,
+                                            "creatable": true,
+                                            "editable": true,
+                                            "removable": true,
+                                            "source": {
+                                                "url": "/api/DynamicPermission/GetAllDynamicPermissions",
+                                                "method": "get",
+                                                "messages": {}
+                                            },
+                                            "autoCheckChildren": true,
+                                            "labelRemark": {
+                                                "icon": "fa fa-question-circle",
+                                                "trigger": [
+                                                    "hover"
+                                                ],
+                                                "className": "Remark--warning",
+                                                "placement": "top"
+                                            },
+                                            "withChildren": true,
+                                            "joinValues": false,
+                                            "extractValue": true,
+                                            "onEvent": {
+                                                "add": {
+                                                    "weight": 0,
+                                                    "actions": [
+                                                        {
+                                                            "componentId": "u:2990a846d46b",
+                                                            "actionType": "reload",
+                                                            "dataMergeMode": "merge"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "rootCreatable": true,
+                                            "rootCreateTip": "添加权限根",
+                                            "onlyLeaf": true,
+                                            "showOutline": true,
+                                            "editControls": [
+                                                {
+                                                    "type": "json",
+                                                    "name": "ext"
+                                                },
+                                                {
+                                                    "type": "input-text",
+                                                    "name": "label",
+                                                    "label": "权限名称"
+                                                },
+                                                {
+                                                    "type": "input-text",
+                                                    "name": "parentPermissionId",
+                                                    "label": "父级权限标识",
+                                                    "value": "${ext.Parent}",
+                                                    "readonly": true
+                                                },
+                                                {
+                                                    "type": "input-text",
+                                                    "name": "value",
+                                                    "label": "权限标识"
+                                                }
+                                            ],
+                                            "addControls": [
+                                                {
+                                                    "type": "json",
+                                                    "name": "parent"
+                                                },
+                                                {
+                                                    "type": "text",
+                                                    "name": "parentPermissionId",
+                                                    "label": "父级权限标识",
+                                                    "readOnly": false,
+                                                    "value": "${parent.ext.ContentItemId}",
+                                                    "hiddenOn": "!parent"
+                                                },
+                                                {
+                                                    "type": "input-text",
+                                                    "name": "label",
+                                                    "label": "权限名称"
+                                                }
+                                            ],
+                                            "addApi": {
+                                                "url": "/api/postContent/DynamicPermissionItem",
+                                                "method": "post",
+                                                "messages": {},
+                                                "requestAdaptor": "",
+                                                "data": {
+                                                    "parent": "${parentPermissionId}",
+                                                    "name": "${label}",
+                                                    "displayText": "${label}"
+                                                }
+                                            },
+                                            "deleteApi": {
+                                                "url": "/api/ContentManagement/Delete",
+                                                "method": "delete",
+                                                "messages": {},
+                                                "data": {
+                                                    "contentItemId": "${ext.ContentItemId}"
+                                                }
+                                            },
+                                            "editApi": {
+                                                "url": "/api/postContent/DynamicPermissionItem",
+                                                "method": "post",
+                                                "messages": {},
+                                                "data": {
+                                                    "parent": "${parentPermissionId}",
+                                                    "contentItemId": "${ext.ContentItemId}",
+                                                    "name": "${label}",
+                                                    "displayText": "${label}"
+                                                }
+                                            },
+                                            "menuTpl": "<div class='flex justify-between'><span>${label}</span><span class='bg-gray-200 rounded p-1 text-xs text-center' onclick='amisExt.copy(\"${ext.PermissionName}\",true,true)'>${ext.PermissionName}</span></div>"
+                                        }
+                                    ],
+                                    "id": "u:2990a846d46b",
+                                    "initApi": {
+                                        "url": "/api/DynamicPermission/GetPermissionsByRole?roleName=${roleSelected}",
+                                        "method": "get",
+                                        "messages": {},
+                                        "sendOn": "",
+                                        "requestAdaptor": "console.log(\"rolerrrr\", api) \r\nreturn api",
+                                        "responseData": {
+                                            "&": "$$"
+                                        },
+                                        "adaptor": "return {\r\n  data: {\r\n    permissions: response.data\r\n  }\r\n}"
+                                    },
+                                    "debug": false,
+                                    "name": "rolePermission",
+                                    "actions": []
+                                }
+                            ],
+                            "size": "xs",
+                            "style": {
+                                "position": "static",
+                                "display": "block",
+                                "flex": "1 1 auto",
+                                "flexGrow": 1,
+                                "flexBasis": "auto"
+                            },
+                            "wrapperBody": false,
+                            "isFixedHeight": false,
+                            "isFixedWidth": false,
+                            "id": "u:84e2d9c8e50d"
+                        }
+                    ],
+                    "style": {
+                        "position": "relative"
+                    },
+                    "direction": "row",
+                    "justify": "flex-start",
+                    "alignItems": "stretch",
+                    "id": "u:0ee50d2402b4"
+                }
+            ],
+            "debug": false,
+            "wrapWithPanel": false,
+            "initApi": {
+                "url": "",
+                "method": "get",
+                "messages": {},
+                "data": {
+                    "roleName": "${value}"
+                },
+                "responseData": {
+                    "&": "$$"
+                },
+                "replaceData": false,
+                "adaptor": "return {\r\n  data: {\r\n    permissions: response.data\r\n  }\r\n}"
+            },
+            "rules": []
+        }
+    ],
+    "title": "角色管理",
+    "toolbar": [
+        {
+            "type": "button",
+            "label": "更新权限",
+            "onEvent": {
+                "click": {
+                    "actions": [
+                        {
+                            "componentId": "u:2990a846d46b",
+                            "actionType": "submit"
+                        }
+                    ]
+                }
+            },
+            "id": "u:b7e79cb74843",
+            "level": "primary"
+        }
+    ],
+    "data": {
+        "roleSelected": ""
+    }
+}

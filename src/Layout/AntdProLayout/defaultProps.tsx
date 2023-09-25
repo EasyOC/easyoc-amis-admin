@@ -1,3 +1,4 @@
+import svgIndex from '@/pages/dashboard/svgIndex';
 import routeConfig from '@/route/routeConfig';
 import {EocLayoutSettings} from '@/types/src/SiteGlobalSettings';
 import {
@@ -12,6 +13,8 @@ export default {
   // route: {path: '/', routes: [...routeConfig]},
   route: {
     path: '/',
+    name: 'home',
+    component: svgIndex,
     routes: [...routeConfig]
   },
   navTheme: 'light',

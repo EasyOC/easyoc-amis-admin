@@ -1,0 +1,788 @@
+{
+  "type": "page",
+  "regions": [
+    "body",
+    "toolbar",
+    "header"
+  ],
+  "id": "u:e371616b442b",
+  "body": [
+    {
+      "type": "crud",
+      "id": "u:a402298fc64d",
+      "messages": {},
+      "name": "contentMangeCrud",
+      "perPage": 9999,
+      "alwaysShowPagination": true,
+      "perPageAvailable": [
+        9999
+      ],
+      "footerToolbar": [
+        {
+          "type": "statistics"
+        },
+        {
+          "type": "switch-per-page"
+        },
+        {
+          "type": "pagination",
+          "align": "right"
+        }
+      ],
+      "api": {
+        "method": "post",
+        "url": "/api/graphql",
+        "dataType": "json",
+        "requestAdaptor": "console.log(\"api.发送适配器\", api)\nconsole.log(\"amisExt.convertCondition(api.body.conditions))\", amisExt.convertCondition(api.body.conditions));\nconst filterParams = [`status: ${api.body.status}`]\nconst variables = {\n  jsonFilter: amisExt.dynamicJsonFilter(api.body.conditions)//,\n  // filter: amisExt.convertCondition(api.body.conditions)\n}\nif (api.body.displayText) {\n  filterParams.push(`where: {displayText_contains: \"${api.body.displayText}\"}`)\n}\nif (api.body.orderBy) {\n  filterParams.push(`orderBy:{${api.body.orderBy}:${api.body.orderDir.toUpperCase()}}`)\n}\nconsole.log(\"filterParams.join(',')\", filterParams.join(','))\nconst query = `query curdQuery($jsonFilter:String){ \n        data:pagedContentItems( \n            contentType: AntdMenuItem\n            page: ${api.body.page}  \n            pageSize: ${api.body.perPage} \n            orderBy: {field: \"${api.body.orderBy ? api.body.orderBy : 'modifiedUtc'}\", direction: ${api.body.orderDir ? api.body.orderDir.toUpperCase() : 'DESC'} } \n            dynamicJSONFilter: $jsonFilter\n              )\n            {  \n                total\n       items {\n      ... on AntdMenuItem {\n        access\n        createdUtc\n        target\n        redirect\n        publishedUtc\n        published\n        path\n        owner\n        otherConfig\n        orderIndex\n        modifiedUtc\n        name\n        menuType\n        locale\n        latest\n        icon\n        hideInMenu\n        displayText\n        contentType\n        contentItemVersionId\n        contentItemId\n        author\n        parent{firstValue}\n      }\n                    \n                }\n            }\n        }`\napi.data = { query, variables }\nconsole.log(\"api.发送适配器2\", api)\nreturn api",
+        "adaptor": "console.log(\"datatatat\", response)\r\nlet data = response.data.data\r\nvar mapData = data.items.map(x => {\r\n  if (x.parent && x.parent.firstValue) {\r\n    x.parentId = x.parent.firstValue\r\n  } else {\r\n    x.parentId=null\r\n  }\r\n  return x;\r\n});\r\nconst treeData = listToTree(mapData, {\r\n  pid: \"parentId\",\r\n  children: \"children\",\r\n  id: \"contentItemId\"\r\n})\r\nconsole.log(\"treeData\", treeData)\r\nconst result = {\r\n  items: treeData,\r\n  total: data.total\r\n}\r\nconsole.log(\"treeData result\",result)\r\nreturn result",
+        "messages": {}
+      },
+      "columns": [
+        {
+          "type": "text",
+          "name": "displayText",
+          "label": "显示名称",
+          "id": "u:24a5a543514d"
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "buttons": [
+            {
+              "type": "button",
+              "id": "u:cd399b879627",
+              "label": "编辑",
+              "level": "link",
+              "onEvent": {
+                "click": {
+                  "actions": [
+                    {
+                      "dialog": {
+                        "type": "dialog",
+                        "title": "编辑",
+                        "body": [
+                          {
+                            "type": "form",
+                            "id": "frmEdit",
+                            "body": [
+                              {
+                                "type": "input-text",
+                                "id": "u:52c697de330b",
+                                "name": "contentItemId",
+                                "label": "菜单编号",
+                                "readOnly": true
+                              },
+                              {
+                                "name": "menuType",
+                                "label": "页面类型",
+                                "description": null,
+                                "type": "radios",
+                                "id": "u:d10904e4abc9",
+                                "multiple": false,
+                                "required": true,
+                                "options": [
+                                  {
+                                    "label": "普通页面",
+                                    "value": "Component"
+                                  },
+                                  {
+                                    "label": "节点",
+                                    "value": "Node"
+                                  },
+                                  {
+                                    "label": "动态页面",
+                                    "value": "DynamicPage"
+                                  }
+                                ]
+                              },
+                              {
+                                "name": "parent.firstValue",
+                                "label": "Parent",
+                                "description": "顶层菜单无需选择",
+                                "type": "tree-select",
+                                "id": "u:344d1b8383aa",
+                                "disabled": false,
+                                "checkAll": false,
+                                "searchable": true,
+                                "multiple": false,
+                                "extractValue": false,
+                                "source": {
+                                  "url": "api/graphql",
+                                  "method": "post",
+                                  "messages": {},
+                                  "requestAdaptor": "\r\n\r\nconst query = `{options:antdMenuItem\r\n  (status: PUBLISHED, first: 100)\r\n  {\r\n  label:displayText\r\n  parent{firstValue}\r\n  value:contentItemId}}`\r\napi.data = { query }\r\nconsole.log(\"api\", api)\r\nreturn api",
+                                  "adaptor": "console.log(\"datatatat\", response)\r\n\r\nvar data = response.data.data.options.map(x => {\r\n  if (x.parent && x.parent.firstValue) {\r\n    x.parentId = x.parent.firstValue\r\n  } else {\r\n    x.parentId = null\r\n  }\r\n  return x;\r\n});\r\nconst treeData = listToTree(data, {\r\n  pid: \"parentId\",\r\n  children: \"children\",\r\n  id: \"value\"\r\n})\r\nconsole.log(\"treeData\", treeData)\r\nconst result = {\r\n  options: treeData, \r\n}\r\nconsole.log(\"treeData result\", result)\r\nreturn result"
+                                },
+                                "clearable": true,
+                                "enableNodePath": false,
+                                "hideRoot": true,
+                                "showIcon": true,
+                                "initiallyOpen": true
+                              },
+                              {
+                                "name": "schemaId.firstValue",
+                                "label": "动态页面",
+                                "description": null,
+                                "type": "select",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:068bb684a369",
+                                "checkAll": false,
+                                "searchable": true,
+                                "multiple": false,
+                                "extractValue": false,
+                                "hiddenOn": "this.menuType!='DynamicPage'",
+                                "autoComplete": {
+                                  "method": "post",
+                                  "url": "/api/graphql",
+                                  "dataType": "json",
+                                  "replaceData": false,
+                                  "requestAdaptor": "const query=`\n                            {\n                                options:amisSchema\n                                (status: PUBLISHED, first: 10, \n                                    where: {displayText_contains: \"${api.body.term}\"}) \n                                {\n                                    label:displayText\n                                    value:contentItemId\n                                }\n                            }`\n                            api.data={query}\n                            return api"
+                                },
+                                "onEvent": {
+                                  "change": {
+                                    "weight": 0,
+                                    "actions": []
+                                  }
+                                }
+                              },
+                              {
+                                "name": "name",
+                                "label": "Name",
+                                "description": "${this.menuType=='DynamicPage'?'动态菜单无法设置此项':''}",
+                                "type": "input-text",
+                                "required": true,
+                                "disabled": false,
+                                "id": "u:a46f25923e63",
+                                "readOnlyOn": "this.menuType&&this.menuType!='DynamicPage'"
+                              },
+                              {
+                                "name": "path",
+                                "description": null,
+                                "type": "input-text",
+                                "required": true,
+                                "disabled": false,
+                                "id": "u:aa716fd32ab5",
+                                "label": "Path",
+                                "hiddenOn": "this.menuType=='DynamicPage'",
+                                "readOnly": false,
+                                "hideOn": "this.menuType=='DynamicPage'"
+                              },
+                              {
+                                "name": "redirect",
+                                "description": "redirect 属性",
+                                "type": "input-text",
+                                "disabled": false,
+                                "id": "u:fa50812323f1",
+                                "label": "跳转",
+                                "hiddenOn": "menuType!='Node'",
+                                "required": "this.menuType==\"Node\"",
+                                "hidden": "typeof this.hiddenOn === \"string\" ? 2 : 1"
+                              },
+                              {
+                                "name": "hideInMenu",
+                                "type": "switch",
+                                "id": "u:60ed4ca17486",
+                                "description": null,
+                                "required": false,
+                                "disabled": false,
+                                "option": "在菜单中隐藏"
+                              },
+                              {
+                                "name": "icon",
+                                "description": null,
+                                "type": "input-text",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:7e43b538ffd9",
+                                "label": "Icon"
+                              },
+                              {
+                                "name": "locale",
+                                "description": "未开启多语言时将使用Name 作为菜单名称",
+                                "type": "switch",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:c8b23f92fbea",
+                                "option": "多语言"
+                              },
+                              {
+                                "name": "zhCN",
+                                "description": null,
+                                "type": "input-text",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:a089068d5846",
+                                "label": "中文",
+                                "hiddenOn": "!this.locale",
+                                "value": ""
+                              },
+                              {
+                                "name": "enUS",
+                                "description": "其他语言请在其他设置中添加 如：lanng:{\"fr\":\"franch\"}",
+                                "type": "input-text",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:369267b90f5f",
+                                "label": "英文",
+                                "hiddenOn": "!this.locale"
+                              },
+                              {
+                                "name": "target",
+                                "label": "Target",
+                                "description": null,
+                                "type": "input-text",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:60773bc5cf38"
+                              },
+                              {
+                                "name": "access",
+                                "label": "页面权限",
+                                "description": null,
+                                "type": "input-text",
+                                "required": false,
+                                "disabled": false,
+                                "id": "u:fac0f8ff493b"
+                              },
+                              {
+                                "name": "orderIndex",
+                                "label": "排序",
+                                "description": null,
+                                "type": "input-text",
+                                "disabled": false,
+                                "id": "u:a67f7d0d2237",
+                                "required": false
+                              },
+                              {
+                                "name": "otherConfig",
+                                "label": "其他设置",
+                                "description": null,
+                                "type": "editor",
+                                "disabled": false,
+                                "id": "u:19f64122222b"
+                              }
+                            ],
+                            "initApi": {
+                              "method": "get",
+                              "url": "/api/graphql?query={   data:contentItem(contentItemId: \"${contentItemId}\") {     contentItemId     displayText     contentType     contentItemVersionId     modifiedUtc     publishedUtc     owner     createdUtc     author     ... on AntdMenuItem {       contentItemId       displayText       path       name       icon       enUS       zhCN       target       access       hideInMenu       otherConfig       menuType       schemaId {         firstValue         firstContentItem {           displayText         }       }       redirect       locale       orderIndex       parent {         firstValue         firstContentItem {           displayText         }       }       modifiedUtc       createdUtc       owner       author       publishedUtc       contentItemVersionId       contentType       latest       published     }   } }",
+                              "dataType": "json",
+                              "replaceData": true,
+                              "requestAdaptor": "",
+                              "adaptor": "console.log(\" data:contentItem\", response)\r\n\r\nreturn {\r\n  data: response.data.data\r\n}",
+                              "messages": {},
+                              "data": {
+                                "&": "$$"
+                              }
+                            },
+                            "api": {
+                              "method": "post",
+                              "url": "/api/ContentManagement/PostContent",
+                              "dataType": "json",
+                              "data": {
+                                "&": "$$",
+                                "contentType": "AntdMenuItem"
+                              }
+                            },
+                            "name": "frmEdit",
+                            "actions": [
+                              {
+                                "type": "button",
+                                "label": "取消",
+                                "actionType": "cancel",
+                                "id": "u:6f04f6521dc7"
+                              },
+                              {
+                                "type": "button",
+                                "label": "提交",
+                                "actionType": "confirm",
+                                "id": "u:8b74b5644485",
+                                "reload": "contentMangeCrud,contentViewer",
+                                "level": "primary"
+                              }
+                            ],
+                            "debug": false
+                          }
+                        ],
+                        "showCloseButton": true,
+                        "showErrorMsg": true,
+                        "showLoading": true,
+                        "id": "u:1a29f6150c04",
+                        "resizable": true,
+                        "closeOnEsc": true,
+                        "closeOnOutside": true,
+                        "size": "md",
+                        "dataMapSwitch": true,
+                        "dataMap": {
+                          "reloadMenus": "${reloadMenus}"
+                        },
+                        "data": {
+                          "&": "$$",
+                          "reloadMenus": "${reloadMenus}"
+                        },
+                        "className": "",
+                        "bodyClassName": "",
+                        "onEvent": {
+                          "confirm": {
+                            "weight": 0,
+                            "actions": [
+                              {
+                                "componentId": "u:a402298fc64d",
+                                "actionType": "reload"
+                              },
+                              {
+                                "args": {},
+                                "actionType": "custom",
+                                "script": "/* 自定义JS使用说明：\n  * 1.动作执行函数doAction，可以执行所有类型的动作\n  * 2.通过上下文对象context可以获取当前组件实例，例如context.props可以获取该组件相关属性\n  * 3.事件对象event，在doAction之后执行event.stopPropagation = true;可以阻止后续动作执行\n*/\nevent.data.reloadMenus();\n"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "actionType": "dialog"
+                    }
+                  ],
+                  "weight": 0
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "删除",
+              "level": "link",
+              "confirmText": "确定要删除？",
+              "id": "u:466d2b9a0e3e",
+              "onEvent": {
+                "click": {
+                  "weight": 0,
+                  "actions": [
+                    {
+                      "args": {
+                        "options": {},
+                        "api": {
+                          "url": "/api/ContentManagement/Delete?contentItemId=${contentItemId}",
+                          "method": "delete",
+                          "messages": {}
+                        }
+                      },
+                      "actionType": "ajax",
+                      "outputVar": "responseResult"
+                    },
+                    {
+                      "actionType": "reload",
+                      "componentId": "u:a402298fc64d",
+                      "args": {
+                        "resetPage": true
+                      },
+                      "dataMergeMode": "merge"
+                    },
+                    {
+                      "actionType": "custom",
+                      "script": "event.data.reloadMenus()"
+                    }
+                  ]
+                }
+              },
+              "className": "text-danger",
+              "block": false
+            }
+          ],
+          "id": "u:57d6fb047f9e"
+        },
+        {
+          "name": "path",
+          "label": "Path",
+          "sortable": true,
+          "type": "text",
+          "id": "u:cb468054e33b"
+        },
+        {
+          "name": "name",
+          "label": "Name",
+          "sortable": false,
+          "type": "text",
+          "id": "u:00e22628c3d4",
+          "placeholder": "-"
+        },
+        {
+          "name": "orderIndex",
+          "label": "排序",
+          "type": "text",
+          "id": "u:2862e8ec4af4"
+        },
+        {
+          "type": "text",
+          "label": "页面类型",
+          "name": "menuType",
+          "id": "u:464f8b3125f7",
+          "sortable": false,
+          "placeholder": "-"
+        },
+        {
+          "name": "modifiedUtc",
+          "label": "修改时间",
+          "sortable": false,
+          "type": "date",
+          "id": "u:cf69910762e1",
+          "placeholder": "-"
+        },
+        {
+          "type": "date",
+          "label": "创建时间",
+          "name": "createdUtc",
+          "placeholder": "-",
+          "sortable": false,
+          "id": "u:8cde8c628948",
+          "toggled": false
+        },
+        {
+          "name": "author",
+          "label": "创建人",
+          "type": "text",
+          "placeholder": "-",
+          "sortable": false,
+          "id": "u:2416b56a0fd2"
+        }
+      ],
+      "placeholder": "未查询到数据",
+      "itemActions": [],
+      "features": [
+        "filter",
+        "create",
+        "update",
+        "view",
+        "delete"
+      ],
+      "headerToolbar": [
+        {
+          "label": "新增",
+          "type": "button",
+          "level": "primary",
+          "id": "u:691e4cf693d3",
+          "onEvent": {
+            "click": {
+              "weight": 0,
+              "actions": [
+                {
+                  "dialog": {
+                    "type": "dialog",
+                    "title": "新增",
+                    "body": [
+                      {
+                        "type": "form",
+                        "id": "frmEdit",
+                        "body": [
+                          {
+                            "name": "menuType",
+                            "label": "页面类型",
+                            "description": null,
+                            "type": "radios",
+                            "id": "u:d1787771d209",
+                            "multiple": false,
+                            "required": true,
+                            "options": [
+                              {
+                                "label": "普通页面",
+                                "value": "Component"
+                              },
+                              {
+                                "label": "节点",
+                                "value": "Node"
+                              },
+                              {
+                                "label": "动态页面",
+                                "value": "DynamicPage"
+                              }
+                            ]
+                          },
+                          {
+                            "name": "parent.firstValue",
+                            "label": "Parent",
+                            "description": "顶层菜单无需选择",
+                            "type": "tree-select",
+                            "id": "u:aafe2376ab90",
+                            "disabled": false,
+                            "checkAll": false,
+                            "searchable": true,
+                            "multiple": false,
+                            "extractValue": false,
+                            "source": {
+                              "url": "api/graphql",
+                              "method": "post",
+                              "messages": {},
+                              "requestAdaptor": "\r\n\r\nconst query = `{options:antdMenuItem\r\n  (status: PUBLISHED, first: 100)\r\n  {\r\n  label:displayText\r\n  parent{firstValue}\r\n  value:contentItemId}}`\r\napi.data = { query }\r\nconsole.log(\"api\", api)\r\nreturn api",
+                              "adaptor": "console.log(\"datatatat\", response)\r\n\r\nvar data = response.data.options.map(x => {\r\n  if (x.parent && x.parent.firstValue) {\r\n    x.parentId = x.parent.firstValue\r\n  } else {\r\n    x.parentId = null\r\n  }\r\n  return x;\r\n});\r\nconst treeData = listToTree(data, {\r\n  pid: \"parentId\",\r\n  children: \"children\",\r\n  id: \"value\"\r\n})\r\nconsole.log(\"treeData\", treeData)\r\nconst result = {\r\n  options: treeData, \r\n}\r\nconsole.log(\"treeData result\", result)\r\nreturn result"
+                            },
+                            "clearable": true,
+                            "enableNodePath": false,
+                            "hideRoot": true,
+                            "showIcon": true,
+                            "initiallyOpen": true
+                          },
+                          {
+                            "name": "schemaId.firstValue",
+                            "label": "动态页面",
+                            "description": null,
+                            "type": "select",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:28b08de503ad",
+                            "checkAll": false,
+                            "searchable": true,
+                            "multiple": false,
+                            "extractValue": false,
+                            "hiddenOn": "this.menuType!='DynamicPage'",
+                            "autoComplete": {
+                              "method": "post",
+                              "url": "/api/graphql",
+                              "dataType": "json",
+                              "replaceData": false,
+                              "requestAdaptor": "const query=`\n                            {\n                                options:amisSchema\n                                (status: PUBLISHED, first: 10, \n                                    where: {displayText_contains: \"${api.body.term}\"}) \n                                {\n                                    label:displayText\n                                    value:contentItemId\n                                }\n                            }`\n                            api.data={query}\n                            return api"
+                            },
+                            "onEvent": {
+                              "change": {
+                                "weight": 0,
+                                "actions": [
+                                  {
+                                    "actionType": "custom",
+                                    "script": "/* 自定义JS使用说明： \n * 1.动作执行函数doAction，可以执行所有类型的动作\n * 2.通过上下文对象context可以获取当前组件实例，例如context.props可以获取该组件相关属性\n * 3.事件对象event，在doAction之后执行event.stopPropagation = true;可以阻止后续动作执行\n*/\n \nvar value = event.data.value;\nvar option = event.data.options.find(x => x.value == value);\ndoAction({\n  \"actionType\": \"setValue\",\n  \"componentId\": \"frmEdit\",\n  \"args\": {\n    \"value\": {\n      name: option.label,\n      path:`/menu/${option.value}`\n    }\n  }\n})"
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "name": "name",
+                            "label": "Name",
+                            "description": "${this.menuType=='DynamicPage'?'动态菜单无法设置此项':''}",
+                            "type": "input-text",
+                            "required": true,
+                            "disabled": false,
+                            "id": "u:5eb5d99d3e3f",
+                            "readOnlyOn": "this.menuType&&this.menuType!='DynamicPage'"
+                          },
+                          {
+                            "name": "path",
+                            "description": null,
+                            "type": "input-text",
+                            "required": true,
+                            "disabled": false,
+                            "id": "u:e674b9db0ce3",
+                            "label": "Path",
+                            "hiddenOn": "this.menuType=='DynamicPage'",
+                            "readOnly": false
+                          },
+                          {
+                            "name": "redirect",
+                            "description": "redirect 属性",
+                            "type": "input-text",
+                            "disabled": false,
+                            "id": "u:3b46d0ae8082",
+                            "label": "跳转",
+                            "hiddenOn": "menuType!='Node'",
+                            "required": "this.menuType==\"Node\"",
+                            "hidden": "typeof this.hiddenOn === \"string\" ? 2 : 1"
+                          },
+                          {
+                            "name": "hideInMenu",
+                            "type": "switch",
+                            "id": "u:bf5769c205fd",
+                            "description": null,
+                            "required": false,
+                            "disabled": false,
+                            "option": "在菜单中隐藏"
+                          },
+                          {
+                            "name": "icon",
+                            "description": null,
+                            "type": "input-text",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:5426ca472b8d",
+                            "label": "Icon"
+                          },
+                          {
+                            "name": "locale",
+                            "description": "未开启多语言时将使用Name 作为菜单名称",
+                            "type": "switch",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:90fe4ffb1ebe",
+                            "option": "多语言"
+                          },
+                          {
+                            "name": "zhCN",
+                            "description": null,
+                            "type": "input-text",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:a6fcab56952c",
+                            "label": "中文",
+                            "value": "${this.name}",
+                            "hiddenOn": "!this.locale"
+                          },
+                          {
+                            "name": "enUS",
+                            "description": "其他语言请在其他设置中添加 如：lanng:{\"fr\":\"franch\"}",
+                            "type": "input-text",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:871e47e19e37",
+                            "label": "英文",
+                            "hiddenOn": "!this.locale"
+                          },
+                          {
+                            "name": "target",
+                            "label": "Target",
+                            "description": null,
+                            "type": "input-text",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:95fc378d1dde"
+                          },
+                          {
+                            "name": "access",
+                            "label": "页面权限",
+                            "description": null,
+                            "type": "input-text",
+                            "required": false,
+                            "disabled": false,
+                            "id": "u:356db52dd21c"
+                          },
+                          {
+                            "name": "orderIndex",
+                            "label": "排序",
+                            "description": null,
+                            "type": "input-text",
+                            "disabled": false,
+                            "id": "u:a76c40822f16",
+                            "required": false
+                          },
+                          {
+                            "name": "otherConfig",
+                            "label": "其他设置",
+                            "description": null,
+                            "type": "editor",
+                            "disabled": false,
+                            "id": "u:b579a90f7c9b"
+                          }
+                        ],
+                        "api": {
+                          "method": "post",
+                          "url": "/api/ContentManagement/PostContent",
+                          "dataType": "json",
+                          "data": {
+                            "&": "$$",
+                            "contentType": "AntdMenuItem"
+                          }
+                        },
+                        "name": "frmEdit",
+                        "actions": [
+                          {
+                            "type": "button",
+                            "label": "取消",
+                            "actionType": "cancel",
+                            "id": "u:69fd7c21307f"
+                          },
+                          {
+                            "type": "button",
+                            "label": "提交",
+                            "actionType": "confirm",
+                            "id": "u:1a8dd8ace1f7",
+                            "reload": "contentMangeCrud,contentViewer",
+                            "level": "primary"
+                          }
+                        ],
+                        "debug": false
+                      }
+                    ],
+                    "showCloseButton": true,
+                    "showErrorMsg": true,
+                    "showLoading": true,
+                    "id": "u:393c2aebcd7a",
+                    "size": "lg",
+                    "resizable": true,
+                    "closeOnEsc": true,
+                    "closeOnOutside": true,
+                    "dataMapSwitch": true,
+                    "dataMap": {},
+                    "data": {
+                      "&": "$$"
+                    },
+                    "onEvent": {
+                      "confirm": {
+                        "weight": 0,
+                        "actions": [
+                          {
+                            "componentId": "u:a402298fc64d",
+                            "actionType": "reload"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "actionType": "dialog"
+                }
+              ]
+            }
+          }
+        },
+        "bulkActions"
+      ],
+      "bulkActions": [],
+      "primaryField": "contentItemId",
+      "filter": {
+        "title": "查询条件",
+        "name": "searchForm",
+        "body": [
+          {
+            "type": "input-text",
+            "name": "displayText",
+            "label": "名称",
+            "size": "lg",
+            "id": "u:8d21b93e6e14"
+          }
+        ],
+        "actions": [
+          {
+            "type": "submit",
+            "label": "搜索",
+            "actionType": "submit",
+            "id": "u:f919f2d70d5d",
+            "level": "primary"
+          }
+        ],
+        "checkAll": false,
+        "submitOnChange": false,
+        "perPageAvailable": [
+          10
+        ],
+        "mode": "inline",
+        "panelClassName": "",
+        "id": "u:1930dc58d93e"
+      },
+      "keepItemSelectionOnPageChange": true,
+      "labelTpl": "${displayText||contentItemId}",
+      "filterColumnCount": 3,
+      "syncLocation": false,
+      "defaultParams": {},
+      "columnsTogglable": "auto",
+      "showFooter": false,
+      "footable": {
+        "expand": "all"
+      }
+    }
+  ],
+  "messages": {},
+  "style": {},
+  "title": "菜单管理",
+  "definitions": {},
+  "data": {
+    "contentType": "AntdMenuItem"
+  },
+  "pullRefresh": {
+    "disabled": true
+  },
+  "asideResizor": false,
+  "subTitle": ""
+}

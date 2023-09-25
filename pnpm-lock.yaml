@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -119,6 +119,9 @@ dependencies:
   react-hook-form:
     specifier: ^7.46.2
     version: 7.46.2(react@18.2.0)
+  react-monaco-editor:
+    specifier: ^0.54.0
+    version: 0.54.0(@types/react@17.0.65)(react@18.2.0)
   react-router:
     specifier: 5.2.1
     version: 5.2.1(react@18.2.0)
@@ -216,7 +219,7 @@ devDependencies:
     version: 11.1.3(less@4.2.0)(webpack@5.88.2)
   monaco-editor-webpack-plugin:
     specifier: ^6.0.0
-    version: 6.0.0(monaco-editor@0.30.1)(webpack@5.88.2)
+    version: 6.0.0(webpack@5.88.2)
   prettier:
     specifier: ^2.8.8
     version: 2.8.8
@@ -7325,19 +7328,19 @@ packages:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
     dev: false
 
-  /monaco-editor-webpack-plugin@6.0.0(monaco-editor@0.30.1)(webpack@5.88.2):
+  /monaco-editor-webpack-plugin@6.0.0(webpack@5.88.2):
     resolution: {integrity: sha512-vC886Mzpd2AkSM35XLkfQMjH+Ohz6RISVwhAejDUzZDheJAiz6G34lky1vyO8fZ702v7IrcKmsGwL1rRFnwvUA==}
     peerDependencies:
       monaco-editor: 0.30.x
       webpack: ^4.5.0 || 5.x
     dependencies:
       loader-utils: 2.0.4
-      monaco-editor: 0.30.1
       webpack: 5.88.2(webpack-cli@4.10.0)
     dev: true
 
   /monaco-editor@0.30.1:
     resolution: {integrity: sha512-B/y4+b2O5G2gjuxIFtCE2EkM17R2NM7/3F8x0qcPsqy4V83bitJTIO4TIeZpYlzu/xy6INiY/+84BEm6+7Cmzg==}
+    dev: false
 
   /mpegts.js@1.7.3:
     resolution: {integrity: sha512-kqZ1C1IsbAQN72cK8vMrzKeM7hwrwSBbFAwVAc7PPweOeoZxCANrc7fAVDKMfYUzxdNkMTnec9tVmlxmKZB0TQ==}
@@ -8780,6 +8783,18 @@ packages:
 
   /react-lifecycles-compat@3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
+    dev: false
+
+  /react-monaco-editor@0.54.0(@types/react@17.0.65)(react@18.2.0):
+    resolution: {integrity: sha512-9JwO69851mfpuhYLHlKbae7omQWJ/2ICE2lbL0VHyNyZR8rCOH7440u+zAtDgiOMpLwmYdY1sEZCdRefywX6GQ==}
+    peerDependencies:
+      '@types/react': '>=16 <= 18'
+      monaco-editor: ^0.39.0
+      react: '>=16 <= 18'
+    dependencies:
+      '@types/react': 17.0.65
+      prop-types: 15.8.1
+      react: 18.2.0
     dev: false
 
   /react-overlays@5.1.1(react-dom@18.2.0)(react@18.2.0):

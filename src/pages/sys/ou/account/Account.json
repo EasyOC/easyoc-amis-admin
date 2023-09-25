@@ -1,0 +1,962 @@
+{
+  "type": "page",
+  "regions": [
+    "body",
+    "toolbar",
+    "header"
+  ],
+  "title": "用户管理",
+  "data": {
+    "contentType": "UserProfile"
+  },
+  "body": [
+    {
+      "type": "crud",
+      "name": "contentMangeCrud",
+      "affixHeader": false,
+      "perPage": 10,
+      "alwaysShowPagination": true,
+      "perPageAvailable": [
+        10,
+        20,
+        50,
+        100
+      ],
+      "footerToolbar": [
+        {
+          "type": "statistics"
+        },
+        {
+          "type": "switch-per-page"
+        },
+        {
+          "type": "pagination",
+          "align": "right"
+        }
+      ],
+      "api": {
+        "method": "post",
+        "url": "/api/graphql",
+        "data": {
+          "&": "$$"
+        },
+        "dataType": "json",
+        "requestAdaptor": "console.log(\"api.发送适配器\",api) \n                     console.log(\"哈哈哈哈\", amisExt.convertCondition(api.body.conditions));\n                     const filterParams=[`status: ${api.data.status}`]\n                     const variables={\n                        jsonFilter:amisExt.dynamicJsonFilter(api.body.conditions)//,\n                        // filter: amisExt.convertCondition(api.body.conditions)\n                      }\n                     if(api.data.displayText){\n                         filterParams.push(`where: {displayText_contains: \"${api.data.displayText}\"}`)\n                        }\n                        if(api.data.orderBy){\n                                filterParams.push(`orderBy:{${api.body.orderBy}:${api.body.orderDir.toUpperCase()}}`)\n                            }\n                            console.log(\"filterParams.join(',')\",filterParams.join(','))\n                            const  query=`query curdQuery($jsonFilter:String){ \n        data:pagedContentItems( \n            contentType: UserProfile\n            ${api.body.page?\"page:\"+api.body.page:\"\"}  \n            ${api.body.perPage?\"pageSize:\"+api.body.perPage:\"\"}\n            orderBy: {field: \\\"${api.body.orderBy?api.body.orderBy:'modifiedUtc'}\\\", direction: ${api.body.orderDir?api.body.orderDir.toUpperCase():'DESC' } } \n            dynamicJSONFilter: $jsonFilter\n              )\n            {  \n                total                 \n                 items {\n      ... on UserProfile {\n        userName\n        roles\n        userProperties {\n          firstName\n          lastName\n        }\n        displayText\n        contentItemId\n        email\n        contentType\n        contentItemVersionId\n        createdUtc\n        latest\n        modifiedUtc\n        owner\n        published\n        publishedUtc\n        author\n      }\n    }\n            }\n        }`\n        api.data={query,variables}\n        console.log(\"api.发送适配器2\",api) \n        return api",
+        "adaptor": "return response.data.data",
+        "messages": {}
+      },
+      "columns": [
+        {
+          "type": "operation",
+          "label": "操作",
+          "id": "u:ab3eb2d2e3dd",
+          "buttons": [
+            {
+              "type": "button",
+              "label": "编辑",
+              "onEvent": {
+                "click": {
+                  "actions": [
+                    {
+                      "actionType": "drawer",
+                      "drawer": {
+                        "type": "drawer",
+                        "title": "编辑用户",
+                        "body": [
+                          {
+                            "type": "form",
+                            "id": "u:0e34fe4d2432",
+                            "body": [
+                              {
+                                "type": "tabs",
+                                "tabs": [
+                                  {
+                                    "title": "主要",
+                                    "body": [
+                                      {
+                                        "name": "userName",
+                                        "label": "UserName",
+                                        "description": null,
+                                        "type": "input-text",
+                                        "required": true,
+                                        "disabled": false,
+                                        "id": "u:af81531dac86"
+                                      },
+                                      {
+                                        "name": "email",
+                                        "label": "Email",
+                                        "description": null,
+                                        "type": "input-text",
+                                        "required": true,
+                                        "disabled": false,
+                                        "id": "u:46690ca27b31"
+                                      },
+                                      {
+                                        "type": "checkboxes",
+                                        "label": "Roles",
+                                        "name": "roleNames",
+                                        "multiple": true,
+                                        "id": "u:7d8851ff7f3c",
+                                        "checkAll": false,
+                                        "joinValues": false,
+                                        "source": {
+                                          "url": "/api/Roles/GetRoles",
+                                          "method": "get",
+                                          "messages": {},
+                                          "adaptor": "console.log(\"response.data\", response.data)\r\nreturn {\r\n  options: response.data.map(x => {\r\n    return {\r\n      value: x.roleName,\r\n      label: x.roleDescription || x.roleName\r\n    }\r\n  })\r\n\r\n}"
+                                        },
+                                        "extractValue": true,
+                                        "labelClassName": "w-md"
+                                      }
+                                    ],
+                                    "id": "u:5b45f450b437"
+                                  },
+                                  {
+                                    "title": "详细",
+                                    "body": [
+                                      {
+                                        "name": "properties.UserProfileInternal.DisplayText",
+                                        "label": "显示名",
+                                        "description": null,
+                                        "type": "input-text",
+                                        "required": false,
+                                        "disabled": false,
+                                        "id": "u:fde667f8942d"
+                                      },
+                                      {
+                                        "name": "properties.UserProfileInternal.UserProfilePart.FirstName.Text",
+                                        "label": "First Name",
+                                        "description": null,
+                                        "type": "input-text",
+                                        "required": false,
+                                        "disabled": false,
+                                        "id": "u:879ff465226a"
+                                      },
+                                      {
+                                        "name": "properties.UserProfileInternal.UserProfilePart.LastName.Text",
+                                        "label": "Last Name",
+                                        "description": null,
+                                        "type": "input-text",
+                                        "required": false,
+                                        "disabled": false,
+                                        "id": "u:0cd275ff67af"
+                                      }
+                                    ],
+                                    "id": "u:b08d393349f0"
+                                  },
+                                  {
+                                    "title": "其它",
+                                    "body": [
+                                      {
+                                        "type": "property",
+                                        "id": "u:1577f3084cdd",
+                                        "title": "",
+                                        "labelStyle": {
+                                          "textAlign": "right"
+                                        },
+                                        "contentStyle": {
+                                          "textAlign": "left"
+                                        },
+                                        "items": [
+                                          {
+                                            "label": "编号",
+                                            "content": "${contentItemId}",
+                                            "span": 1
+                                          },
+                                          {
+                                            "label": "版本号",
+                                            "content": "${contentItemVersionId}",
+                                            "span": 1
+                                          },
+                                          {
+                                            "label": "创建人",
+                                            "content": "${author}",
+                                            "span": 1
+                                          },
+                                          {
+                                            "label": "创建时间",
+                                            "content": "${createdUtc | toDate |date:YYYY-MM-DD HH\\:mm\\:ss }",
+                                            "span": 1
+                                          },
+                                          {
+                                            "span": 1,
+                                            "label": "修改时间",
+                                            "content": "${modifiedUtc | toDate |date:YYYY-MM-DD HH\\:mm\\:ss } "
+                                          }
+                                        ],
+                                        "column": 2,
+                                        "mode": "table",
+                                        "closeOnEsc": false,
+                                        "closeOnOutside": false,
+                                        "showCloseButton": true,
+                                        "className": "m-b-md"
+                                      }
+                                    ],
+                                    "id": "u:0b85e4b5aa26"
+                                  }
+                                ],
+                                "id": "u:2dd74a78adc7",
+                                "tabsMode": "strong"
+                              }
+                            ],
+                            "initApi": {
+                              "method": "get",
+                              "url": "api/Users/GetUser?id=${contentItemId}",
+                              "dataType": "json",
+                              "replaceData": true,
+                              "onPreRequest": "",
+                              "adaptor": "",
+                              "sendOn": "!!this.contentItemId",
+                              "messages": {}
+                            },
+                            "api": {
+                              "method": "post",
+                              "url": "/api/users/update",
+                              "dataType": "json",
+                              "data": {
+                                "&": "$$"
+                              },
+                              "messages": {}
+                            },
+                            "name": "EditForm",
+                            "actions": [
+                              {
+                                "type": "button",
+                                "label": "取消",
+                                "actionType": "cancel",
+                                "id": "u:69fd7c21307f"
+                              },
+                              {
+                                "type": "button",
+                                "label": "提交",
+                                "actionType": "confirm",
+                                "id": "u:1a8dd8ace1f7",
+                                "reload": "contentMangeCrud,contentViewer",
+                                "level": "primary"
+                              }
+                            ],
+                            "debug": true
+                          }
+                        ],
+                        "id": "u:c2b29fac213f",
+                        "resizable": true,
+                        "closeOnEsc": true,
+                        "closeOnOutside": true,
+                        "showCloseButton": true,
+                        "size": "lg",
+                        "dataMapSwitch": false
+                      }
+                    }
+                  ]
+                }
+              },
+              "level": "link",
+              "id": "u:6e90c7e688ea"
+            }
+          ],
+          "placeholder": "-",
+          "fixed": "left"
+        },
+        {
+          "name": "displayText",
+          "label": "显示名",
+          "type": "text",
+          "id": "u:feaaab3b7895",
+          "placeholder": "-"
+        },
+        {
+          "name": "userName",
+          "label": "登录名",
+          "type": "text",
+          "id": "u:8bfb7cdc486e",
+          "sortable": true,
+          "placeholder": "-"
+        },
+        {
+          "name": "email",
+          "label": "Email",
+          "type": "text",
+          "id": "u:37e6c2f5db55",
+          "placeholder": "-",
+          "sortable": true
+        },
+        {
+          "name": "roles",
+          "label": "Roles",
+          "type": "text",
+          "id": "u:0cb203bc681d",
+          "placeholder": "-"
+        },
+        {
+          "type": "date",
+          "name": "modifiedUtc",
+          "label": "修改时间",
+          "id": "u:79b1a92dbf15",
+          "placeholder": "-",
+          "sortable": true
+        },
+        {
+          "name": "createdUtc",
+          "label": "创建时间",
+          "type": "date",
+          "id": "u:c537d82b8f0c",
+          "placeholder": "-",
+          "sortable": true,
+          "toggled": false
+        },
+        {
+          "name": "author",
+          "label": "创建人",
+          "type": "text",
+          "id": "u:56b0c5012aac",
+          "placeholder": "-",
+          "sortable": true
+        }
+      ],
+      "placeholder": "未查询到数据",
+      "itemActions": [],
+      "features": [
+        "filter",
+        "create",
+        "update",
+        "view",
+        "delete"
+      ],
+      "headerToolbar": [
+        {
+          "type": "button",
+          "label": "新增",
+          "actionType": "dialog",
+          "level": "primary",
+          "dialog": {
+            "title": "新增",
+            "body": {
+              "type": "form",
+              "api": {
+                "method": "post",
+                "url": "/api/graphql",
+                "data": {
+                  "&": "$$"
+                },
+                "dataType": "json",
+                "requestAdaptor": "console.log(\"api.发送适配器\",api) \n                     console.log(\"哈哈哈哈\", amisExt.convertCondition(api.body.conditions));\n                     const filterParams=[`status: ${api.data.status}`]\n                     const variables={\n                        jsonFilter:amisExt.dynamicJsonFilter(api.body.conditions)//,\n                        // filter: amisExt.convertCondition(api.body.conditions)\n                      }\n                     if(api.data.displayText){\n                         filterParams.push(`where: {displayText_contains: \"${api.data.displayText}\"}`)\n                        }\n                        if(api.data.orderBy){\n                                filterParams.push(`orderBy:{${api.body.orderBy}:${api.body.orderDir.toUpperCase()}}`)\n                            }\n                            console.log(\"filterParams.join(',')\",filterParams.join(','))\n                            const  query=`query curdQuery($jsonFilter:String){ \n        data:pagedContentItems( \n            contentType: UserProfile\n            ${api.body.page?\"page:\"+api.body.page:\"\"}  \n            ${api.body.perPage?\"pageSize:\"+api.body.perPage:\"\"}\n            orderBy: {field: \\\"${api.body.orderBy?api.body.orderBy:'modifiedUtc'}\\\", direction: ${api.body.orderDir?api.body.orderDir.toUpperCase():'DESC' } } \n            dynamicJSONFilter: $jsonFilter\n              )\n            {  \n                total                 \n                items \n                { \n                    ... on  UserProfile\n                        {\n  contentItemId \n  displayText \n  userProfile {\n    firstName \n    lastName \n    name \n    displayName \n    email \n    roles \n  }\n  ownerUser {\n    firstValue \n    firstUserProfiles {\n      displayText \n    }\n  }\n  userName \n  email \n  userId \n  modifiedUtc \n  createdUtc \n  owner \n  author \n  publishedUtc \n  contentItemVersionId \n  contentType \n  latest \n  published \n}\n                    \n                }\n            }\n        }`\n        api.data={query,variables}\n        console.log(\"api.发送适配器2\",api) \n        return api",
+                "adaptor": "return response.data.data"
+              },
+              "body": [
+                {
+                  "type": "input-operation",
+                  "name": "displayText",
+                  "label": "显示名称"
+                },
+                {
+                  "type": "input-operation",
+                  "label": "操作"
+                },
+                {
+                  "type": "input-text",
+                  "name": "userProfile.name",
+                  "label": "登录名"
+                },
+                {
+                  "type": "input-text",
+                  "name": "userProfile.displayName",
+                  "label": "显示名"
+                },
+                {
+                  "type": "input-text",
+                  "name": "userProfile.email",
+                  "label": "Email"
+                },
+                {
+                  "type": "input-text",
+                  "name": "userProfile.roles",
+                  "label": "Roles"
+                },
+                {
+                  "type": "input-text",
+                  "name": "userName",
+                  "label": "UserName"
+                },
+                {
+                  "type": "input-text",
+                  "name": "email",
+                  "label": "Email"
+                },
+                {
+                  "type": "input-text",
+                  "name": "userId",
+                  "label": "UserId"
+                },
+                {
+                  "type": "input-date",
+                  "name": "modifiedUtc",
+                  "label": "修改时间"
+                },
+                {
+                  "type": "input-date",
+                  "name": "createdUtc",
+                  "label": "创建时间"
+                },
+                {
+                  "type": "input-text",
+                  "name": "author",
+                  "label": "创建人"
+                }
+              ]
+            }
+          },
+          "id": "u:68c24f994c45",
+          "hidden": true
+        },
+        "bulkActions"
+      ],
+      "bulkActions": [],
+      "messages": {},
+      "primaryField": "contentItemId",
+      "filter": {
+        "title": "查询条件",
+        "name": "searchForm",
+        "body": [
+          {
+            "type": "input-text",
+            "name": "displayText",
+            "label": "名称",
+            "size": "lg",
+            "id": "u:5fdb46dcc80e"
+          }
+        ],
+        "actions": [
+          {
+            "type": "submit",
+            "label": "搜索",
+            "actionType": "submit",
+            "id": "u:f919f2d70d5d",
+            "level": "primary"
+          },
+          {
+            "type": "button",
+            "label": "高级..",
+            "actionType": "drawer",
+            "name": "conditionsDrawer",
+            "drawer": {
+              "type": "drawer",
+              "position": "right",
+              "resizable": true,
+              "closeOnEsc": true,
+              "closeOnOutside": true,
+              "showCloseButton": true,
+              "title": "",
+              "overlay": false,
+              "width": "1000px",
+              "body": [
+                {
+                  "type": "form",
+                  "title": "表单",
+                  "body": [
+                    {
+                      "type": "condition-builder",
+                      "label": "",
+                      "name": "conditions",
+                      "searchable": true,
+                      "fields": [
+                        {
+                          "name": "published",
+                          "label": "发布状态",
+                          "type": "select",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            "select_any_in",
+                            "select_not_any_in"
+                          ],
+                          "options": [
+                            {
+                              "label": "已发布或草稿",
+                              "value": "PUBLISHEDORLATEST"
+                            },
+                            {
+                              "label": "只看最新版",
+                              "value": "LATEST"
+                            },
+                            {
+                              "label": "所有发布版",
+                              "value": "PUBLISHED"
+                            },
+                            {
+                              "label": "所有草稿",
+                              "value": "DRAFT"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "修改时间",
+                          "name": "modifiedUtc",
+                          "type": "date",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "大于等于",
+                              "value": "GREATER_THAN_OR_EQUAL"
+                            },
+                            {
+                              "label": "小于等于",
+                              "value": "LESS_THAN_OR_EQUAL"
+                            },
+                            {
+                              "label": "大于",
+                              "value": "GREATER_THAN"
+                            },
+                            {
+                              "label": "小于",
+                              "value": "LESS_THAN"
+                            },
+                            "between"
+                          ]
+                        },
+                        {
+                          "label": "创建时间",
+                          "type": "date",
+                          "name": "createdUtc",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "大于等于",
+                              "value": "GREATER_THAN_OR_EQUAL"
+                            },
+                            {
+                              "label": "小于等于",
+                              "value": "LESS_THAN_OR_EQUAL"
+                            },
+                            {
+                              "label": "大于",
+                              "value": "GREATER_THAN"
+                            },
+                            {
+                              "label": "小于",
+                              "value": "LESS_THAN"
+                            },
+                            "between"
+                          ]
+                        },
+                        {
+                          "type": "select",
+                          "name": "author",
+                          "label": "创建人",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            "select_any_in",
+                            "select_not_any_in"
+                          ],
+                          "source": {
+                            "method": "post",
+                            "url": "/api/graphql",
+                            "dataType": "json",
+                            "replaceData": false,
+                            "requestAdaptor": "const query=`\n                    {\n                        options:userProfile(first: 10}) {\n                          label:displayText\n                          value:userId\n                        }\n                      }`\n                    api.data={query}\n                    return api"
+                          }
+                        },
+                        {
+                          "label": "First Name",
+                          "name": "userProfile.firstName",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "Last Name",
+                          "name": "userProfile.lastName",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "登录名",
+                          "name": "userProfile.name",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "显示名",
+                          "name": "userProfile.displayName",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "Email",
+                          "name": "userProfile.email",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "OwnerUser",
+                          "name": "ownerUser.firstValue",
+                          "type": "select",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            "select_any_in",
+                            "select_not_any_in"
+                          ],
+                          "source": {
+                            "method": "post",
+                            "url": "/api/graphql",
+                            "dataType": "json",
+                            "replaceData": false,
+                            "requestAdaptor": "const query=`\n                    {\n                        options:userProfile(first: 10, where: {displayText_contains: \"${api.body.term}\"}) {\n                          label:displayText\n                          value:userId\n                        }\n                      }`\n                    api.data={query}\n                    return api"
+                          }
+                        },
+                        {
+                          "label": "UserName",
+                          "name": "userName",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "Email",
+                          "name": "email",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        },
+                        {
+                          "label": "UserId",
+                          "name": "userId",
+                          "type": "text",
+                          "operators": [
+                            {
+                              "label": "等于",
+                              "value": "EQUALS"
+                            },
+                            {
+                              "label": "不等于",
+                              "value": "NOT_EQUAL"
+                            },
+                            {
+                              "label": "包含",
+                              "value": "CONTAINS"
+                            },
+                            {
+                              "label": "不匹配",
+                              "value": "NOT_CONTAINS"
+                            },
+                            {
+                              "label": "匹配开头",
+                              "value": "STARTS_WITH"
+                            },
+                            {
+                              "label": "匹配结尾",
+                              "value": "ENDS_WITH"
+                            },
+                            {
+                              "label": "不开头",
+                              "value": "NOT_STARTS_WITH"
+                            },
+                            {
+                              "label": "不结尾",
+                              "value": "NOT_ENDS_WITH"
+                            }
+                          ]
+                        }
+                      ],
+                      "id": "u:96dde8a70d9a"
+                    }
+                  ],
+                  "id": "u:6c7f8dc7b9b6",
+                  "target": "searchForm"
+                }
+              ],
+              "id": "u:5bcf07abcedd"
+            },
+            "id": "u:e9ab6b33df76"
+          }
+        ],
+        "checkAll": false,
+        "submitOnChange": false,
+        "perPageAvailable": [
+          10
+        ],
+        "mode": "inline",
+        "panelClassName": "",
+        "id": "u:2ed922b981ef"
+      },
+      "keepItemSelectionOnPageChange": true,
+      "labelTpl": "${displayText||contentItemId}",
+      "filterTogglable": true,
+      "filterColumnCount": 3,
+      "syncLocation": false,
+      "defaultParams": {},
+      "id": "u:80012be45279"
+    }
+  ],
+  "definitions": {},
+  "messages": {},
+  "style": {
+    "boxShadow": " 0px 0px 0px 0px transparent"
+  },
+  "id": "u:dd429373b2dc",
+  "asideResizor": false,
+  "pullRefresh": {
+    "disabled": true
+  }
+}

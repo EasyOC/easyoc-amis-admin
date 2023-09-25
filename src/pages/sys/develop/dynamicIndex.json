@@ -1,0 +1,364 @@
+{
+  "type": "page",
+  "regions": [
+    "body",
+    "toolbar",
+    "header"
+  ],
+  "id": "u:c7c31840260f",
+  "body": [
+    {
+      "type": "form",
+      "api": "",
+      "id": "u:e9b1e459dc49",
+      "title": "表单",
+      "body": [
+        {
+          "type": "grid",
+          "columns": [
+            {
+              "body": [
+                {
+                  "type": "select",
+                  "label": "类型",
+                  "name": "typeName",
+                  "id": "u:01e84799b97b",
+                  "source": {
+                    "method": "get",
+                    "url": "/api/ContentTypeManagement/GetAllTypes",
+                    "data": {
+                      "typeName": "${typeName}",
+                      "stereotype": "1",
+                      "pageSize": "-1"
+                    },
+                    "adaptor": "console.log('dropdown options11',response)\r\nvar items = response.data.items.map(x=>{\r\n    return {label:x.displayName,value:x.name}\r\n})\r\nconsole.log('dropdown options',items)\r\nreturn {options:items}",
+                    "replaceData": false,
+                    "dataType": "json",
+                    "messages": {}
+                  },
+                  "searchable": true,
+                  "submitOnChange": false,
+                  "validations": {},
+                  "mode": "horizontal",
+                  "size": "",
+                  "horizontal": {
+                    "leftFixed": "normal",
+                    "left": 2,
+                    "right": 10
+                  },
+                  "checkAll": false,
+                  "multiple": false
+                }
+              ],
+              "id": "u:208fb48479fb",
+              "md": 5
+            },
+            {
+              "body": [
+                {
+                  "type": "switch",
+                  "option": "刷新字段",
+                  "name": "renew",
+                  "falseValue": false,
+                  "trueValue": true,
+                  "id": "u:5a4bb6fa4ec5",
+                  "mode": "inline"
+                }
+              ],
+              "id": "u:684168039adc",
+              "md": 1
+            },
+            {
+              "body": [
+                {
+                  "type": "submit",
+                  "id": "u:c25bbea0513a",
+                  "label": "刷新",
+                  "actionType": "dialog",
+                  "dialog": {
+                    "title": "系统提示",
+                    "body": "对你点击了"
+                  },
+                  "checkAll": false,
+                  "level": "primary"
+                }
+              ],
+              "id": "u:9c74016f572c"
+            }
+          ],
+          "id": "u:eec0b89bd4a5"
+        }
+      ],
+      "actions": [],
+      "submitOnChange": true,
+      "submitOnInit": true,
+      "reload": "indexConfigForm",
+      "target": "indexConfigForm,manageIndexpage,btnSubmit",
+      "checkAll": false,
+      "name": "firstForm",
+      "wrapWithPanel": false,
+      "className": "m-b",
+      "mode": "horizontal",
+      "horizontal": {
+        "leftFixed": "",
+        "left": 4,
+        "right": 8
+      }
+    },
+    {
+      "type": "form",
+      "title": "",
+      "body": [
+        {
+          "type": "grid",
+          "columns": [
+            {
+              "body": [
+                {
+                  "type": "static",
+                  "label": "数据库表名",
+                  "id": "u:daf8d9d48471",
+                  "name": "tableName"
+                }
+              ],
+              "id": "u:350ed822c9fb"
+            },
+            {
+              "valign": "",
+              "columnClassName": "",
+              "md": "auto",
+              "id": "u:76c8d96d49b6"
+            }
+          ],
+          "id": "u:84b91d3bdecf"
+        },
+        {
+          "type": "tabs",
+          "tabs": [
+            {
+              "title": "字段映射",
+              "body": [
+                {
+                  "type": "input-table",
+                  "name": "fields",
+                  "label": "字段列表",
+                  "columns": [
+                    {
+                      "label": "字段名称",
+                      "name": "contentFieldOption.displayName",
+                      "type": "text",
+                      "placeholder": "-",
+                      "className": "",
+                      "groupName": "OrchardCore",
+                      "id": "u:c7203661a2c3"
+                    },
+                    {
+                      "label": "字段",
+                      "name": "contentFieldOption.fieldName",
+                      "type": "text",
+                      "placeholder": "-",
+                      "className": "",
+                      "groupName": "OrchardCore",
+                      "id": "u:5cbea24159c1"
+                    },
+                    {
+                      "label": "Part",
+                      "name": "contentFieldOption.partName",
+                      "type": "text",
+                      "placeholder": "-",
+                      "className": "",
+                      "groupName": "OrchardCore",
+                      "id": "u:7a2ca46849d3"
+                    },
+                    {
+                      "type": "text",
+                      "label": "字段类型",
+                      "name": "contentFieldOption.fieldType",
+                      "placeholder": "-",
+                      "groupName": "OrchardCore",
+                      "className": "",
+                      "id": "u:32a869ff55b7"
+                    },
+                    {
+                      "label": "实体字段",
+                      "name": "csFieldName",
+                      "type": "text",
+                      "groupName": "实体映射",
+                      "id": "u:23571130c50f"
+                    },
+                    {
+                      "label": "实体字段类型",
+                      "name": "csTypeName",
+                      "groupName": "实体映射",
+                      "type": "text",
+                      "id": "u:49c18b709457"
+                    },
+                    {
+                      "name": "dbFieldName",
+                      "groupName": "数据库",
+                      "placeholder": "-",
+                      "type": "text",
+                      "id": "u:df26b0481c4b",
+                      "label": "数据库字段"
+                    },
+                    {
+                      "name": "length",
+                      "groupName": "数据库",
+                      "id": "u:49fd8dc0ec00",
+                      "placeholder": "-",
+                      "type": "text",
+                      "label": "字段长度"
+                    },
+                    {
+                      "name": "disabled",
+                      "groupName": "数据库",
+                      "placeholder": "-",
+                      "type": "checkbox",
+                      "id": "u:181ccb459697",
+                      "option": "",
+                      "label": "Disabled"
+                    },
+                    {
+                      "name": "isDefaultIndex",
+                      "groupName": "数据库",
+                      "id": "u:181ccb459697",
+                      "placeholder": "-",
+                      "type": "checkbox",
+                      "option": "",
+                      "label": "TableIndex"
+                    }
+                  ],
+                  "strictMode": false,
+                  "id": "u:2003cb60cb7a",
+                  "mode": "horizontal",
+                  "size": "",
+                  "horizontal": {
+                    "leftFixed": "normal",
+                    "left": 2,
+                    "right": 10
+                  },
+                  "placeholder": "-",
+                  "copyable": false
+                }
+              ],
+              "id": "u:dac2ef20b217"
+            },
+            {
+              "title": "实体类",
+              "body": [
+                {
+                  "type": "editor",
+                  "label": "索引类代码",
+                  "name": "entityInfo.entityContent",
+                  "id": "u:73702e911714",
+                  "language": "csharp"
+                }
+              ]
+            }
+          ],
+          "id": "u:dc655cbe8e52"
+        },
+        {
+          "type": "hidden",
+          "name": "contentItemId",
+          "id": "u:bd12b2a13634"
+        },
+        {
+          "type": "hidden",
+          "name": "contentType",
+          "id": "u:a1ae08b567b3",
+          "value": "DynamicIndexConfigSetting"
+        },
+        {
+          "type": "hidden",
+          "name": "typeName",
+          "id": "u:bd12b2a13634"
+        }
+      ],
+      "id": "u:5bd9921a8c0a",
+      "checkAll": false,
+      "mode": "horizontal",
+      "initApi": {
+        "method": "get",
+        "url": "/api/DynamicIndex/GetDynamicIndexConfigOrDefault",
+        "data": {
+          "typeName": "${typeName}",
+          "renew": "${renew}"
+        },
+        "dataType": "json",
+        "sendOn": "!!typeName",
+        "requestAdaptor": "if(!api.body.typeName){\r\n    return false\r\n}\r\napi.timeout=100*1000\r\nreturn api;",
+        "adaptor": ""
+      },
+      "affixFooter": false,
+      "wrapWithPanel": false,
+      "horizontal": {
+        "leftFixed": "normal",
+        "left": 3,
+        "right": 9
+      },
+      "strictMode": true,
+      "submitOnChange": false,
+      "name": "indexConfigForm",
+      "canAccessSuperData": false,
+      "api": {
+        "method": "post",
+        "url": "/api/DynamicIndex/UpdateDynamicIndex",
+        "data": {
+          "&": "$$",
+          "typeName": "${typeName}"
+        }
+      },
+      "placeholder": "-",
+      "data": {
+        "typeName": ""
+      },
+      "onEvent": {
+        "submitSucc": {
+          "weight": 0,
+          "actions": [
+            {
+              "args": {
+                "msgType": "success",
+                "position": "top-right",
+                "closeButton": true,
+                "showIcon": true,
+                "msg": "操作成功"
+              },
+              "actionType": "toast"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "style": {
+    "fontWeight": "normal",
+    "backgroundColor": "",
+    "fontSize": "16px"
+  },
+  "title": "动态索引设置",
+  "subTitle": "将根据此页面的配置创建或更新索引表",
+  "toolbar": [
+    {
+      "type": "submit",
+      "label": "提交",
+      "actionType": "submit",
+      "id": "u:41627a0c4d0b",
+      "level": "primary",
+      "confirmText": "提交执行将更新数据库表，请确保已备份相关数据",
+      "target": "indexConfigForm",
+      "disabledOn": "!this.typeName",
+      "name": "btnSubmit"
+    },
+    {
+      "type": "button",
+      "label": "重建索引",
+      "actionType": "ajax",
+      "id": "u:78e8dfd57661",
+      "disabledOn": "!this.typeName",
+      "api": "get:/api/DynamicIndex/RebuildIndexData?typeName=${typeName}"
+    }
+  ],
+  "name": "manageIndexpage"
+}

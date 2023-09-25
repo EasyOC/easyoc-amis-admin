@@ -6,6 +6,7 @@ import type CurrentUser from '@/types/src/CurrentUser';
 import { getSiteGlobalSettings } from '@/services/amis/siteSettings';
 import { deepMerge } from '@/utils';
 import defaultAmisEnv from '@/services/amis/AmisEnv';
+import authService from '@/services/auth/authService';
 
 const _userStore = new UserStore();
 
@@ -43,19 +44,33 @@ class IMainStore {
     // flows 相关文档https://cn.mobx.js.org/best/actions.html#flows
     this.settingsLoading = true;
     try {
-      const serverConfig = yield getSiteGlobalSettings(userInfo); //使用 yield 代替 await
-      console.log('fetchServerSideSettings: from server ', serverConfig);
-      this.settings = deepMerge(this.settings, serverConfig)
-      this.amisEnv = deepMerge(this.amisEnv, serverConfig?.amis);
-      this.settingsLoaded = true
-      return this.settings;
+      if (!userInfo) {
+        if (yield authService.isLoggedIn()) {
+          userInfo = yield authService.getLocalUserInfo();
+        }
+      }
+      //只尝试一次，不管能不能取到 直接传入到下一步
+      this.userStore.user = userInfo
+      return yield this.reloadSettings(userInfo)
     } catch (error) {
-      console.log("ensureServerSideSettings Faild.", error)
+      console.log("loadServerSideSettings Faild.", error)
     } finally {
-      this.settingsLoading = false;
       return this.settings;
     }
   })
+
+  @action
+  reloadSettings = flow(function* (this: IMainStore, userInfo?: CurrentUser) { // <- 注意*号，这是生成器函数！
+    const serverConfig = yield getSiteGlobalSettings(userInfo); //使用 yield 代替 await
+    console.log('fetchServerSideSettings: from server ', serverConfig);
+    this.settings = deepMerge(this.settings, serverConfig)
+    this.amisEnv = deepMerge(this.amisEnv, serverConfig?.amis);
+    // this.settings.menuData = []
+    this.settingsLoading = false;
+    this.settingsLoaded = true
+    return this.settings;
+  })
+
 }
 
 const mainStore = new IMainStore()
