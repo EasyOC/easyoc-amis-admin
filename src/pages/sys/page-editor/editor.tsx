@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import qs from 'query-string';
-import { Editor, ShortcutKey } from 'amis-editor';
+import {Editor, ShortcutKey} from 'amis-editor';
 
-import { amisRequest } from '@/services/amis/AmisEnv';
-import { Button, Dropdown, Form, Input, Modal, Select } from 'antd';
-import { wrapedResultRequest } from '@/services/requests';
+import {Button, Dropdown, Form, Input, Modal, Select} from 'antd';
 import 'amis-editor-core/lib/style.css';
 import './style.less';
-import { getLocale, history, setLocale, useLocation } from '@umijs/max';
-import { H5Preview, PCPreview } from '@/components/icons/customIcons';
-import { FullScreen, useFullScreenHandle } from 'react-full-screen';
-import { excuteGraphqlQuery } from '@/services/graphql/graphqlApi';
-import { CloudUploadOutlined, DownOutlined } from '@ant-design/icons';
+import {FullScreen, useFullScreenHandle} from 'react-full-screen';
+import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
+import {CloudUploadOutlined, DownOutlined} from '@ant-design/icons';
 import {
   Switch,
   DatePicker as AMISDatePicker,
@@ -21,21 +17,24 @@ import {
   FormItemWrap,
   addSchemaFilter,
   Schema,
-  RendererConfig,
+  RendererConfig
 } from 'amis';
-import { isEqual, unset } from 'lodash';
+import {isEqual, unset} from 'lodash';
 
-import { mustEndsWith } from '@/utils';
-import getAppSettings from '@/services/appSettings';
-import { ProForm, ProFormCheckbox, ProFormRadio, ProFormSelect } from '@ant-design/pro-components';
+import {mustEndsWith} from '@/utils';
+import {
+  ProForm,
+  ProFormCheckbox,
+  ProFormRadio,
+  ProFormSelect
+} from '@ant-design/pro-components';
 import buildCrud from './Gencurd/GenCrud';
 // import 'amis/schema.json';
 //修改amis 内置组件
 // import '@/components/AMISComponent/components';
-import moment from 'moment';
-import { useModel } from '@umijs/max';
 
-const schemaUrl = mustEndsWith(getAppSettings().publicPath, '/') + 'amis/schema.json';
+const schemaUrl =
+  mustEndsWith(getAppSettings().publicPath, '/') + 'amis/schema.json';
 // @ts-ignore
 // __uri?.('amis/schema.json');
 //console.log('schemaUrl: ', schemaUrl);
@@ -43,8 +42,8 @@ const schemaUrl = mustEndsWith(getAppSettings().publicPath, '/') + 'amis/schema.
 // @ts-ignore
 // __uri('amis/schema.json');
 
-const PageEditor: React.FC = (props) => {
-  const { initialState } = useModel('@@initialState');
+const PageEditor: React.FC = props => {
+  const {initialState} = useModel('@@initialState');
   const amisEnv = initialState?.amisEnv;
   const [state, setState] = React.useState({
     theme: amisEnv?.theme || 'cxd',
@@ -54,7 +53,7 @@ const PageEditor: React.FC = (props) => {
     id: '',
     preview: false,
     schema: {
-      type: 'page',
+      type: 'page'
     } as any,
     version: '',
     displayText: '',
@@ -65,7 +64,7 @@ const PageEditor: React.FC = (props) => {
     showVersion: false,
     latest: true,
     debug: amisEnv?.enableAMISDebug || false,
-    currentLanguage: false,
+    currentLanguage: false
   });
 
   addSchemaFilter((schema: Schema, renderer: RendererConfig, props?: any) => {
@@ -77,19 +76,19 @@ const PageEditor: React.FC = (props) => {
 
   const location = useLocation();
   //console.log('props: ', props);
-  const { id, vId } = qs.parse(location?.search);
+  const {id, vId} = qs.parse(location?.search);
   //console.log('history.location: ', history.location, qs.parse(location?.search));
   const fullScreenHandle = useFullScreenHandle();
 
   const editorLanguages = [
     {
       label: '简体中文',
-      value: 'zh-CN',
+      value: 'zh-CN'
     },
     {
       label: 'English',
-      value: 'en-US',
-    },
+      value: 'en-US'
+    }
   ];
 
   const changeLocale = (value: string) => {
@@ -111,22 +110,28 @@ const PageEditor: React.FC = (props) => {
     //1. 打开页面时根据 当前内容的version 检查 localStorage
     //2. 如果浏览器本地保存有快照，则从快照中加载，且通过toast 提示用户“当前编辑内容为本地快照”
     //3. 增加按钮清除页面缓存，点击后删除当前版本的快照，然后调用api重新加载当前版本
-    localStorage.setItem(`Editor_Snapshot_${state.version}`, JSON.stringify(schema));
+    localStorage.setItem(
+      `Editor_Snapshot_${state.version}`,
+      JSON.stringify(schema)
+    );
     toast.success('已保存快照');
   };
 
-  const clearSnapshot = (version) => {
+  const clearSnapshot = version => {
     localStorage.removeItem(`Editor_Snapshot_${version}`);
   };
 
-  const checkSnapshot = async (version) => {
+  const checkSnapshot = async version => {
     const snapshot = localStorage.getItem(`Editor_Snapshot_${version}`);
     if (snapshot && !isEqual(snapshot, state.schema)) {
-      let load = await confirm('检测到与当前版本不同的本地快照，是否加载?', '提示');
+      let load = await confirm(
+        '检测到与当前版本不同的本地快照，是否加载?',
+        '提示'
+      );
       if (load) {
         const snapshotContent = JSON.parse(snapshot);
         //console.log('snapshotContent: ', snapshotContent);
-        setState((s) => ({ ...s, schema: snapshotContent }));
+        setState(s => ({...s, schema: snapshotContent}));
       } else {
         if (await confirm('是否清除快照？', '提示')) {
           clearSnapshot(version);
@@ -138,7 +143,7 @@ const PageEditor: React.FC = (props) => {
 
   const handleEdtorChange = (schema: any) => {
     //console.log('handleEdtorChange', schema);
-    setState((s) => ({ ...s, schema }));
+    setState(s => ({...s, schema}));
   };
 
   useEffect(() => {
@@ -169,8 +174,8 @@ const PageEditor: React.FC = (props) => {
                       latest
                     }
                   }
-                }`,
-      }).then((result) => {
+                }`
+      }).then(result => {
         //console.log('可视化编辑器 result: ', result);
         if (result?.contentItem) {
           try {
@@ -183,14 +188,14 @@ const PageEditor: React.FC = (props) => {
                 toast.error('schema 格式错误');
               }
             }
-            setState((s) => ({
+            setState(s => ({
               ...s,
               ...result?.contentItem,
               //最后修改时间
               modified: result?.contentItem?.modifiedUtc
                 ? new Date(result?.contentItem?.modifiedUtc)
                 : null,
-              schema: schema || s.schema,
+              schema: schema || s.schema
             }));
           } catch (error) {
             toast.error('加载失败');
@@ -205,7 +210,7 @@ const PageEditor: React.FC = (props) => {
     if (!state.preview) {
       makeSnapshot();
     }
-    setState((s) => ({ ...s, preview: !state.preview }));
+    setState(s => ({...s, preview: !state.preview}));
   };
 
   const toggleDebug = () => {
@@ -225,7 +230,7 @@ const PageEditor: React.FC = (props) => {
   }>({
     publish: false,
     publishLaterFlag: false,
-    publishLaterWhen: new Date(),
+    publishLaterWhen: new Date()
   });
 
   const handlePublish = async () => {
@@ -247,12 +252,12 @@ const PageEditor: React.FC = (props) => {
       //console.log('values: ', values);
       values.properties = {
         AuditTrailPart: {
-          Comment: values.versionDescription,
-        },
+          Comment: values.versionDescription
+        }
       };
       if (publishOption.publishLaterFlag) {
         values.properties.PublishLaterPart = {
-          ScheduledPublishUtc: moment(publishOption.publishLaterWhen),
+          ScheduledPublishUtc: moment(publishOption.publishLaterWhen)
         };
       }
 
@@ -265,15 +270,17 @@ const PageEditor: React.FC = (props) => {
           schema: JSON.stringify(state.schema),
           contentType: 'AmisSchema',
           contentItemId: state.id,
-          ...values,
+          ...values
         },
-        timeout: 10000,
+        timeout: 10000
       });
       setPublishOption({} as any);
       publishForm.resetFields();
       clearSnapshot(state.version);
-      setState((s) => ({ ...s, showSaveModal: false }));
-      history.push(`/sys/dev/page-editor?vId=${result.data.ContentItemVersionId}`);
+      setState(s => ({...s, showSaveModal: false}));
+      history.push(
+        `/sys/dev/page-editor?vId=${result.data.ContentItemVersionId}`
+      );
       //触发重新加载
       setIsMounted(false);
     } catch (errorInfo) {
@@ -289,30 +296,40 @@ const PageEditor: React.FC = (props) => {
         open={state.showSaveModal}
         onOk={handlePublish}
         onCancel={() => {
-          setState((s) => ({ ...s, showSaveModal: false }));
+          setState(s => ({...s, showSaveModal: false}));
         }}
       >
         <Form
           labelAlign="right"
-          labelCol={{ flex: '100px' }}
+          labelCol={{flex: '100px'}}
           form={publishForm}
           name="basic"
           autoComplete="off"
         >
-          <Form.Item hidden={publishOption.publishLaterFlag} name="publish" label="发布状态">
+          <Form.Item
+            hidden={publishOption.publishLaterFlag}
+            name="publish"
+            label="发布状态"
+          >
             <Switch
               theme={state.theme}
               offText={'草稿'}
               onText={'立即发布'}
               value={publishOption.publish}
-              onChange={(v) => setPublishOption((s) => ({ ...s, publish: v }))}
+              onChange={v => setPublishOption(s => ({...s, publish: v}))}
             />
           </Form.Item>
-          <Form.Item hidden={publishOption.publish} name="publishLaterFlag" label="延迟发布">
+          <Form.Item
+            hidden={publishOption.publish}
+            name="publishLaterFlag"
+            label="延迟发布"
+          >
             <Switch
               theme={state.theme}
               value={publishOption.publishLaterFlag}
-              onChange={(v) => setPublishOption((s) => ({ ...s, publishLaterFlag: v }))}
+              onChange={v =>
+                setPublishOption(s => ({...s, publishLaterFlag: v}))
+              }
             />
           </Form.Item>
           <Form.Item
@@ -323,7 +340,9 @@ const PageEditor: React.FC = (props) => {
             <AMISDatePicker
               theme={state.theme}
               value={publishOption.publishLaterWhen}
-              onChange={(v) => setPublishOption((s) => ({ ...s, publishLaterWhen: v }))}
+              onChange={v =>
+                setPublishOption(s => ({...s, publishLaterWhen: v}))
+              }
               timeFormat={'HH:mm'}
               inputFormat={'YYYY-MM-DD HH:mm'}
             ></AMISDatePicker>
@@ -332,7 +351,9 @@ const PageEditor: React.FC = (props) => {
             <Input.TextArea
               required={true}
               value={state.description}
-              onChange={(event) => setState((s) => ({ ...s, description: event.target.value }))}
+              onChange={event =>
+                setState(s => ({...s, description: event.target.value}))
+              }
             />
           </Form.Item>
         </Form>
@@ -343,10 +364,10 @@ const PageEditor: React.FC = (props) => {
   const changeFullScreen = () => {
     if (!state.fullScreen) {
       fullScreenHandle.enter();
-      setState((s) => ({ ...s, fullScreen: true }));
+      setState(s => ({...s, fullScreen: true}));
     } else {
       fullScreenHandle.exit();
-      setState((s) => ({ ...s, fullScreen: false }));
+      setState(s => ({...s, fullScreen: false}));
     }
     //console.log('changeFullScreen', state.fullScreen);
   };
@@ -366,8 +387,8 @@ const PageEditor: React.FC = (props) => {
       url: `/api/ContentTypeManagement/GetTypeDefinitionForEdit`,
       method: 'GET',
       params: {
-        name: genFromTypeform.getFieldValue('contentType'),
-      },
+        name: genFromTypeform.getFieldValue('contentType')
+      }
     });
     const json = await buildCrud(res.data.data, settings);
     genFromTypeform.setFieldValue('json', JSON.stringify(json));
@@ -376,10 +397,10 @@ const PageEditor: React.FC = (props) => {
   const handleAcceptSchema = async () => {
     const values = genFromTypeform.getFieldsValue();
     if (values.json) {
-      setState((s) => ({
+      setState(s => ({
         ...s,
         showGenModal: false,
-        schema: Object.assign({}, JSON.parse(values.json)),
+        schema: Object.assign({}, JSON.parse(values.json))
       }));
       toast.success('页面已更新');
     }
@@ -387,17 +408,17 @@ const PageEditor: React.FC = (props) => {
 
   const loadAllContentType = async () => {
     const result = await amisRequest.get(
-      '/api/ContentTypeManagement/GetAllTypes?stereotype=1&pageSize=-1',
+      '/api/ContentTypeManagement/GetAllTypes?stereotype=1&pageSize=-1'
     );
 
     //console.log('dropdown options11', result);
-    let items = result.data.data.items.map((x) => {
-      return { label: x.displayName, value: x.name };
+    let items = result.data.data.items.map(x => {
+      return {label: x.displayName, value: x.name};
     });
     //console.log('dropdown options222', items);
     return items;
   };
-  const [genFormState, setGenFormState] = useState({ isPartial: false });
+  const [genFormState, setGenFormState] = useState({isPartial: false});
   const renderGenCode = () => {
     return (
       <Modal
@@ -407,16 +428,16 @@ const PageEditor: React.FC = (props) => {
         onOk={handleAcceptSchema}
         destroyOnClose={true}
         onCancel={() => {
-          setState((s) => ({ ...s, showGenModal: false }));
+          setState(s => ({...s, showGenModal: false}));
         }}
         open={state.showGenModal}
       >
         {/* <GenFromType setSchemaHandle={handleGen} /> */}
         <ProForm
           onFinish={handleGenSchema}
-          submitter={{ searchConfig: { submitText: '生成' } }}
+          submitter={{searchConfig: {submitText: '生成'}}}
           labelAlign="right"
-          style={{ marginTop: '20px', width: '750px' }}
+          style={{marginTop: '20px', width: '750px'}}
           // labelCol={{ flex: '80px' }}
           form={genFromTypeform}
           name="basic"
@@ -427,32 +448,32 @@ const PageEditor: React.FC = (props) => {
             label="内容模型"
             debounceTime={1000}
             showSearch
-            request={async (keywords) => loadAllContentType()}
+            request={async keywords => loadAllContentType()}
           ></ProFormSelect>
 
           <ProFormRadio.Group
             fieldProps={{
-              defaultValue: 'hasPage',
+              defaultValue: 'hasPage'
             }}
             name="listType"
             label="数据源类型"
             options={[
               {
                 label: '列表分页',
-                value: 'hasPage',
+                value: 'hasPage'
               },
               {
                 label: '不需要分页',
-                value: 'noPage',
-              },
+                value: 'noPage'
+              }
             ]}
           />
 
           <Form.Item name={'isPartial'} label="只生成选中部分功能">
             <Switch
               theme={state.theme}
-              onChange={(v) => {
-                setGenFormState({ isPartial: v });
+              onChange={v => {
+                setGenFormState({isPartial: v});
               }}
             ></Switch>
           </Form.Item>
@@ -467,7 +488,7 @@ const PageEditor: React.FC = (props) => {
             name="functions"
             label="功能"
             fieldProps={{
-              defaultValue: ['新增', '修改', '删除'],
+              defaultValue: ['新增', '修改', '删除']
             }}
             options={['新增', '修改', '查看+修改', '删除', '导入']}
           />
@@ -478,7 +499,7 @@ const PageEditor: React.FC = (props) => {
               language="json"
               name="json"
               height="100%" //不设置高度 会显示为1行。。设置了高度全屏 显示不全~~
-              style={{ minHeight: '40vh' }}
+              style={{minHeight: '40vh'}}
               // options={{
               //   tabSize: 2,
               //   minimap: {
@@ -496,7 +517,7 @@ const PageEditor: React.FC = (props) => {
     <FullScreen handle={fullScreenHandle}>
       <div
         className="Editor-Demo"
-        style={{ height: state.fullScreen ? '100vh' : 'calc(100vh - 120px)' }}
+        style={{height: state.fullScreen ? '100vh' : 'calc(100vh - 120px)'}}
       >
         {renderPublish()}
         {renderGenCode()}
@@ -520,17 +541,21 @@ const PageEditor: React.FC = (props) => {
           <div className="Editor-view-mode-group-container">
             <div className="Editor-view-mode-group">
               <div
-                className={`Editor-view-mode-btn ${!state.isMobile ? 'is-active' : ''}`}
+                className={`Editor-view-mode-btn ${
+                  !state.isMobile ? 'is-active' : ''
+                }`}
                 onClick={() => {
-                  setState((s) => ({ ...s, isMobile: false }));
+                  setState(s => ({...s, isMobile: false}));
                 }}
               >
                 <PCPreview title="PC模式" />
               </div>
               <div
-                className={`Editor-view-mode-btn ${state.isMobile ? 'is-active' : ''}`}
+                className={`Editor-view-mode-btn ${
+                  state.isMobile ? 'is-active' : ''
+                }`}
                 onClick={() => {
-                  setState((s) => ({ ...s, isMobile: true }));
+                  setState(s => ({...s, isMobile: true}));
                 }}
               >
                 <H5Preview title="移动模式" />
@@ -540,7 +565,7 @@ const PageEditor: React.FC = (props) => {
 
           <div className="Editor-header-actions">
             <ShortcutKey />
-            <div style={{ marginLeft: '15px' }}>
+            <div style={{marginLeft: '15px'}}>
               <Switch
                 theme={state.theme}
                 checked={state.debug}
@@ -550,14 +575,17 @@ const PageEditor: React.FC = (props) => {
               />
             </div>
             <Select
-              style={{ marginLeft: '15px' }}
+              style={{marginLeft: '15px'}}
               options={editorLanguages}
               value={getLocale()}
               onChange={(e: any) => changeLocale(e)}
             />
 
             {/* //TODO: 全屏后会导致看不到弹窗，后面再修 */}
-            <div className={`header-action-btn exit-btn`} onClick={changeFullScreen}>
+            <div
+              className={`header-action-btn exit-btn`}
+              onClick={changeFullScreen}
+            >
               {state.fullScreen ? '退出' : '全屏'}
             </div>
 
@@ -568,7 +596,7 @@ const PageEditor: React.FC = (props) => {
               {state.preview ? '编辑' : '预览'}
             </div>
 
-            <div style={{ marginLeft: '15px' }}>
+            <div style={{marginLeft: '15px'}}>
               <Dropdown.Button
                 icon={<DownOutlined />}
                 menu={{
@@ -577,26 +605,26 @@ const PageEditor: React.FC = (props) => {
                       label: '从类型生成',
                       key: '1',
                       onClick: () => {
-                        setState((s) => ({ ...s, showGenModal: true }));
-                      },
+                        setState(s => ({...s, showGenModal: true}));
+                      }
                     },
                     {
                       label: '历史版本',
                       key: '2',
                       onClick: () => {
-                        setState((s) => ({ ...s, showVersion: true }));
-                      },
-                    },
-                  ],
+                        setState(s => ({...s, showVersion: true}));
+                      }
+                    }
+                  ]
                 }}
               >
                 加载...
               </Dropdown.Button>
             </div>
-            <div style={{ marginLeft: '15px' }}>
+            <div style={{marginLeft: '15px'}}>
               <Button
                 icon={<CloudUploadOutlined />}
-                onClick={() => setState((s) => ({ ...s, showSaveModal: true }))}
+                onClick={() => setState(s => ({...s, showSaveModal: true}))}
               >
                 发布
               </Button>
@@ -609,15 +637,15 @@ const PageEditor: React.FC = (props) => {
             preview={state.preview}
             isMobile={state.isMobile}
             value={state.schema}
-            onChange={(value) => handleEdtorChange(value)}
+            onChange={value => handleEdtorChange(value)}
             onPreview={() => {
-              setState((s) => ({ ...s, preview: true }));
+              setState(s => ({...s, preview: true}));
             }}
             onSave={() => handleSave()}
             className="is-fixed"
             $schemaUrl={schemaUrl}
             showCustomRenderersPanel={true}
-            amisEnv={{ ...amisEnv }}
+            amisEnv={{...amisEnv}}
           />
         </div>
       </div>

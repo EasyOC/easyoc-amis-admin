@@ -1,14 +1,14 @@
-import { clone, has, merge, unset } from 'lodash';
+import { clone, merge, unset } from 'lodash';
 import authService from '../auth/authService';
 import { JSONC } from '../../utils/json';
 import { listToTree, treeMap } from '../../utils/helper/tree';
 import { deepMerge, mustStartsWith, safeEval } from '../../utils';
-import { currentLocale, extendLocale, translate } from 'i18n-runtime';
+import { currentLocale, extendLocale, i18n } from 'i18n-runtime';
 import { gql, useQuery } from '@apollo/client';
 import { DynamicMenuData, EocLayoutSettings, EocMenuDataItem } from '../../types/src/SiteGlobalSettings';
 import { CurrentUser } from '../../types/src/CurrentUser';
 import defaultRequest from '../requests';
-import { excuteGraphqlGetQuery, excuteGraphqlQuery } from '../graphql/graphqlApi';
+import { excuteGraphqlGetQuery } from '../graphql/graphqlApi';
 import ProLayoutProps from '@/Layout/AntdProLayout/defaultProps';
 import { apiUrl } from '@/utils/urlHelper';
 import { fixMenuItemIcon } from '@/utils/helper/iconHelper';
@@ -16,35 +16,31 @@ import { fixMenuItemIcon } from '@/utils/helper/iconHelper';
 
 
 
-const addTranslateToDict = (element, menuLang: { [langKey: string]: { [transKey: string]: string } }) => {
+const translateMenuItem = (element) => {
 
     const currlang = currentLocale();
     if (!element.keyPath) {
         return;
     }
-    const tryAddMenu = (langName: string, key: string, text: string) => {
-        menuLang[langName] ??= {}
-        menuLang[langName][key] = text
-    }
+
     //菜单多语言处理
     if (currlang == "zh-CN" && element.zhCN) {
-        tryAddMenu(currlang, element.keyPath, element.zhCN || element.displayText || element.name)
-
+        // tryAddMenu(currlang, element.keyPath, element.zhCN || element.displayText || element.name)
+        element.name = element.zhCN || element.displayText || element.name
         // console.log('element.keyPath:zhCN ', element.keyPath, element.zhCN, element);
     } else if (currlang == "en-US" && element.enUS) {
-        tryAddMenu(currlang, element.keyPath, element.enUS || element.displayText || element.name)
+        // tryAddMenu(currlang, element.keyPath, element.enUS || element.displayText || element.name)
+        element.name = element.enUS || element.displayText || element.name
+
         // console.log('element.keyPath: en-US', element.keyPath, element.enUS, element);
     } else if (element.lang && element.lang[currlang]) {
-        tryAddMenu(currlang, element.keyPath, element.lang[currlang] || element.displayText || element.name)
+        // tryAddMenu(currlang, element.keyPath, element.lang[currlang] || element.displayText || element.name)
+        element.name = element.lang[currlang] || element.displayText || element.name
     }
 }
 
 
 export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> => {
-    const currlang = currentLocale();
-    const menuLang: {
-        [langKey: string]: { [transKey: string]: string }
-    } = {}
     let result = treeMap(serverMenus || [], {
         children: 'routes',
         conversion: (item: any) => {
@@ -61,7 +57,7 @@ export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> =
             } else {
 
                 if (!item.parentNode) {
-                    item.keyPath = 'menu.' + item.name;
+                    item.keyPath = item.name;
                 } else {
                     item.keyPath = item.parentNode.keyPath + (item.name ? '.' + item.name : "")
                 }
@@ -72,22 +68,13 @@ export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> =
             } else {
                 item.fullPath = mustStartsWith(item.path, '/')
             }
-            // if (item.contentItemId) {
-            // dynamicMenuDict[item.fullPath] = {
-            //     contentItemId: item.contentItemId,
-            //     schemaStr: item.schemaConfig?.schemaDetails?.schemaStr,
-            //     useLayout: item.schemaConfig?.schemaDetails?.useLayout,
-            //     description: item.schemaConfig?.schemaDetails?.description,
-            //     displayText: item.schemaConfig?.schemaDetails?.displayText
-            // }
-            // }
 
-            addTranslateToDict(item, menuLang)
+            translateMenuItem(item)
+            // extendLocale(currlang, menuLang[currlang])
+            // item.name = i18n(item.keyPath)
             return item;
         },
     });
-    console.log('menuLang: ', menuLang);
-    extendLocale(currlang, menuLang[currlang])
     result = result.sort((a, b) => a.orderIndex - b.orderIndex)
     //修复图标
     const menus = fixMenuItemIcon(result as EocMenuDataItem[])

@@ -43,7 +43,7 @@ const AmisDynamicPage: React.FC = (props: any) => {
       setState({schema: {type: 'page', body: '未找到页面：' + pageName}});
       console.error('未找到页面：' + pageName);
     }
-    history.push('/404');
+    history.push('/404', {errorPath: history.location.pathname});
   };
 
   const loadSchemaById = async schemaId => {

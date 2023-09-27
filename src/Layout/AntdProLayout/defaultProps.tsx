@@ -11,12 +11,12 @@ import React from 'react';
 //@ts-expect-error
 export default {
   // route: {path: '/', routes: [...routeConfig]},
-  route: {
-    path: '/',
-    name: 'home',
-    component: svgIndex,
-    routes: [...routeConfig]
-  },
+  // route: {
+  //   path: '/',
+  //   name: 'home',
+  //   component: svgIndex,
+  //   routes: [...routeConfig]
+  // },
   navTheme: 'light',
   colorPrimary: '#1890ff',
   layout: 'mix',

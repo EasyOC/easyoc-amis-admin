@@ -4,7 +4,7 @@ import {
   LogoutOutlined,
   QuestionCircleFilled
 } from '@ant-design/icons';
-import type {ProSettings} from '@ant-design/pro-components';
+import type {MenuDataItem, ProSettings} from '@ant-design/pro-components';
 import {
   PageContainer,
   ProCard,
@@ -14,127 +14,26 @@ import {
 } from '@ant-design/pro-components';
 import {ConfigProvider, Dropdown} from 'antd';
 import React, {FC, useEffect, useState} from 'react';
-import defaultProps from './defaultProps';
 import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
-import {Route, Switch, useHistory} from 'react-router';
-import appSettings from '@/services/appsettings';
-import routeConfig from '@/route/routeConfig';
-import {eachTree} from 'amis';
-import {mustStartsWith, treeMap, treeTraverse} from '@/utils';
+import {useHistory} from 'react-router';
 import authService from '@/services/auth/authService';
 import {merge} from 'lodash';
-import {apiUrl, localPath} from '@/utils/urlHelper';
+import {localPath} from '@/utils/urlHelper';
+import {currentLocale, i18n} from 'i18n-runtime';
 
-// 过滤出需要显示的路由, 这里的filterFn 指 不希望显示的层级
-const filterRoutes = (routes: Route[], filterFn: (route: any) => boolean) => {
-  if (routes.length === 0) {
-    return [];
-  }
-
-  let newRoutes: any = [];
-  for (const route of routes) {
-    const newRoute: any = {...route};
-    if (filterFn(route)) {
-      if (Array.isArray(newRoute.routes)) {
-        newRoutes.push(...filterRoutes(newRoute.routes, filterFn));
-      }
-    } else {
-      if (Array.isArray(newRoute.children)) {
-        newRoute.children = filterRoutes(newRoute.children, filterFn);
-        newRoute.routes = newRoute.children;
-      }
-      newRoutes.push(newRoute);
-    }
-  }
-
-  return newRoutes;
-};
-
-// 格式化路由 处理因 wrapper 导致的 菜单 path 不一致
-const mapRoutes = (routes: any[]) => {
-  if (routes.length === 0) {
-    return [];
-  }
-  return routes.map(route => {
-    // 需要 copy 一份, 否则会污染原始数据
-    const newRoute = {...route};
-    if (route.originPath) {
-      newRoute.path = route.originPath;
-    }
-
-    if (Array.isArray(route.routes)) {
-      newRoute.routes = mapRoutes(route.routes);
-    }
-
-    if (Array.isArray(route.children)) {
-      newRoute.children = mapRoutes(route.children);
-    }
-
-    return newRoute;
-  });
-};
-
-const AntdProLayout: FC<{store: IMainStore}> = props => {
+const AntdProLayout: FC<{
+  store: IMainStore;
+  children: React.ReactNode;
+}> = props => {
   const {store, children} = props;
-  const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({
-    ...(store.settings as Partial<ProSettings>),
-    fixSiderbar: true,
-    layout: 'mix',
-    splitMenus: true
-  });
-
-  // const newRoutes = filterRoutes(
-  //   routeConfig.filter(route => route.id === 'ant-design-pro-layout'),
-  //   route => {
-  //     return (
-  //       (!!route.isLayout && route.id !== 'ant-design-pro-layout') ||
-  //       !!route.isWrapper
-  //     );
-  //   }
-  // );
-  const [route] = mapRoutes(store.settings.route.routes);
 
   const history = useHistory();
-  // const RenderContent = () => {
-  //   let routes: any = [];
-  //   let ContextPath = appSettings.publicPath;
-  //   routes = treeMap(routeConfig, {
-  //     children: 'routes',
-  //     conversion: current => {
-  //       return;
-  //     }
-  //   });
-
-  //   [routeConfig].forEach((routeItem: any) => {
-  //     const subFolder = ContextPath == '/' ? '' : ContextPath;
-  //     routeItem &&
-  //       eachTree(routeItem, (item: any) => {
-  //         if (item.path) {
-  //           routes.push(
-  //             <Route
-  //               key={item.name}
-  //               path={mustStartsWith(item.path, '/')}
-  //               render={(props: any) => <item.component {...props} />}
-  //             />
-  //           );
-  //         }
-  //       });
-  //   });
-  //   debugger;
-  //   return <Switch>{routes}</Switch>;
-  //   // return routes.find(
-  //   //   x =>
-  //   //     x.props.path?.toLowerCase() == history.location.pathname.toLowerCase()
-  //   // );
-  // };
-  useEffect(() => {
-    setSetting({...setSetting});
-  }, [history, store.settings]);
 
   if (typeof document === 'undefined') {
     return <div />;
   }
+
   return (
     <div
       id="amis-pro-layout"
@@ -151,9 +50,14 @@ const AntdProLayout: FC<{store: IMainStore}> = props => {
         >
           <ProLayout
             {...store.settings}
+            locale={currentLocale()}
+            formatMessage={msg => {
+              const result = i18n(msg.id);
+              return result == msg.id ? msg.defaultMessage || msg.id : result;
+            }}
             // route={defaultProps.route}
             // route={route}
-            prefixCls="my-prefix"
+            // prefixCls="my-prefix"
             bgLayoutImgList={[
               {
                 src: localPath('/assets/imgs/tps-609-606.png'),
@@ -177,14 +81,32 @@ const AntdProLayout: FC<{store: IMainStore}> = props => {
             location={{
               pathname: history.location.pathname
             }}
+            onPageChange={newlocation => {
+              history.push(newlocation.pathname);
+            }}
             token={{
               header: {
                 colorBgMenuItemSelected: 'rgba(0,0,0,0.04)'
               }
             }}
-            siderMenuType="group"
+            // siderMenuType="group"
             menu={{
-              collapsedShowGroupTitle: true
+              // collapsedShowGroupTitle: false,
+              // defaultOpenAll: true,
+              // hideMenuWhenCollapsed: true,
+              // ignoreFlatMenu: true,
+              // 每当 initialState?.currentUser?.userid 发生修改时重新执行 request
+              params: {
+                userId: store.userStore.user.name
+              },
+              locale: true,
+              //Menu 只是 menu ，不要妄想操作 路由。。,屎山代码。。堆在这里不要动，留个纪念
+              //动态Menu可以指定一个参数路由
+              // 如何动态创建菜单？后台加载🧐[问题] #9920
+              //https://github.com/ant-design/ant-design-pro/issues/9920
+              request: async (params: any, defaultMenuData: MenuDataItem[]) => {
+                return store.settings.menuData;
+              }
             }}
             avatarProps={{
               src: 'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg',
@@ -249,17 +171,16 @@ const AntdProLayout: FC<{store: IMainStore}> = props => {
               );
             }}
             onMenuHeaderClick={e => console.log(e)}
-            menuItemRender={(item, dom) => (
-              <div
-                onClick={() => {
-                  history.push(item.path);
-                }}
-              >
-                {dom}
-              </div>
-            )}
+            // menuItemRender={(item, dom) => (
+            //   <div
+            //     onClick={() => {
+            //       history.push(item.path);
+            //     }}
+            //   >
+            //     {dom}
+            //   </div>
+            // )}
             isChildrenLayout={true}
-            {...settings}
           >
             <PageContainer
               loading={store.loading}
@@ -277,17 +198,15 @@ const AntdProLayout: FC<{store: IMainStore}> = props => {
               </ProCard>
             </PageContainer>
             <SettingDrawer
-              pathname={history.location.pathname}
               enableDarkTheme
               getContainer={(e: any) => {
                 if (typeof window === 'undefined') return e;
                 return document.getElementById('amis-pro-layout');
               }}
-              settings={settings}
+              settings={store.settings as any}
               onSettingChange={changeSetting => {
                 merge(store.settings, changeSetting);
               }}
-              disableUrlParams={false}
             />
           </ProLayout>
         </ConfigProvider>
