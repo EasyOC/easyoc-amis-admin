@@ -5,6 +5,7 @@ import RootRoute from './route/index';
 import {extendLocale} from 'amis-core';
 import zhCN from './locales/zh-CN';
 import enUS from './locales/en-US';
+import AntdProLayout from './Layout/AntdProLayout';
 
 extendLocale('zh-CN', zhCN);
 extendLocale('en-US', enUS);
@@ -19,7 +20,8 @@ export default function (): JSX.Element {
   });
   return (
     <Provider store={store}>
-      <RootRoute store={store} />
+      {/* <RootRoute store={store} /> */}
+      <AntdProLayout store={store}></AntdProLayout>
     </Provider>
   );
 }

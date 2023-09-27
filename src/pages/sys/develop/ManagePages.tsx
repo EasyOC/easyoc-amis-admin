@@ -2,7 +2,7 @@ import AMISComponent from '@/components/AMISComponent';
 import React, {useEffect, useState} from 'react';
 // import { useModel } from '@umijs/max';
 import jsonschema from './ManagePages.json';
-
+debugger;
 const ManagePages: React.FC = () => {
   // const { initialState, setInitialState } = useModel('@@initialState');
   // // 侧边栏编辑器，已弃用
