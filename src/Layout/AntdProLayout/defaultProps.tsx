@@ -1,13 +1,6 @@
-import svgIndex from '@/pages/dashboard/svgIndex';
-import routeConfig from '@/route/routeConfig';
 import {EocLayoutSettings} from '@/types/src/SiteGlobalSettings';
-import {
-  ChromeFilled,
-  CrownFilled,
-  SmileFilled,
-  TabletFilled
-} from '@ant-design/icons';
-import React from 'react';
+import {localPath} from '@/utils/urlHelper';
+
 //@ts-expect-error
 export default {
   // route: {path: '/', routes: [...routeConfig]},
@@ -17,6 +10,26 @@ export default {
   //   component: svgIndex,
   //   routes: [...routeConfig]
   // },
+  bgLayoutImgList: [
+    {
+      src: localPath('/assets/imgs/tps-609-606.png'),
+      left: 85,
+      bottom: 100,
+      height: '303px'
+    },
+    {
+      src: localPath('/assets/imgs/tps-609-606.png'),
+      bottom: -68,
+      right: -45,
+      height: '303px'
+    },
+    {
+      src: localPath('/assets/imgs/tps-884-496.png'),
+      bottom: 0,
+      left: 0,
+      width: '331px'
+    }
+  ],
   navTheme: 'light',
   colorPrimary: '#1890ff',
   layout: 'mix',

@@ -1,5 +1,6 @@
 import React from 'react';
 import * as aliIcons from '@ant-design/icons'
+import { EocMenuDataItem } from '@/types/src/SiteGlobalSettings';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import { treeMap } from './tree';
 // FIX从接口获取菜单时icon为string类型

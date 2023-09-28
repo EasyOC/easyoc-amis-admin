@@ -13,22 +13,15 @@ import {
 } from '@ant-design/pro-components';
 import {ConfigProvider, Dropdown} from 'antd';
 import React, {FC, useEffect, useState} from 'react';
-import {inject, observer} from 'mobx-react';
+import {observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
-import {useHistory, useLocation} from 'react-router';
+import {useHistory} from 'react-router';
 import authService from '@/services/auth/authService';
-import {localPath, routerPathName} from '@/utils/urlHelper';
+import {localPath} from '@/utils/urlHelper';
 import appSettings from '@/services/appsettings';
-import queryString from 'query-string';
-import RootRoute from '@/route';
-const loginPage = appSettings.loginPage;
 
-const WITHELIST = [
-  loginPage,
-  '/auth/login',
-  '/auth/redirect',
-  '/auth/logout_redirect'
-];
+import ContentRoutes from '@/route/contentRoutes';
+const loginPage = appSettings.loginPage;
 
 const AntdProLayout: FC<{
   store: IMainStore;
@@ -49,25 +42,6 @@ const AntdProLayout: FC<{
   }, [store, history, children]);
 
   //使用 useEffect hook，检查登录状态
-  const location = useLocation();
-  useEffect(() => {
-    const {search} = location;
-    (async () => {
-      store.userStore.isAuthenticated = await authService.isLoggedIn();
-      if (!store.userStore.isAuthenticated) {
-        const currentPath = routerPathName();
-        if (!WITHELIST.includes(currentPath)) {
-          store.loading = false;
-          let query = queryString.parse(search) as any;
-          let redirect = currentPath + (search || '').toLowerCase();
-          if (query.redirect) {
-            redirect = query.redirect;
-          }
-          history.push(loginPage + '?redirect=' + redirect);
-        }
-      }
-    })();
-  }, [history, location]);
 
   if (typeof document === 'undefined') {
     return <div />;
@@ -88,34 +62,6 @@ const AntdProLayout: FC<{
         >
           <ProLayout
             {...settings}
-            // locale={currentLocale()}
-            // formatMessage={msg => {
-            //   const result = i18n(msg.id);
-            //   return result == msg.id ? msg.defaultMessage || msg.id : result;
-            // }}
-            // route={defaultProps.route}
-            // route={route}
-            // prefixCls="my-prefix"
-            bgLayoutImgList={[
-              {
-                src: localPath('/assets/imgs/tps-609-606.png'),
-                left: 85,
-                bottom: 100,
-                height: '303px'
-              },
-              {
-                src: localPath('/assets/imgs/tps-609-606.png'),
-                bottom: -68,
-                right: -45,
-                height: '303px'
-              },
-              {
-                src: localPath('/assets/imgs/tps-884-496.png'),
-                bottom: 0,
-                left: 0,
-                width: '331px'
-              }
-            ]}
             location={{
               pathname: history.location.pathname
             }}
@@ -215,9 +161,7 @@ const AntdProLayout: FC<{
                   minHeight: 800
                 }}
               >
-                {/* {route} */}
-                {/* <RenderContent /> */}
-                <RootRoute store={store}></RootRoute>
+                <ContentRoutes />
               </ProCard>
             </PageContainer>
             {/* <SettingDrawer
@@ -238,4 +182,4 @@ const AntdProLayout: FC<{
   );
 };
 // export default AntdProLayout;
-export default inject('store')(observer(AntdProLayout));
+export default observer(AntdProLayout);

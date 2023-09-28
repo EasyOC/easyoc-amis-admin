@@ -1,7 +1,7 @@
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import React, {useEffect, useState} from 'react';
-import {Route, useHistory} from 'react-router-dom';
+import {Route, useHistory, useLocation} from 'react-router-dom';
 import {routerPathName} from '@/utils/urlHelper';
 import queryString from 'query-string';
 import {PageLoading} from '@ant-design/pro-components';
@@ -21,33 +21,26 @@ const PermissionWaper: React.FC<{
   store: IMainStore;
 }> = props => {
   const {store} = props;
-  const doLogin = async () => {
-    const {search} = location;
-    const currentPath = routerPathName();
-    if (!WITHELIST.includes(currentPath)) {
-      let query = queryString.parse(search) as any;
-      let redirect = currentPath + (search || '').toLowerCase();
-      if (query.redirect) {
-        redirect = query.redirect;
-      }
-      history.push(loginPage + '?redirect=' + redirect);
-    }
-  };
-  //使用 useEffect hook，检查登录状态
   const history = useHistory();
+  const location = useLocation();
   useEffect(() => {
-    const init = async () => {
+    const {search} = location;
+    (async () => {
       store.userStore.isAuthenticated = await authService.isLoggedIn();
       if (!store.userStore.isAuthenticated) {
         const currentPath = routerPathName();
         if (!WITHELIST.includes(currentPath)) {
           store.loading = false;
-          doLogin();
+          let query = queryString.parse(search) as any;
+          let redirect = currentPath + (search || '').toLowerCase();
+          if (query.redirect) {
+            redirect = query.redirect;
+          }
+          history.push(loginPage + '?redirect=' + redirect);
         }
       }
-    };
-    init();
-  }, [history]);
+    })();
+  }, [history, location]);
   /**
    * 配置未加载完成或配置加载中 显示一个loading
    */
@@ -59,16 +52,8 @@ const PermissionWaper: React.FC<{
   }, [store.settingsLoaded, store.settingsLoading]);
 
   //返回包含子组件的 JSX
-  return (
-    <>
-      {showLoading ? (
-        <PageLoading />
-      ) : (
-        <Route component={AntdProLayout}></Route>
-      )}
-    </>
-  );
+  return <>{showLoading ? <PageLoading /> : <AntdProLayout store={store} />}</>;
 };
 // export default PermissionWaper;
 //observer 会在store变化时重新渲染，此处移除
-export default inject('store')(observer(PermissionWaper));
+export default observer(PermissionWaper);

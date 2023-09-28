@@ -20,8 +20,8 @@ export default function (): JSX.Element {
   });
   return (
     <Provider store={store}>
-      {/* <RootRoute store={store} /> */}
-      <AntdProLayout store={store}></AntdProLayout>
+      <RootRoute store={store} />
+      {/* <AntdProLayout store={store}></AntdProLayout> */}
     </Provider>
   );
 }
