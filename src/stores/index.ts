@@ -66,6 +66,12 @@ class IMainStore {
     }
   })
 
+
+  @action
+  updateSettings = (newSettingsProps: Partial<EocLayoutSettings>) => {
+    deepMerge(this.settings, newSettingsProps)
+  }
+
   @action
   reloadSettings = flow(function* (this: IMainStore, userInfo?: CurrentUser) { // <- 注意*号，这是生成器函数！
     const serverConfig = yield getSiteGlobalSettings(userInfo); //使用 yield 代替 await

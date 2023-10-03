@@ -50,7 +50,7 @@ const RootRoute = function (props: {store: IMainStore}) {
             <Route path="/auth/redirect" component={redirect} />
             <Route path="/auth/logout_redirect" component={logout_redirect} />
             <Route path="/404" component={PageNotFound} />
-            <Route component={PermissionWaper}></Route>
+            <Route render={() => <PermissionWaper store={store} />}></Route>
           </Switch>
         </React.Suspense>
       </div>

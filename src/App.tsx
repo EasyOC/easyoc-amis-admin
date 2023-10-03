@@ -10,17 +10,17 @@ import '@/services/amis/AmisExt';
 extendLocale('zh-CN', zhCN);
 extendLocale('en-US', enUS);
 
-export default function (): JSX.Element {
-  const MainStore = new IMainStore();
-  const store = (window.store = MainStore);
+export default () => {
+  const store = new IMainStore();
+
   useEffect(() => {
     if (!store.settingsLoaded && !store.settingsLoading) {
       store.loadServerSideSettings();
     }
-  });
+  }, []); // 仅在组件挂载时运行
   return (
     <Provider store={store}>
       <RootRoute store={store} />
     </Provider>
   );
-}
+};
