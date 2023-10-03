@@ -8,6 +8,7 @@ import {PageLoading} from '@ant-design/pro-components';
 import authService from '@/services/auth/authService';
 import appSettings from '@/services/appsettings';
 import AntdProLayout from '@/Layout/AntdProLayout';
+import {Spinner} from 'amis';
 const loginPage = appSettings.loginPage;
 
 const WITHELIST = [
@@ -52,8 +53,16 @@ const PermissionWaper: React.FC<{
   }, [store.settingsLoaded, store.settingsLoading]);
 
   //返回包含子组件的 JSX
-  return <>{showLoading ? <PageLoading /> : <AntdProLayout store={store} />}</>;
+  return (
+    <>
+      {showLoading ? (
+        <Spinner overlay className="m-t-lg" size="lg" />
+      ) : (
+        <AntdProLayout store={store} />
+      )}
+    </>
+  );
 };
 // export default PermissionWaper;
 //observer 会在store变化时重新渲染，此处移除
-export default observer(PermissionWaper);
+export default inject('store')(observer(PermissionWaper));

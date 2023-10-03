@@ -12,19 +12,28 @@ import logout_redirect from '@/pages/auth/logout_redirect';
 import redirect from '@/pages/auth/redirect';
 import PageNotFound from '@/pages/PageNotFound';
 import {inject, observer} from 'mobx-react';
-import AntdProLayout from '@/Layout/AntdProLayout';
 import PermissionWaper from './PermissionWaper';
+import AntdProLayout from '@/Layout/AntdProLayout';
+import appSettings from '@/services/appsettings';
 
 const RootRoute = function (props: {store: IMainStore}) {
   const {store} = props;
 
-  let toastPosition = store.settings?.amis?.toastConf?.position || 'top-center';
+  const [settings, setSettings] = useState({
+    toastPosition: store.settings?.amis?.toastConf?.position || 'top-center'
+  });
+
+  useEffect(() => {
+    setSettings({
+      toastPosition: store.settings?.amis?.toastConf?.position || 'top-center'
+    });
+  }, [store.settings.amis?.toastConf?.position]);
 
   return (
     <Router>
       <ToastComponent
         key="toast"
-        position={toastPosition}
+        position={settings}
         {...store.amisEnv}
         closeButton={true}
       />
@@ -41,7 +50,7 @@ const RootRoute = function (props: {store: IMainStore}) {
             <Route path="/auth/redirect" component={redirect} />
             <Route path="/auth/logout_redirect" component={logout_redirect} />
             <Route path="/404" component={PageNotFound} />
-            <PermissionWaper store={store}></PermissionWaper>
+            <Route component={PermissionWaper}></Route>
           </Switch>
         </React.Suspense>
       </div>

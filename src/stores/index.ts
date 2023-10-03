@@ -11,6 +11,13 @@ import authService from '@/services/auth/authService';
 const _userStore = new UserStore();
 
 class IMainStore {
+  @observable theme: 'cxd'
+
+  @observable asideFixed: true
+
+  @observable asideFolded: false
+
+  @observable offScreen: false
 
   @observable
   settings: Partial<EocLayoutSettings> = {};

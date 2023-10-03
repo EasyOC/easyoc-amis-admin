@@ -229,9 +229,9 @@ const treeMapEach = (
 /**
  * @description: Extract tree specified structure, 如果需要分别处理父级和子集，可以直接使用 current.children
  */
-export const treeMap = <T = any>(
+export const treeMap = <T>(
   treeData: T[],
-  opt: { children?: string; conversion: (current) => any },
+  opt: { children?: string; conversion: (current: T & { parentNode: T }) => T },
 ): T[] => {
   return treeData.map((item) => treeMapEach(item, opt))
 }

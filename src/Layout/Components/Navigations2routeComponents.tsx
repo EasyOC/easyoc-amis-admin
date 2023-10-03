@@ -3,7 +3,7 @@ import {Route, Switch} from 'react-router-dom';
 
 import {NavigationItem} from 'amis-ui/lib/components/menu';
 import {eachTree} from 'amis-core';
-import AppSettings from '@/services/appSettings';
+import appSettings from '@/services/appsettings';
 export default class Navigations2routeComponents extends React.PureComponent<any> {
   components: NavigationItem[] = [];
   constructor(props: {navigations: NavigationItem[]}) {
@@ -49,7 +49,7 @@ export default class Navigations2routeComponents extends React.PureComponent<any
   }
 }
 
-let ContextPath = AppSettings.publicPath;
+let ContextPath = appSettings.publicPath;
 
 export function getContextPath() {
   return ContextPath;
@@ -60,10 +60,11 @@ export function navigations2route(
   additionalProperties?: any
 ) {
   let routes: any = [];
-
+  debugger;
   navigations.forEach((root: any) => {
     root.children &&
       eachTree(root.children, (item: any) => {
+        item.path ??= '';
         if (item.path && item.component) {
           routes.push(
             additionalProperties ? (

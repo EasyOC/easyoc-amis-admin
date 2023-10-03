@@ -6,14 +6,15 @@ import {
   ToastComponent,
   updateEnv
 } from 'amis';
-import AmisEnv from '@/services/amis/AmisEnv';
 //link button 样式丢失 时
 //比如 text-danger 不红了，把下面这行注释掉保存，刷新页面，再取消注释
 import 'amis/lib/helper.css'; //amis精简过的 辅助 class 参考自tailwindcss, 做了精简，把一些不常用的剔除了，响应式方面只保留 pc 和手机两种，css 未压缩版本大概是 800K 左右，比 tailwind 要小很多。
 import './components/index';
 import {inject, observer} from 'mobx-react';
+import {IMainStore} from '@/stores';
 interface AMISComponentProps {
   schema: any;
+  store?: IMainStore;
   amisMounted?: (amisScoped: any) => void;
   trackerFn?: (
     tracker: any,
@@ -23,6 +24,7 @@ interface AMISComponentProps {
 
 const AMISComponent: React.FC<AMISComponentProps> = inputProps => {
   console.log('inputProps: ', inputProps);
+  const [AmisEnv, setAmisEnv] = useState(inputProps.store.amisEnv);
   const [schema, setSchema] = React.useState<any>({});
   const [amisSate, setAmisState] = useState();
   const handleScope = (scope: any) => {
@@ -49,23 +51,12 @@ const AMISComponent: React.FC<AMISComponentProps> = inputProps => {
 
   return (
     <div>
-      <ToastComponent
-        theme={AmisEnv.theme}
-        key="toast"
-        position={'top-right'}
-        locale={AmisEnv.locale}
-      />
-      <AlertComponent
-        theme={AmisEnv.theme}
-        key="alert"
-        locale={AmisEnv.locale}
-      />
       {renderAmis(
         // 这里是 amis 的 Json 配置。
         schema,
         {
           scopeRef: handleScope,
-          locale: AmisEnv.locale
+          locale: inputProps.store.settings?.amis?.locale || 'zh-CN'
         },
         {
           tracker: handleTrace,

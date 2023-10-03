@@ -1,3 +1,5 @@
+import AntdProLayout from '@/Layout/AntdProLayout';
+import appSettings from '@/services/appsettings';
 import {Spinner} from 'amis-ui';
 import {observer} from 'mobx-react';
 import React from 'react';
@@ -28,33 +30,73 @@ const AmisDynamicPage = React.lazy(
 
 const ContentRoutes = () => {
   return (
-    <React.Suspense fallback={<Spinner overlay className="m-t-lg" size="lg" />}>
-      <Switch>
-        <Redirect exact path={'/'} to={'/dashboard'} />
-        <Route exact path={'/dashboard'} component={svgIndex} />
-        <Route path={'/sys'}>
-          <Redirect from="/sys" to={'/sys/develop/ManagePages'}></Redirect>
-          <Route path={'dev'}>
-            <Redirect from="dev" to={'ManagePages'}></Redirect>
-            <Route path={'Preview/:versionId'} component={AmisPreview} />
-            <Route path={'ManagePages'} component={ManagePages} />
-            <Route path={'SchemaVersions'} component={SchemaVersions} />
-            <Route path={'page-editor'} component={AmisEditor} />
-            <Route path={'dynamicIndex'} component={dynamicIndex} />
-            <Route path={'menus'} component={menus} />
-          </Route>
-          <Route path={'type-management'}>
-            <Redirect from="type-management" to={'contentTypeList'} />
-            <Route path={'contentTypeList'} component={typeManagement} />
-            <Route path={'editModel'} component={ModelEditor} />
-            <Route path={'genTypeFromRDBMS'} component={genTypeFromRDBMS} />
-          </Route>
+    <Switch>
+      <Redirect exact path={'/'} to={'/dashboard'} />
+      <Route exact path={'/dashboard'} component={svgIndex} />
+      <Route path={'/sys/dev/menus'} component={menus} />
+      <Route path={'/sys/dev/ManagePages'} component={ManagePages} />
+
+      <Route path={'/sys'}>
+        <Route path={'dev'}>
+          <Route path={'/sys/dev/SchemaVersions'} component={SchemaVersions} />
+          <Route path={'/sys/dev/page-editor'} component={AmisEditor} />
+          <Route path={'/sys/dev/dynamicIndex'} component={dynamicIndex} />
         </Route>
-        {/* 动态构建的树形路径 */}
-        <Route component={AmisDynamicPage} />
-      </Switch>
-    </React.Suspense>
+      </Route>
+
+      <Route
+        path={'/sys/type-management/contentTypeList'}
+        component={typeManagement}
+      />
+      {/* <Route path={'/sys/type-management/editModel'} component={ModelEditor} /> */}
+      {/* <Route
+        path={'/sys/type-management/genTypeFromRDBMS'}
+        component={genTypeFromRDBMS}
+      /> */}
+      <Route path={'/sys/Preview/:versionId'} component={AmisPreview} />
+      {/* 动态构建的路径 */}
+      <Route path="*" component={AmisDynamicPage} />
+    </Switch>
   );
 };
-
 export default observer(ContentRoutes);
+
+// export const path2components = [
+//   {
+//     to: '/',
+//     redicect: '/dashboard'
+//   },
+//   {
+//     path: '/dashboard',
+//     component: svgIndex
+//   },
+//   {path: '/sys/Preview/:versionId', component: AmisPreview},
+//   {path: '/sys/dev/ManagePages', component: ManagePages},
+//   {path: '/sys/dev/SchemaVersions', component: SchemaVersions},
+//   {path: '/sys/dev/page-editor', component: AmisEditor},
+//   {path: '/sys/dev/dynamicIndex', component: dynamicIndex},
+//   {path: '/sys/dev/menus', component: menus},
+//   {path: '/sys/type-management/contentTypeList', component: typeManagement},
+//   {path: '/sys/type-management/editModel', component: ModelEditor},
+//   {path: '/sys/type-management/genTypeFromRDBMS', component: genTypeFromRDBMS},
+//   {path: '*', component: AmisDynamicPage}
+// ];
+// const ContentRoutes = () => {
+//   const Routes = () => {
+//     var routeIndex = 0;
+//     return path2components.map(item => {
+//       const routeKey = `RouteIndex_${routeIndex++}_${item.path ?? 'default'}`;
+//       console.log(routeKey);
+//       return (
+//         <Route
+//           key={routeKey}
+//           path={`${appSettings.publicPath}${item.path}`}
+//           component={item.component}
+//         />
+//       );
+//     });
+//   };
+//   return <Switch>{Routes}</Switch>;
+// };
+
+// export default observer(ContentRoutes);

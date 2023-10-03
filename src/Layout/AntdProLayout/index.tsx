@@ -13,36 +13,49 @@ import {
 } from '@ant-design/pro-components';
 import {ConfigProvider, Dropdown} from 'antd';
 import React, {FC, useEffect, useState} from 'react';
-import {observer} from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
-import {useHistory} from 'react-router';
+import {useHistory, useLocation} from 'react-router';
 import authService from '@/services/auth/authService';
-import {localPath} from '@/utils/urlHelper';
 import appSettings from '@/services/appsettings';
-
-import ContentRoutes from '@/route/contentRoutes';
+import ContentRoutes from '@/route/ContentRoutes';
+import {treeFind} from '@/utils';
 const loginPage = appSettings.loginPage;
 
 const AntdProLayout: FC<{
   store: IMainStore;
 }> = props => {
-  const {store, children} = props;
+  const {store} = props;
 
-  const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({
-    ...(store.settings as Partial<ProSettings>),
-    fixSiderbar: true,
-    layout: 'mix',
-    splitMenus: true
-  });
+  // const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({
+  //   ...(store.settings as Partial<ProSettings>),
+  //   navTheme: 'light',
+  //   contentWidth: 'Fluid',
+  //   colorPrimary: '#1677FF',
+  //   siderMenuType: 'sub',
+  //   fixSiderbar: true,
+  //   layout: 'mix',
+  //   // "title": "SalesPortal",
+  //   // "footerRender": false,
+  //   fixedHeader: false,
+  //   // "fixSiderbar": true,
+  //   // pwa: true,
+  //   // logo: '/media/siteassets/jz-logo.svg',
+  //   // loginBg: '/media/siteassets/loginbg.png',
+  //   // locale: {
+  //   //   default: 'zh-CN'
+  //   // },
+  //   splitMenus: true
+  // });
 
   const history = useHistory();
 
-  useEffect(() => {
-    setSetting(s => ({...s, ...store.settings} as Partial<ProSettings>));
-  }, [store, history, children]);
+  // useEffect(() => {
+  //   setSetting(s => ({...s, ...store.settings} as Partial<ProSettings>));
+  // }, [store, history, children]);
 
   //使用 useEffect hook，检查登录状态
-
+  const layoutLocaion = useLocation();
   if (typeof document === 'undefined') {
     return <div />;
   }
@@ -61,13 +74,43 @@ const AntdProLayout: FC<{
           }}
         >
           <ProLayout
-            {...settings}
-            location={{
-              pathname: history.location.pathname
+            breadcrumbRender={false}
+            {...store.settings}
+            location={layoutLocaion}
+            onPageChange={newlocation => {
+              //处理默认跳转
+              let pathKey = newlocation?.pathname as string;
+              if (store.settings.menuData) {
+                const redirectMenu = treeFind(
+                  store.settings.menuData,
+                  node => node.fullPath.toLowerCase() == pathKey.toLowerCase()
+                );
+                //如果是节点路径，则应该自动跳转
+                if (
+                  redirectMenu?.children &&
+                  redirectMenu?.children?.length > 0
+                ) {
+                  //解析路由默认跳转
+                  //尝试从路由节点本身查找redirect 属性
+                  let redirect = redirectMenu?.redirect;
+                  //@ts-ignore
+                  if (!redirect) {
+                    //@ts-ignore 尝试从子节点查找 redirect 属性
+                    redirect = redirectMenu.children.find(
+                      x => x.redirect
+                    )?.redirect;
+                    //使用第一个节点的 路径作为 redirect
+                    if (!redirect) {
+                      //@ts-ignore
+                      redirect = redirectMenu.children[0].fullPath;
+                    }
+                  }
+                  if (redirect) {
+                    history.push(redirect);
+                  }
+                }
+              }
             }}
-            // onPageChange={newlocation => {
-            //   history.push(newlocation.pathname);
-            // }}
             // token={{
             //   header: {
             //     colorBgMenuItemSelected: 'rgba(0,0,0,0.04)'
@@ -140,7 +183,7 @@ const AntdProLayout: FC<{
                 </div>
               );
             }}
-            onMenuHeaderClick={e => console.log(e)}
+            onMenuHeaderClick={e => history.push('/')}
             menuItemRender={(item, dom) => (
               <div
                 onClick={() => {
@@ -151,7 +194,8 @@ const AntdProLayout: FC<{
               </div>
             )}
           >
-            <PageContainer
+            <ContentRoutes />
+            {/* <PageContainer
               loading={store.loading}
               subTitle={store.settings?.subTitle}
             >
@@ -163,7 +207,7 @@ const AntdProLayout: FC<{
               >
                 <ContentRoutes />
               </ProCard>
-            </PageContainer>
+            </PageContainer> */}
             {/* <SettingDrawer
               enableDarkTheme
               getContainer={(e: any) => {
@@ -182,4 +226,4 @@ const AntdProLayout: FC<{
   );
 };
 // export default AntdProLayout;
-export default observer(AntdProLayout);
+export default inject('store')(observer(AntdProLayout));

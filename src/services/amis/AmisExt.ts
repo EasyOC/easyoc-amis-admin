@@ -1,7 +1,8 @@
-
 import { deepMerge } from "@/utils/deep-merge"
-import { listToTree } from "@/utils/helper/tree"
-import { uniqueId } from "lodash"
+import { listToTree, treeMap, treeToList } from "@/utils/helper/tree"
+import { makeTranslator, toast, uuid } from "amis"
+import copy from "copy-to-clipboard"
+import { currentLocale } from 'i18n-runtime'
 
 enum DynamicFilterOperator {
     /// <summary>
@@ -135,11 +136,7 @@ function convertToJSONFilter(condition: any): DynamicFilterInfo[] {
     return arr
 }
 
-
-
-//@ts-ignore 
-function dynamicJsonFilter(condition: any) {
-
+function getConditionFilter(condition): DynamicFilterInfo {
     let dynamicFilter = {
         filters: []
     } as DynamicFilterInfo;
@@ -157,10 +154,13 @@ function dynamicJsonFilter(condition: any) {
                 dynamicFilter = mapResult[0];
             }
     }
+    return dynamicFilter
+}
 
+//@ts-ignore 
+function dynamicJsonFilter(condition: any): string {
+    let dynamicFilter = getConditionFilter(condition)
     return JSON.stringify(dynamicFilter)
-
-    // return "{\"field\":\"address.city\",\"operator\":\"Eq\",\"value\":[]}"
 }
 
 
@@ -233,7 +233,7 @@ function genGraphqlFilter(children: any) {
 }
 
 
-function buildConditionFilter(args: [{ value: any }]) {
+function buildConditionFilter(args: [{ value: any }]): any[] {
     const filter = []
     args.forEach(x => {
         if (x.value) {
@@ -243,16 +243,43 @@ function buildConditionFilter(args: [{ value: any }]) {
     })
     return filter
 }
+
+//#region 兼容旧版
 //@ts-ignore
-window.uuid = uniqueId
+window.listToTree = listToTree;
 //@ts-ignore
-window.listToTree = listToTree
+window.treeMap = treeMap;
 //@ts-ignore
-window.deepMerge = deepMerge
+window.deepMerge = deepMerge;
+//@ts-ignore
+window.treeToList = treeToList;
+//@ts-ignore
+window.treeMap = treeMap;
+//@ts-ignore
+window.deepMerge = deepMerge;
+//#endregion 兼容旧版结束
+const $t = makeTranslator(currentLocale());
 
 //@ts-ignore
 window.amisExt = {
+    listToTree,
+    copy: (content, toastMsg, stopEvent) => {
+        copy(content)
+        if (typeof toastMsg == 'string') {
+            toast.success($t(toastMsg))
+        }
+        else if (toastMsg !== false) {
+            toast.success($t('system.copySuccessfully'))
+        }
+        if (stopEvent) {
+            return false
+        }
+    },
+    treeToList,
+    treeMap,
+    deepMerge,
     buildConditionFilter,
+    getConditionFilter,
     dynamicJsonFilter,
     convertCondition: function (condition: any) {
         console.log(condition, "convertCondition")
@@ -273,3 +300,4 @@ window.amisExt = {
         }
     }
 }
+

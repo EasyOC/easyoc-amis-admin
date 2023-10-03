@@ -1,12 +1,12 @@
 import AMISComponent from '@/components/AMISComponent';
 import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
 import {IMainStore} from '@/stores';
-import {treeFind} from '@/utils';
+import {mustEndsWith, treeFind} from '@/utils';
 import {PageContainer} from '@ant-design/pro-components';
 import {inject, observer} from 'mobx-react';
 import React, {useEffect, useState} from 'react';
 import {useHistory, useLocation} from 'react-router';
-const AmisDynamicPage: React.FC = (props: any) => {
+const AmisDynamicPage: React.FC<{store?: IMainStore}> = (props: any) => {
   const {store} = props as {store: IMainStore};
   const history = useHistory();
   const [state, setState] = useState<{
@@ -133,6 +133,7 @@ const AmisDynamicPage: React.FC = (props: any) => {
       return;
     }
     let pathKey = pathname;
+    //此处只处理精确匹配，默认跳转又Layout 中的onPageChange 处理
     const menuConfig = treeFind(menuData, node => node.fullPath == pathKey);
     if (menuConfig) {
       const schemaInfo = menuConfig.schemaConfig?.schemaDetails;
