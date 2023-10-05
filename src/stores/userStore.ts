@@ -15,6 +15,11 @@ class UserStore {
     return this.user?.name || ""
   };
 
+  @computed
+  get isAdmin() {
+    return this.user?.roles?.includes("Administrator")
+  }
+
   @observable
   isAuthenticated: boolean = false
 

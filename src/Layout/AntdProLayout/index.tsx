@@ -165,7 +165,7 @@ const AntdProLayout: FC<{
         </ProCard>
       </PageContainer> */}
         <FloatButton.BackTop style={{right: '2px'}} />
-        {process.env.NODE_ENV == 'development' ? (
+        {store.userStore.isAdmin ? (
           <SettingDrawer
             getContainer={(e: any) => {
               if (typeof window === 'undefined') return e;
