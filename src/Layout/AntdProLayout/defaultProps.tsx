@@ -12,19 +12,19 @@ export default {
   // },
   bgLayoutImgList: [
     {
-      src: localPath('/assets/imgs/tps-609-606.png'),
+      src: '/assets/imgs/tps-609-606.png',
       left: 85,
       bottom: 100,
       height: '303px'
     },
     {
-      src: localPath('/assets/imgs/tps-609-606.png'),
+      src: '/assets/imgs/tps-609-606.png',
       bottom: -68,
       right: -45,
       height: '303px'
     },
     {
-      src: localPath('/assets/imgs/tps-884-496.png'),
+      src: '/assets/imgs/tps-884-496.png',
       bottom: 0,
       left: 0,
       width: '331px'
