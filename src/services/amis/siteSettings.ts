@@ -12,6 +12,7 @@ import { excuteGraphqlGetQuery } from '../graphql/graphqlApi';
 import ProLayoutProps from '@/Layout/AntdProLayout/defaultProps';
 import { apiUrl } from '@/utils/urlHelper';
 import { fixMenuItemIcon } from '@/utils/helper/iconHelper';
+import appSettings from '../appsettings';
 
 
 
@@ -257,7 +258,12 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
                 })
             }
         }
-
+        if (appSettings.limitlocale) {
+            siteConfig.amis = {
+                ...siteConfig.amis,
+                locale: appSettings.limitlocale.split(',')[0]
+            }
+        }
         if (isLoggedIn) {
             currentUser ??= await authService.getLocalUserInfo()
             let IsAdmin = false;

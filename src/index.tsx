@@ -1,6 +1,10 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App';
+
+import 'amis/lib/helper.css';
+import 'amis-editor-core/lib/style.css';
+console.log(process.env.NODE_ENV);
 //@ts-ignore
 self.MonacoEnvironment = {
   getWorker: async function (workerId, label) {

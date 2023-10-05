@@ -13,7 +13,6 @@ import redirect from '@/pages/auth/redirect';
 import PageNotFound from '@/pages/PageNotFound';
 import {inject, observer} from 'mobx-react';
 import PermissionWaper from './PermissionWaper';
-import AntdProLayout from '@/Layout/AntdProLayout';
 import appSettings from '@/services/appsettings';
 
 const RootRoute = function (props: {store: IMainStore}) {
@@ -30,7 +29,7 @@ const RootRoute = function (props: {store: IMainStore}) {
   }, [store.settings.amis?.toastConf?.position]);
 
   return (
-    <Router>
+    <>
       <ToastComponent
         key="toast"
         position={settings.toastPosition}
@@ -38,18 +37,20 @@ const RootRoute = function (props: {store: IMainStore}) {
         closeButton={true}
       />
       <AlertComponent key="alert" {...store.amisEnv} />
-      <div className="routes-wrapper">
-        {/* 需要授权的页面 */}
-        <Switch>
-          {/* 不需要授权的页面 */}
-          <Route path="/auth/login" component={login} />
-          <Route path="/auth/redirect" component={redirect} />
-          <Route path="/auth/logout_redirect" component={logout_redirect} />
-          <Route component={PermissionWaper}></Route>
-          <Route path="/404" component={PageNotFound} />
-        </Switch>
-      </div>
-    </Router>
+      <Router basename={appSettings.routeBase ?? '/'}>
+        <div className="routes-wrapper">
+          {/* 需要授权的页面 */}
+          <Switch>
+            {/* 不需要授权的页面 */}
+            <Route path="/auth/login" component={login} />
+            <Route path="/auth/redirect" component={redirect} />
+            <Route path="/auth/logout_redirect" component={logout_redirect} />
+            <Route component={PermissionWaper}></Route>
+            <Route path="/404" component={PageNotFound} />
+          </Switch>
+        </div>
+      </Router>
+    </>
   );
 };
 export default observer(RootRoute);

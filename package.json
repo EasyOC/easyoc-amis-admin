@@ -4,9 +4,11 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "vite": "vite",
-    "vite-build": "vite build",
-    "vite-build-cloud": "cross-env NODE_ENV=cloud vite build",
+    "run:dev": "cross-env vite --mode cloud",
+    "run:subFolder": "vite --mode subfolder",
+    "build:subFolder": "vite build  --mode subfolder",
+    "build:cloud": "vite build  --mode cloud",
+    "preview:subFolder": "vite preview --mode subfolder --port 2688",
     "tsc-build": "tsc --build"
   },
   "dependencies": {

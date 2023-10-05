@@ -45,7 +45,7 @@ import {useHistory} from 'react-router';
 //#endregion
 
 const schemaUrl =
-  mustEndsWith(appSettings.publicPath as string, '/') + 'amis/schema.json';
+  mustEndsWith(appSettings.routeBase as string, '/') + 'amis/schema.json';
 // @ts-ignore
 // __uri?.('amis/schema.json');
 console.log('schemaUrl: ', schemaUrl);
