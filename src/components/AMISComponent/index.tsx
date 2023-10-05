@@ -57,7 +57,7 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
   }, [inputProps]);
 
   return (
-    <div>
+    <div className="schema-wrapper">
       {renderAmis(
         // 这里是 amis 的 Json 配置。
         schema,

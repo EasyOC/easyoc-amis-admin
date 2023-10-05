@@ -2,11 +2,16 @@ import {QuestionCircleOutlined} from '@ant-design/icons';
 import {useEmotionCss} from '@ant-design/use-emotion-css';
 import React from 'react';
 import Avatar from './AvatarDropdown';
-import SelectLang from './SelectLang';
+import {IMainStore} from '@/stores';
+import {inject, observer} from 'mobx-react';
+import {SelectLang} from './SelectLang';
 
 export type SiderTheme = 'light' | 'dark';
 
-const GlobalHeaderRight: React.FC<{menu: boolean}> = props => {
+const GlobalHeaderRight: React.FC<{menu: boolean; store: IMainStore}> = ({
+  menu,
+  store
+}) => {
   const className = useEmotionCss(() => {
     return {
       display: 'flex',
@@ -33,11 +38,11 @@ const GlobalHeaderRight: React.FC<{menu: boolean}> = props => {
     };
   });
 
-  if (!initialState || !initialState.settings) {
+  if (!store || !store.settings) {
     return null;
   }
   const showLangSelect = () => {
-    if (initialState.settings?.showLangSelect) {
+    if (store.settings?.showLangSelect) {
       return <SelectLang className={actionClassName} />;
     } else {
       return <></>;
@@ -45,17 +50,9 @@ const GlobalHeaderRight: React.FC<{menu: boolean}> = props => {
   };
   return (
     <div className={className}>
-      {/* <span
-        className={actionClassName}
-        onClick={() => {
-          window.open('https://pro.ant.design/docs/getting-started');
-        }}
-      >
-        <QuestionCircleOutlined />
-      </span> */}
-      <Avatar menu={props.menu} />
+      <Avatar menu={menu} store={store} />
       {showLangSelect()}
     </div>
   );
 };
-export default GlobalHeaderRight;
+export default inject('store')(observer(GlobalHeaderRight));

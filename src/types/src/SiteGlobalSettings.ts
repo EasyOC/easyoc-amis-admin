@@ -40,13 +40,12 @@ export type EocLayoutSettings = Partial<ProLayoutProps> & {
   };
   subTitle?: string;
   serverTitle: string | false | undefined;
-  dynamicMenuData: Partial<DynamicMenuData>;
+  showSettingsDrawer?: boolean;
 };
 
 export type EocInitialState = {
   settings?: Partial<EocLayoutSettings>;
   amisEnv?: RenderOptions;
-  showSettingsDrawer?: boolean;
   currentUser?: CurrentUser;
   accessToken?: string;
   loading?: boolean;

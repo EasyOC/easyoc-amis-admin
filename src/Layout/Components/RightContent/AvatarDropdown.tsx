@@ -1,5 +1,3 @@
-import {outLogin} from '@/services/ant-design-pro/api';
-
 import {
   LogoutOutlined,
   SettingOutlined,
@@ -14,62 +12,21 @@ import type {MenuInfo} from 'rc-menu/lib/interface';
 import React, {useCallback} from 'react';
 import HeaderDropdown from '../HeaderDropdown';
 import confirm from 'antd/es/modal/confirm';
+import authService from '@/services/auth/authService';
+import {i18n} from 'i18n-runtime';
+import {IMainStore} from '@/stores';
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
+  store: IMainStore;
 };
 
-const Name = () => {
-  const {initialState} = useModel('@@initialState');
-  const {currentUser} = initialState || {};
-
-  const nameClassName = useEmotionCss(({token}) => {
-    return {
-      width: '70px',
-      height: '48px',
-      overflow: 'hidden',
-      lineHeight: '48px',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      [`@media only screen and (max-width: ${token.screenMD}px)`]: {
-        display: 'none'
-      }
-    };
-  });
-
-  return (
-    <span className={`${nameClassName} anticon`}>{currentUser?.name}</span>
-  );
-};
-
-const AvatarLogo = () => {
-  const {initialState} = useModel('@@initialState');
-  const {currentUser} = initialState || {};
-
-  const avatarClassName = useEmotionCss(({token}) => {
-    return {
-      marginRight: '8px',
-      color: token.colorPrimary,
-      verticalAlign: 'top',
-      background: setAlpha(token.colorBgContainer, 0.85),
-      [`@media only screen and (max-width: ${token.screenMD}px)`]: {
-        margin: 0
-      }
-    };
-  });
-
-  return (
-    <Avatar
-      size="small"
-      className={avatarClassName}
-      src={currentUser?.avatar}
-      alt="avatar"
-    />
-  );
-};
-
-const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
-  const intl = useIntl();
+const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu, store}) => {
+  const intl = {
+    formatMessage: (message: {id: string; defaultMessage?: string}) => {
+      return i18n(message.id);
+    }
+  };
 
   /**
    * 退出登录，并且将当前的 url 保存
@@ -88,7 +45,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
       // cancelText: '取消',
       // okText: '确认',
       onOk: async () => {
-        await outLogin();
+        await authService.goLogin();
       }
     });
   };
@@ -107,18 +64,54 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
       }
     };
   });
-  const {initialState, setInitialState} = useModel('@@initialState');
-
+  const avatarClassName = useEmotionCss(({token}) => {
+    return {
+      marginRight: '8px',
+      color: token.colorPrimary,
+      verticalAlign: 'top',
+      background: setAlpha(token.colorBgContainer, 0.85),
+      [`@media only screen and (max-width: ${token.screenMD}px)`]: {
+        margin: 0
+      }
+    };
+  });
+  const noneAvatarClassName = useEmotionCss(({token}) => {
+    return {
+      display: 'flex',
+      height: '48px',
+      marginLeft: 'auto',
+      color: '#fff',
+      overflow: 'hidden',
+      alignItems: 'center',
+      padding: '0 8px',
+      cursor: 'pointer',
+      borderRadius: token.borderRadius
+    };
+  });
+  const nameClassName = useEmotionCss(({token}) => {
+    return {
+      width: '70px',
+      height: '48px',
+      color: '#fff',
+      overflow: 'hidden',
+      lineHeight: '48px',
+      whiteSpace: 'nowrap',
+      textOverflow: 'ellipsis',
+      [`@media only screen and (max-width: ${token.screenMD}px)`]: {
+        display: 'none'
+      }
+    };
+  });
+  const initialState = store.settings;
   const onMenuClick = useCallback(
     async (event: MenuInfo) => {
       const {key} = event;
       switch (key) {
         case 'logout':
-          await loginOut();
+          loginOut();
           return;
         case 'themeSettings':
-          await setInitialState(s => ({...s, showSettingsDrawer: true}));
-          console.log('themeSettings', initialState);
+          await store.updateSettings({showSettingsDrawer: true});
           return;
       }
       // history.push(`/account/${key}`);
@@ -142,7 +135,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
     return loading;
   }
 
-  const {currentUser} = initialState;
+  const currentUser = store.userStore.user;
 
   if (!currentUser || !currentUser.name) {
     return loading;
@@ -191,23 +184,30 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
       }}
     >
       <span
-        {...(initialState.settings?.token?.header?.colorTextRightActionsItem
+        {...(store.settings?.token?.header?.colorTextRightActionsItem
           ? {
               style: {
-                color:
-                  initialState.settings?.token?.header
-                    ?.colorTextRightActionsItem
+                color: store.settings?.token?.header?.colorTextRightActionsItem
               }
             }
           : {})}
         className={actionClassName}
       >
-        {currentUser?.avatar ? (
-          <AvatarLogo />
-        ) : (
-          <UserOutlined className={actionClassName} />
-        )}
-        <Name />
+        <>
+          {currentUser?.avatar ? (
+            <Avatar
+              size="small"
+              className={avatarClassName}
+              src={currentUser?.avatar}
+              alt="avatar"
+            />
+          ) : (
+            <UserOutlined className={noneAvatarClassName} />
+          )}
+          <span className={`${nameClassName} anticon`}>
+            {currentUser?.name}
+          </span>
+        </>
       </span>
     </HeaderDropdown>
   );
