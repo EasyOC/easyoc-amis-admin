@@ -36,7 +36,7 @@ export type EocLayoutSettings = Partial<ProLayoutProps> & {
     toastConf: {
       position: 'top-right' | 'top-center' | 'top-left' | 'bottom-center' | 'bottom-left' | 'bottom-right' | 'center'
     }
-    theme?: 'cxd' | 'antd';
+    theme?: 'cxd' | 'antd' | 'dark';
   };
   subTitle?: string;
   serverTitle: string | false | undefined;

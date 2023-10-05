@@ -1,14 +1,14 @@
 import AMISComponent from '@/components/AMISComponent';
-import { wrapedResultRequest } from '@/services/requests';
-import { deepMerge, treeMap } from '@/utils';
-import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
-import { Button, Card, Col, Input, message, Modal, Row, Tree } from 'antd';
-import type { DataNode } from 'antd/lib/tree';
-import { get, set } from 'lodash';
-import React, { useEffect, useRef, useState } from 'react';
+import {deepMerge, treeMap} from '@/utils';
+import {PlusOutlined} from '@ant-design/icons';
+import type {ActionType, ProColumns} from '@ant-design/pro-components';
+import {ProTable} from '@ant-design/pro-components';
+import {Button, Card, Col, Input, message, Modal, Row, Tree} from 'antd';
+import type {DataNode} from 'antd/lib/tree';
+import {get, set} from 'lodash';
+import React, {useEffect, useRef, useState} from 'react';
 import scemaJsonData from './AccountModal.json';
+import defaultRequest from '@/services/requests';
 
 type GithubIssueItem = {
   url: string;
@@ -84,7 +84,7 @@ const Account: React.FC = () => {
   const getTitle = editUserModel.isUpdate ? '编辑账号' : '新增账号';
 
   const amisMounted = (amisScope: any) => {
-    setAmisScoped({ ...amisScope });
+    setAmisScoped({...amisScope});
   };
 
   // 新增或编辑用户的提交事件
@@ -101,19 +101,19 @@ const Account: React.FC = () => {
       //console.log('userInfo: ', userInfo);
       // 如果是更新
       if (editUserModel.isUpdate) {
-        wrapedResultRequest.request({
+        defaultRequest.request({
           url: '/api/Users/Update',
           method: 'POST',
-          data: userInfo as UserDetailsDto,
+          data: userInfo as UserDetailsDto
         });
 
         message.success('User updated successfully');
       } else {
         // 如果是新增
-        wrapedResultRequest.request({
+        defaultRequest.request({
           url: '/api/Users/NewUser',
           method: 'POST',
-          data: userInfo as UserDetailsDto,
+          data: userInfo as UserDetailsDto
         });
 
         message.success('User created successfully');
@@ -127,7 +127,7 @@ const Account: React.FC = () => {
 
   // 树节点选中事件
   const onTreeSelect = (selectedKeys: any, e: any) => {
-    const { selected, selectedNodes, node, event } = e;
+    const {selected, selectedNodes, node, event} = e;
     //console.log('selectedKeys: ', selectedKeys);
     //console.log('selected: ', selected, selectedNodes, node, event);
     setSelectTreeKey(selectedKeys[0]);
@@ -148,7 +148,7 @@ const Account: React.FC = () => {
 
   // 新建用户弹窗
   const handleOnCreateClick = async () => {
-    setEditUserModel({ isUpdate: false });
+    setEditUserModel({isUpdate: false});
     setEditUserModalVisible(true);
     if (amisScoped) {
       const form = amisScoped.getComponentByName('page1.form1');
@@ -161,7 +161,7 @@ const Account: React.FC = () => {
         // form.reset();
         setSchema({
           ...schema,
-          data: { ...newData },
+          data: {...newData}
         });
       }
     }
@@ -173,36 +173,43 @@ const Account: React.FC = () => {
       {
         id: 'id',
         children: 'children',
-        pid: 'pid',
+        pid: 'pid'
       },
-      config,
+      config
     ) as TreeHelperConfig;
 
-  const getChildren = (list: any[], parent: any, config: Partial<TreeHelperConfig> = {}) => {
+  const getChildren = (
+    list: any[],
+    parent: any,
+    config: Partial<TreeHelperConfig> = {}
+  ) => {
     const conf = mergeConfig(config);
-    const { id, children, pid, parentFinder } = conf;
-    const childNodes = list.filter((x) => {
+    const {id, children, pid, parentFinder} = conf;
+    const childNodes = list.filter(x => {
       if (parentFinder) {
         return parentFinder(parent, x);
       } else {
         return get(x, pid as string) == get(parent, id);
       }
     });
-    childNodes.forEach((element) => {
+    childNodes.forEach(element => {
       getChildren(list, element, config);
     });
     set(parent, children, childNodes);
   };
 
-  const listToTree = (list: any[], config: Partial<TreeHelperConfig>): any[] => {
+  const listToTree = (
+    list: any[],
+    config: Partial<TreeHelperConfig>
+  ): any[] => {
     // eslint-disable-next-line no-param-reassign
     config = mergeConfig(config);
     if (!config.rootFinder) {
-      config.rootFinder = (item) => !get(item, config.pid || '');
+      config.rootFinder = item => !get(item, config.pid || '');
     }
     const rootNodes = list.filter(config.rootFinder);
 
-    rootNodes.forEach((root) => {
+    rootNodes.forEach(root => {
       getChildren(list, root, config);
     });
     return rootNodes;
@@ -210,7 +217,7 @@ const Account: React.FC = () => {
 
   // 获取部门，并将部门构建成树的结构
   const getDept = async () => {
-    const result = await wrapedResultRequest.request({
+    const result = await defaultRequest.request({
       url: '/api/graphql',
       method: 'POST',
       params: {
@@ -228,8 +235,8 @@ const Account: React.FC = () => {
             }
             contentItemId
           }
-        }`,
-      },
+        }`
+      }
     });
 
     const depList = result.data.data.map((x: any) => {
@@ -241,7 +248,7 @@ const Account: React.FC = () => {
         remark: x.description,
         status: x.status ? 1 : 0,
         key: x.contentItemId,
-        title: x.displayText,
+        title: x.displayText
       } as DeptListItem;
       if (x.parentDepartmentId?.contentItemIds) {
         dept.parentId = x.parentDepartmentId.contentItemIds[0];
@@ -250,7 +257,7 @@ const Account: React.FC = () => {
     });
 
     const treeList = listToTree(depList, {
-      pid: 'parentId',
+      pid: 'parentId'
     });
     return treeList;
   };
@@ -272,12 +279,12 @@ const Account: React.FC = () => {
           if (item.children && item.children.length > 0) {
             expandedKeys.push(item.key);
           }
-        },
+        }
       });
       setTreeData(result);
 
       //console.log('expandedKeys: ', expandedKeys);
-      setDefaultExpandedKeys(result.map((x) => x.key) as []);
+      setDefaultExpandedKeys(result.map(x => x.key) as []);
     })();
     isMounted = true;
   }, []);
@@ -286,74 +293,141 @@ const Account: React.FC = () => {
     {
       dataIndex: 'index',
       valueType: 'indexBorder',
-      width: 48,
+      width: 48
     },
     {
       title: '用户名',
       dataIndex: 'userName',
       sorter: true,
-      width: 120,
+      width: 120
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       sorter: true,
-      width: 120,
+      width: 120
     },
     {
       title: 'Nick Name',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'NickName', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'NickName',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: 'First Name',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'FirstName', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'FirstName',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: 'Last Name	',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'LastName', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'LastName',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: 'Gender',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'Gender', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'Gender',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: 'Job Title',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'JobTitle', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'JobTitle',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: '部门',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'Department', '0'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'Department',
+        '0'
+      ],
+      width: 120
     },
     {
       title: '直属上级',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'Manager', 'DisplayText'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'Manager',
+        'DisplayText'
+      ],
+      width: 120
     },
     {
       title: '员工号',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'EmployeCode', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'EmployeCode',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: '真实姓名',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'RealName', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'RealName',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: '用户头像',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'Avatar', 'Paths', '0'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'Avatar',
+        'Paths',
+        '0'
+      ],
+      width: 120
     },
     {
       title: '登录名',
-      dataIndex: ['properties', 'UserProfileInternal', 'UserProfilePart', 'Name', 'Text'],
-      width: 120,
+      dataIndex: [
+        'properties',
+        'UserProfileInternal',
+        'UserProfilePart',
+        'Name',
+        'Text'
+      ],
+      width: 120
     },
     {
       title: '操作',
@@ -371,9 +445,9 @@ const Account: React.FC = () => {
             setEditUserModalVisible(true);
             //console.log('amisRef: ', amisRef);
             //console.log('amisScoped: ', amisScoped);
-            setEditUserModel({ isUpdate: true });
+            setEditUserModel({isUpdate: true});
 
-            setSchema({ ...schema, data: { ...record } });
+            setSchema({...schema, data: {...record}});
 
             // if (amisScoped) {
             //   const form = amisScoped.getComponentByName('page1.form1');
@@ -386,9 +460,9 @@ const Account: React.FC = () => {
           }}
         >
           编辑
-        </a>,
-      ],
-    },
+        </a>
+      ]
+    }
   ];
 
   return (
@@ -412,7 +486,7 @@ const Account: React.FC = () => {
         <Row>
           <Col span="5">
             <Card>
-              <Input.Search style={{ marginBottom: 8 }} placeholder="Search" />
+              <Input.Search style={{marginBottom: 8}} placeholder="Search" />
               <Tree
                 treeData={treeData}
                 expandedKeys={defaultExpandedKeys}
@@ -436,7 +510,7 @@ const Account: React.FC = () => {
                   sortorder = sort[key];
                 }
 
-                const res = await wrapedResultRequest.request({
+                const res = await defaultRequest.request({
                   url: '/api/Users/GetAll',
                   method: 'GET',
                   params: {
@@ -444,31 +518,31 @@ const Account: React.FC = () => {
                     page: params.current,
                     SortField: sortkey,
                     SortOrder: sortorder,
-                    departmentId: selectTreeKey,
-                  },
+                    departmentId: selectTreeKey
+                  }
                 });
 
                 const data = {
                   data: res?.data?.items || [],
                   total: res?.data?.total || 1,
-                  page: params.current,
+                  page: params.current
                 };
 
                 return data;
               }}
               editable={{
-                type: 'multiple',
+                type: 'multiple'
               }}
               columnsState={{
                 persistenceKey: 'pro-table-singe-demos',
                 persistenceType: 'localStorage',
                 onChange(value) {
                   //console.log('value: ', value);
-                },
+                }
               }}
               rowKey="id"
               search={{
-                labelWidth: 100,
+                labelWidth: 100
               }}
               form={{
                 // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
@@ -476,17 +550,17 @@ const Account: React.FC = () => {
                   if (type === 'get') {
                     return {
                       ...values,
-                      created_at: [values.startTime, values.endTime],
+                      created_at: [values.startTime, values.endTime]
                     };
                   }
                   return values;
-                },
+                }
               }}
               pagination={{
                 pageSize: 10,
                 showSizeChanger: true,
                 pageSizeOptions: ['10', '20', '50', '100'],
-                onChange: (page) => console.log(page),
+                onChange: page => console.log(page)
               }}
               dateFormatter="string"
               headerTitle="高级表格"
@@ -498,7 +572,7 @@ const Account: React.FC = () => {
                   onClick={handleOnCreateClick}
                 >
                   新建
-                </Button>,
+                </Button>
               ]}
             />
           </Col>

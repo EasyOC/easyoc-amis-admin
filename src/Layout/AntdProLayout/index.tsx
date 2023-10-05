@@ -29,33 +29,15 @@ const AntdProLayout: FC<{
 }> = props => {
   const {store, children} = props;
 
-  const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({
-    ...(store.settings as Partial<ProSettings>),
-    navTheme: 'light',
-    contentWidth: 'Fluid',
-    colorPrimary: '#1677FF',
-    siderMenuType: 'sub',
-    fixSiderbar: true,
-    layout: 'mix',
-    // "title": "SalesPortal",
-    // "footerRender": false,
-    fixedHeader: false,
-    // "fixSiderbar": true,
-    // pwa: true,
-    // logo: '/media/siteassets/jz-logo.svg',
-    // loginBg: '/media/siteassets/loginbg.png',
-    // locale: {
-    //   default: 'zh-CN'
-    // },
-    splitMenus: true
-  });
+  const [settings, setSetting] = useState<ProSettings>();
+  //监听配置变化
+  useEffect(() => {
+    setSetting(store.settings as Partial<ProSettings>);
+  }, []);
+
   const location = useLocation();
   const history = useHistory();
-  useEffect(() => {
-    if (!store.settings.menuData) {
-      console.log('store.settings.menuData: ', store.settings.menuData);
-    }
-  }, [store.settings]);
+  const [tabIndex, setTabIndex] = useState(0);
   useEffect(() => {
     try {
       //处理默认跳转
@@ -72,7 +54,7 @@ const AntdProLayout: FC<{
         if (!redirect) {
           if (redirectMenu?.children && redirectMenu?.children?.length > 0) {
             //使用第一个节点的 路径作为 redirect
-            redirect = redirectMenu.children?.fullPath;
+            redirect = redirectMenu.children[0]?.fullPath;
           }
         }
         if (redirect) {
@@ -83,9 +65,6 @@ const AntdProLayout: FC<{
       console.log('onPageChangeerror: ', error);
     }
   }, [location.pathname]);
-  // useEffect(() => {
-  //   setSetting(s => ({...s, ...store.settings} as Partial<ProSettings>));
-  // }, [store, history, children]);
 
   //使用 useEffect hook，检查登录状态
   if (typeof document === 'undefined') {
@@ -93,7 +72,7 @@ const AntdProLayout: FC<{
   }
   return (
     <ProLayout
-      siderMenuType={'group'}
+      tabIndex={tabIndex}
       {...settings}
       // 面包屑
       // itemRender={() => null}
@@ -114,17 +93,16 @@ const AntdProLayout: FC<{
         console.log('message: ', message);
         return message.defaultMessage ?? i18n(message.id);
       }}
-      route={{children: store.settings?.menuData}}
       menu={{
         locale: false,
         defaultOpenAll: true,
         params: {
-          userId: store.userStore?.user?.name || 'default'
+          userId: store.userStore?.user?.name
         },
         request: async (params: any, defaultMenuData: MenuDataItem[]) => {
           // debugger;
           // const newSettings = await store.reloadSettings();
-          return store.settings?.menuData;
+          return store.settings?.menuData as MenuDataItem[];
         }
       }}
       avatarProps={{
@@ -200,10 +178,11 @@ const AntdProLayout: FC<{
           if (typeof window === 'undefined') return e;
           return document.getElementById('amis-pro-layout');
         }}
-        settings={store.settings as any}
-        onSettingChange={changeSetting => {
-          store.updateSettings(changeSetting);
-          console.log('changeSetting: ', changeSetting);
+        settings={{...settings}}
+        onSettingChange={async changedSetting => {
+          await store.updateSettings(changedSetting);
+          setSetting(s => ({...s, ...changedSetting} as Partial<ProSettings>));
+          console.log('changedSetting: ', changedSetting);
         }}
       />
     </ProLayout>

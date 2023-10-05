@@ -630,7 +630,6 @@
             ],
             "bulkActions": [],
             "messages": {},
-            "affixHeader": false,
             "primaryField": "contentItemId",
             "keepItemSelectionOnPageChange": true,
             "labelTpl": "${displayText}",

@@ -1,25 +1,29 @@
 /* eslint-disable react/button-has-type */
-import { Graph, Node } from '@antv/x6';
-import { Clipboard } from '@antv/x6-plugin-clipboard';
-import { Selection } from '@antv/x6-plugin-selection';
-import { History } from '@antv/x6-plugin-history';
-import { Keyboard } from '@antv/x6-plugin-keyboard';
-import { PageContainer } from '@ant-design/pro-components';
-import { MiniMap } from '@antv/x6-plugin-minimap';
-import { Scroller } from '@antv/x6-plugin-scroller';
+import {Graph, Node} from '@antv/x6';
+import {Clipboard} from '@antv/x6-plugin-clipboard';
+import {Selection} from '@antv/x6-plugin-selection';
+import {History} from '@antv/x6-plugin-history';
+import {Keyboard} from '@antv/x6-plugin-keyboard';
+import {PageContainer} from '@ant-design/pro-components';
+import {MiniMap} from '@antv/x6-plugin-minimap';
+import {Scroller} from '@antv/x6-plugin-scroller';
 import ButtonGroup from 'antd/es/button/button-group';
 import AMISComponent from '@/components/AMISComponent';
-import { useEffect, useRef, useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import NodeComponent, {
   ContentTypeNodeData,
   InitNewNodeData,
-  TypeNodeProps,
+  TypeNodeProps
 } from './components/typeNode';
-import { ScaleSettings, ScaleSettingsState } from './components/scale';
-import { register, Portal } from '@antv/x6-react-shape';
+import {ScaleSettings, ScaleSettingsState} from './components/scale';
+import {register, Portal} from '@antv/x6-react-shape';
 import './index.less';
-import { ContentType as ContentTypeDef, FieldName } from '@/types/src/OCRecipeTypes';
-import { PortManager } from '@antv/x6/lib/model/port';
+import {
+  ContentType as ContentTypeDef,
+  FieldName
+} from '@/types/src/OCRecipeTypes';
+import {PortManager} from '@antv/x6/lib/model/port';
+import React from 'react';
 
 /**
  * 生成旧的配方快照
@@ -27,15 +31,19 @@ import { PortManager } from '@antv/x6/lib/model/port';
  * @returns
  */
 const genRecipeSnapsort = (inputNodeData: ContentTypeNodeData[]) => {
-  const nodeData = inputNodeData.filter((x) => !x.isNew);
+  const nodeData = inputNodeData.filter(x => !x.isNew);
   const data = {
     steps: [
       {
         name: 'ReplaceContentDefinition',
-        ContentTypes: [...nodeData.map((x) => x.serverSnapsort?.ContentTypeDefinitionRecord)],
-        ContentParts: [...nodeData.map((x) => x.serverSnapsort?.ContentPartDefinitionRecord)],
-      },
-    ],
+        ContentTypes: [
+          ...nodeData.map(x => x.serverSnapsort?.ContentTypeDefinitionRecord)
+        ],
+        ContentParts: [
+          ...nodeData.map(x => x.serverSnapsort?.ContentPartDefinitionRecord)
+        ]
+      }
+    ]
   };
   return data;
 };
@@ -44,16 +52,16 @@ const genRecipe = (
   nodeData: Array<{
     ContentPartDefinitionRecord: any;
     ContentTypeDefinitionRecord: any;
-  }>,
+  }>
 ) => {
   const data = {
     steps: [
       {
         name: 'ReplaceContentDefinition',
-        ContentTypes: [...nodeData.map((x) => x.ContentTypeDefinitionRecord)],
-        ContentParts: [...nodeData.map((x) => x.ContentPartDefinitionRecord)],
-      },
-    ],
+        ContentTypes: [...nodeData.map(x => x.ContentTypeDefinitionRecord)],
+        ContentParts: [...nodeData.map(x => x.ContentPartDefinitionRecord)]
+      }
+    ]
   };
   return data;
 };
@@ -78,9 +86,9 @@ register({
           circle: {
             magnet: true,
             stroke: '#8f8f8f',
-            r: 5,
-          },
-        },
+            r: 5
+          }
+        }
       },
       bottom: {
         position: 'bottom',
@@ -88,9 +96,9 @@ register({
           circle: {
             magnet: true,
             stroke: '#8f8f8f',
-            r: 5,
-          },
-        },
+            r: 5
+          }
+        }
       },
       left: {
         position: 'left',
@@ -98,13 +106,13 @@ register({
           circle: {
             magnet: true,
             stroke: '#8f8f8f',
-            r: 5,
-          },
-        },
-      },
-    },
+            r: 5
+          }
+        }
+      }
+    }
   },
-  component: NodeComponent,
+  component: NodeComponent
 });
 
 const ModelsER = () => {
@@ -114,7 +122,7 @@ const ModelsER = () => {
     canUndo: false,
     allTypes: [],
     selectedNodes: [],
-    nodeValues: [],
+    nodeValues: []
   });
   let graph: Graph;
   const container = useRef<HTMLDivElement>(null);
@@ -132,7 +140,7 @@ const ModelsER = () => {
     graph = new Graph({
       container: container.current as HTMLDivElement,
       background: {
-        color: '#fff',
+        color: '#fff'
       },
       grid: {
         visible: true,
@@ -140,27 +148,27 @@ const ModelsER = () => {
         args: [
           {
             color: '#eee', // 主网格线颜色
-            thickness: 1, // 主网格线宽度
+            thickness: 1 // 主网格线宽度
           },
           {
             color: '#ddd', // 次网格线颜色
             thickness: 1, // 次网格线宽度
-            factor: 4, // 主次网格线间隔
-          },
-        ],
+            factor: 4 // 主次网格线间隔
+          }
+        ]
       },
       panning: true,
       mousewheel: {
         enabled: true,
         modifiers: 'Ctrl',
-        guard: (e) => {
+        guard: e => {
           const currentScale = graph?.zoom() || 1;
           setScaleLevel(currentScale);
           return true;
         },
         maxScale: 3,
-        minScale: 0.1,
-      },
+        minScale: 0.1
+      }
     });
     setGraphState(graph);
     //@ts-ignore
@@ -175,14 +183,14 @@ const ModelsER = () => {
         showNodeSelectionBox: true,
         pointerEvents: 'none',
         modifiers: 'Ctrl',
-        strict: true,
-      }),
+        strict: true
+      })
     );
     // 记录历史，用于撤销
     graph.use(
       new History({
-        enabled: true,
-      }),
+        enabled: true
+      })
     );
     // 键盘事件
     graph.use(
@@ -191,14 +199,14 @@ const ModelsER = () => {
         global: false,
         guard(this: Graph, e: KeyboardEvent) {
           return true;
-        },
-      }),
+        }
+      })
     );
     // 复制黏贴
     graph.use(
       new Clipboard({
-        enabled: true,
-      }),
+        enabled: true
+      })
     );
 
     // 使用插件滚动条
@@ -207,16 +215,16 @@ const ModelsER = () => {
         enabled: true,
         pageVisible: true,
         pageBreak: false,
-        pannable: true,
-      }),
+        pannable: true
+      })
     );
     // 使用插件小地图
     graph.use(
       new MiniMap({
-        container: minimapContainer.current as HTMLDivElement,
-      }),
+        container: minimapContainer.current as HTMLDivElement
+      })
     );
-    graph.on('node:selected', (args) => {
+    graph.on('node:selected', args => {
       state.selectedNodes.push(args.node.id);
     });
     graph.on('history:change', () => {
@@ -243,7 +251,7 @@ const ModelsER = () => {
   const protList: string[] = [];
   const refreshEdges = () => {
     const exisEdges = currentGraph().getEdges();
-    exisEdges.forEach((x) => {
+    exisEdges.forEach(x => {
       currentGraph().removeEdge(x.id);
     });
     currentGraph()
@@ -255,7 +263,7 @@ const ModelsER = () => {
         }
         let sources =
           nodeType.ContentPartDefinitionRecord?.ContentPartFieldDefinitionRecords?.filter(
-            (x) => x.FieldName == FieldName.ContentPickerField,
+            x => x.FieldName == FieldName.ContentPickerField
           );
         if (sources && sources.length > 0) {
           const portItems: PortManager.PortMetadata[] = [];
@@ -271,29 +279,36 @@ const ModelsER = () => {
           //   }
           // });
           n.prop('ports/items', portItems);
-          sources.forEach((field) => {
-            const sourcePort = nodeType.ContentPartDefinitionRecord?.Name + ' - ' + field.Name;
-            if (!field.Settings?.ContentPickerFieldSettings?.DisplayedContentTypes) {
+          sources.forEach(field => {
+            const sourcePort =
+              nodeType.ContentPartDefinitionRecord?.Name + ' - ' + field.Name;
+            if (
+              !field.Settings?.ContentPickerFieldSettings?.DisplayedContentTypes
+            ) {
               //TODO:如果存在此名称的 连线 ，则需要删除
 
               return;
             }
             //当前外键字段
             field.Settings?.ContentPickerFieldSettings?.DisplayedContentTypes?.forEach(
-              (targetTypeName) => {
+              targetTypeName => {
                 const targetNode = currentGraph()
                   .getNodes()
-                  .find((x) => x.id == targetTypeName);
+                  .find(x => x.id == targetTypeName);
                 if (targetNode) {
-                  addEdgesFn(n, targetNode, { source: sourcePort });
+                  addEdgesFn(n, targetNode, {source: sourcePort});
                 }
-              },
+              }
             );
           });
         }
       });
   };
-  const addEdgesFn = (source: Node, target: Node, prots: { source: string; target?: string }) => {
+  const addEdgesFn = (
+    source: Node,
+    target: Node,
+    prots: {source: string; target?: string}
+  ) => {
     const graph = currentGraph();
     const edges = graph.getEdges();
     // if(edges.find(x=>x.source.)))
@@ -301,14 +316,14 @@ const ModelsER = () => {
       currentGraph().addEdge({
         // source: { cell: source, port: prots?.source },
         // target: { cell: target, port: prots?.target },
-        source: { cell: source },
-        target: { cell: target },
-        label: source.id,
+        source: {cell: source},
+        target: {cell: target},
+        label: source.id
       });
     }
   };
   const addNodesFn = (checkedValues: string[]) => {
-    checkedValues.forEach((e) => {
+    checkedValues.forEach(e => {
       // debugger;
       const localGraph = currentGraph();
       localGraph?.addNode({
@@ -317,7 +332,7 @@ const ModelsER = () => {
         y: (localGraph.getNodes().length % 4) * 150 + 20,
         id: e,
         label: e,
-        data: { afterLoad: refreshEdges },
+        data: {afterLoad: refreshEdges}
       });
     });
   };
@@ -341,7 +356,7 @@ const ModelsER = () => {
     type: 'switch',
     style: {
       position: 'relative',
-      top: '10px',
+      top: '10px'
       // marginTop: '20px',
     },
     onText: '缩略图',
@@ -353,12 +368,12 @@ const ModelsER = () => {
           {
             actionType: 'custom',
             script: (a, b, c) => {
-              setState((s) => ({ ...s, showMiniMap: c.data.value }));
-            },
-          },
-        ],
-      },
-    },
+              setState(s => ({...s, showMiniMap: c.data.value}));
+            }
+          }
+        ]
+      }
+    }
   };
 
   // 撤销
@@ -373,11 +388,11 @@ const ModelsER = () => {
             actionType: 'custom',
             script: () => {
               handleUndo();
-            },
-          },
-        ],
-      },
-    },
+            }
+          }
+        ]
+      }
+    }
   };
   // 重做
   const btnRedo = {
@@ -391,11 +406,11 @@ const ModelsER = () => {
             actionType: 'custom',
             script: () => {
               handleOnRedo();
-            },
-          },
-        ],
-      },
-    },
+            }
+          }
+        ]
+      }
+    }
   };
   // 清空
   const btnClearSchema = {
@@ -408,11 +423,11 @@ const ModelsER = () => {
             actionType: 'custom',
             script: () => {
               clearScreen();
-            },
-          },
-        ],
-      },
-    },
+            }
+          }
+        ]
+      }
+    }
   };
   // 新建
   const btnCreateNewSchema = {
@@ -444,24 +459,34 @@ const ModelsER = () => {
                             let typeschema = InitNewNodeData(formData);
                             currentGraph()?.addNode({
                               shape: 'type-node',
-                              x: 20 + Math.floor(currentGraph()?.getNodes().length / 4) * 220,
-                              y: (currentGraph()?.getNodes().length % 4) * 150 + 20,
+                              x:
+                                20 +
+                                Math.floor(
+                                  currentGraph()?.getNodes().length / 4
+                                ) *
+                                  220,
+                              y:
+                                (currentGraph()?.getNodes().length % 4) * 150 +
+                                20,
                               id: formData.Name,
-                              data: { ...typeschema },
+                              data: {...typeschema}
                               // data: typeschema,
                             });
-                            doAction({ actionType: 'toast', args: { msg: '新建成功' } });
-                          },
-                        },
-                      ],
-                    },
+                            doAction({
+                              actionType: 'toast',
+                              args: {msg: '新建成功'}
+                            });
+                          }
+                        }
+                      ]
+                    }
                   },
                   body: [
                     {
                       type: 'input-text',
                       label: '显示名称',
                       name: 'DisplayName',
-                      id: 'u:a73ec2dd0728',
+                      id: 'u:a73ec2dd0728'
                     },
                     {
                       label: '技术名称',
@@ -483,29 +508,29 @@ const ModelsER = () => {
                                 actionType: 'setValue',
                                 componentId: 'u:1067cab4b614',
                                 args: {
-                                  value: '${pinyinStartCase(DisplayName)}',
-                                },
-                              },
-                            ],
-                          },
-                        },
-                      },
-                    },
+                                  value: '${pinyinStartCase(DisplayName)}'
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
                   ],
-                  wrapWithPanel: false,
-                },
+                  wrapWithPanel: false
+                }
               ],
               showCloseButton: true,
               showErrorMsg: true,
               showLoading: true,
               id: 'u:ca9bf9237cd6',
-              closeOnEsc: false,
-            },
-          },
+              closeOnEsc: false
+            }
+          }
         ],
-        weight: 0,
-      },
-    },
+        weight: 0
+      }
+    }
   };
   // 添加
   const btnAddSchema = {
@@ -540,11 +565,11 @@ const ModelsER = () => {
                               label: '关键字',
                               id: 'u:d5ef7f843771',
                               size: 'full',
-                              mode: 'horizontal',
-                            },
+                              mode: 'horizontal'
+                            }
                           ],
                           md: '',
-                          id: 'u:e6d725fbe08f',
+                          id: 'u:e6d725fbe08f'
                         },
                         {
                           body: [
@@ -555,39 +580,39 @@ const ModelsER = () => {
                               options: [
                                 {
                                   label: '数据容器',
-                                  value: 'ContenContainerTypeOnly',
+                                  value: 'ContenContainerTypeOnly'
                                 },
                                 {
                                   label: '仅动态索引',
-                                  value: 'DIndexOnly',
+                                  value: 'DIndexOnly'
                                 },
                                 {
                                   label: '所有',
-                                  value: 'All',
+                                  value: 'All'
                                 },
                                 {
                                   label: 'Widget',
-                                  value: 'Widget',
+                                  value: 'Widget'
                                 },
                                 {
                                   label: 'CustomUserSettings',
-                                  value: 'CustomUserSettings',
+                                  value: 'CustomUserSettings'
                                 },
                                 {
                                   label: 'MenuItem',
-                                  value: 'MenuItem',
-                                },
+                                  value: 'MenuItem'
+                                }
                               ],
                               multiple: false,
                               value: 'ContenContainerTypeOnly',
                               id: 'u:77381e6fc489',
-                              mode: 'horizontal',
-                            },
+                              mode: 'horizontal'
+                            }
                           ],
-                          id: 'u:5bbe1001c91c',
-                        },
+                          id: 'u:5bbe1001c91c'
+                        }
                       ],
-                      id: 'u:8a3f0184fd88',
+                      id: 'u:8a3f0184fd88'
                     },
                     {
                       type: 'picker',
@@ -601,24 +626,24 @@ const ModelsER = () => {
                       source: {
                         method: 'get',
                         url: '/api/ContentTypeManagement/GetAllTypes?page=${page}&pageSize=${perPage}&typeName=${typeName}&filter=${filter}&stereotype=${stereotype}',
-                        adaptor: (response) => {
-                          const items = response.items.map((x) => {
+                        adaptor: response => {
+                          const items = response.items.map(x => {
                             return {
                               label: `${x.displayName} - ${x.name}${
                                 x.stereotype ? ' - ' + x.stereotype : ''
                               }`,
-                              value: x.name,
+                              value: x.name
                             };
                           });
-                          return { items, total: response.total };
+                          return {items, total: response.total};
                         },
                         replaceData: false,
                         dataType: 'json',
-                        messages: {},
+                        messages: {}
                       },
                       joinValues: false,
-                      extractValue: true,
-                    },
+                      extractValue: true
+                    }
                   ],
                   onEvent: {
                     submitSucc: {
@@ -626,24 +651,24 @@ const ModelsER = () => {
                       actions: [
                         {
                           actionType: 'custom',
-                          script: (context) => {
+                          script: context => {
                             const formData = context.getData();
                             addNodesFn(formData.typeNames);
-                          },
-                        },
-                      ],
-                    },
+                          }
+                        }
+                      ]
+                    }
                   },
-                  id: 'u:bc435d2aa3fe',
-                },
+                  id: 'u:bc435d2aa3fe'
+                }
               ],
-              id: 'u:ce0a11f65c41',
-            },
-          },
-        ],
-      },
+              id: 'u:ce0a11f65c41'
+            }
+          }
+        ]
+      }
     },
-    id: 'u:3e0852cc98db',
+    id: 'u:3e0852cc98db'
   };
   // 提交
   const btnSubmitSchema = {
@@ -661,18 +686,18 @@ const ModelsER = () => {
                   actionType: 'toast',
                   args: {
                     msgType: 'error',
-                    msg: '尚未添加任何类型',
-                  },
+                    msg: '尚未添加任何类型'
+                  }
                 });
                 return false;
               }
-              if (!afterUpdateNodes.find((x) => x.data?.dataChanged || false)) {
+              if (!afterUpdateNodes.find(x => x.data?.dataChanged || false)) {
                 doAction({
                   actionType: 'toast',
                   args: {
                     msgType: 'error',
-                    msg: '未检测到任何更改',
-                  },
+                    msg: '未检测到任何更改'
+                  }
                 });
                 return false;
               }
@@ -696,48 +721,50 @@ const ModelsER = () => {
                                 currentGraph()
                                   .getNodes()
                                   .filter(
-                                    (x: { data: ContentTypeNodeData }) =>
-                                      x.data.dataChanged || x.data.isNew,
+                                    (x: {data: ContentTypeNodeData}) =>
+                                      x.data.dataChanged || x.data.isNew
                                   )
-                                  .forEach(async (x: { data: ContentTypeNodeData }) => {
-                                    await x.data?.initNodeData?.();
-                                  });
-                              },
-                            },
-                          ],
-                        },
+                                  .forEach(
+                                    async (x: {data: ContentTypeNodeData}) => {
+                                      await x.data?.initNodeData?.();
+                                    }
+                                  );
+                              }
+                            }
+                          ]
+                        }
                       },
                       data: {
                         originContent: () =>
                           JSON.stringify(
                             genRecipeSnapsort(
-                              afterUpdateNodes.map((x) => {
+                              afterUpdateNodes.map(x => {
                                 return x.data;
-                              }),
-                            ),
+                              })
+                            )
                           ),
                         recipeContent: () =>
                           JSON.stringify(
                             genRecipe(
-                              afterUpdateNodes.map((x) => {
+                              afterUpdateNodes.map(x => {
                                 return x.data;
-                              }),
-                            ),
-                          ),
+                              })
+                            )
+                          )
                       }, //此处复制使用函数赋值，使用是与普通字段一样，不需要花括号
                       api: {
                         url: '/api/ContentTypeManagement/ImportDeploymentPackage',
                         method: 'post',
                         messages: {},
                         data: {
-                          recipeContent: '${recipeContent}',
+                          recipeContent: '${recipeContent}'
                         },
                         adaptor: () => {
                           // currentGraph
                           return {
-                            msg: '提交成功',
+                            msg: '提交成功'
                           };
-                        },
+                        }
                       },
                       title: '表单',
                       body: [
@@ -749,8 +776,8 @@ const ModelsER = () => {
                           allowFullscreen: true,
                           language: 'json',
                           hiddenOn: '!compare',
-                          diffValue: '${originContent}',
-                        },
+                          diffValue: '${originContent}'
+                        }
                         // {
                         //   type: 'editor',
                         //   label: '配方预览',
@@ -760,23 +787,23 @@ const ModelsER = () => {
                         //   language: 'json',
                         //   allowFullscreen: true,
                         // },
-                      ],
-                    },
+                      ]
+                    }
                   ],
                   showCloseButton: true,
                   showErrorMsg: true,
                   showLoading: true,
                   closeOnEsc: true,
-                  size: 'xl',
-                },
+                  size: 'xl'
+                }
               });
-            },
-          },
-        ],
-      },
+            }
+          }
+        ]
+      }
     },
     id: 'u:18e38ead27e9',
-    level: 'primary',
+    level: 'primary'
   };
   // 展示所有按钮
   const topBtnSchema = Object.freeze({
@@ -788,9 +815,9 @@ const ModelsER = () => {
       btnClearSchema,
       btnCreateNewSchema,
       btnAddSchema,
-      btnSubmitSchema,
+      btnSubmitSchema
     ],
-    id: 'u:402a9db42a6c',
+    id: 'u:402a9db42a6c'
   });
 
   // 比例尺
@@ -805,7 +832,7 @@ const ModelsER = () => {
         <div
           className="app-minimap"
           ref={minimapContainer}
-          style={{ visibility: state.showMiniMap ? 'visible' : 'hidden' }}
+          style={{visibility: state.showMiniMap ? 'visible' : 'hidden'}}
         />
         {/* 比例尺 */}
         <div className="app-scale">
@@ -816,7 +843,7 @@ const ModelsER = () => {
           />
         </div>
         {/* 右上角的按钮 */}
-        <div style={{ position: 'absolute', right: 10, top: 10, zIndex: 4 }}>
+        <div style={{position: 'absolute', right: 10, top: 10, zIndex: 4}}>
           <ButtonGroup>
             <AMISComponent schema={topBtnSchema}></AMISComponent>
           </ButtonGroup>
@@ -829,7 +856,7 @@ const ModelsER = () => {
   );
 };
 
-export default (props) => {
+export default () => {
   return (
     <PageContainer title={false}>
       <ModelsER />

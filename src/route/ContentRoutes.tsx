@@ -15,22 +15,29 @@ import {
 } from 'react-router-dom';
 
 const menus = React.lazy(() => import('@/pages/sys/menus'));
+
+//#region 在线开发相关路由
+
 const AmisEditor = React.lazy(() => import('@/pages/amis/editor'));
 const genTypeFromRDBMS = React.lazy(
-  () => import('@/pages/sys/type-management/genTypeFromRDBMS')
+  () => import('@/pages/develop/typeManagement/genTypeFromRDBMS')
 );
 const ModelEditor = React.lazy(
-  () => import('@/pages/sys/type-management/edit')
+  () => import('@/pages/develop/typeManagement/edit')
 );
-const typeManagement = React.lazy(() => import('@/pages/sys/type-management'));
-const dynamicIndex = React.lazy(
-  () => import('@/pages/sys/develop/dynamicIndex')
+const typeManagement = React.lazy(
+  () => import('@/pages/develop/typeManagement')
 );
+
+const dynamicIndex = React.lazy(() => import('@/pages/develop/dynamicIndex'));
 const SchemaVersions = React.lazy(
-  () => import('@/pages/sys/develop/SchemaVersions')
+  () => import('@/pages/develop/SchemaVersions')
 );
-const ManagePages = React.lazy(() => import('@/pages/sys/develop/ManagePages'));
-const AmisPreview = React.lazy(() => import('@/pages/sys/develop/AmisPreview'));
+const ManagePages = React.lazy(() => import('@/pages/develop/ManagePages'));
+const AmisPreview = React.lazy(() => import('@/pages/develop/AmisPreview'));
+
+//#endregion 在线开发相关路由
+
 const svgIndex = React.lazy(() => import('@/pages/dashboard/svgIndex'));
 
 const AmisDynamicPage = React.lazy(
@@ -40,37 +47,53 @@ const AmisDynamicPage = React.lazy(
 const Account = React.lazy(() => import('@/pages/sys/ou/account'));
 const roles = React.lazy(() => import('@/pages/sys/roles'));
 
-const ContentRoutes: FC = () => {
-  const location = useLocation();
-  const history = useHistory();
-
+const ContentRoutes = () => {
   return (
     <React.Suspense fallback={<Spinner overlay />}>
       <Switch>
         <Redirect exact path={'/'} to={'/dashboard'} />
         <Route exact path={'/dashboard'} component={svgIndex} />
+
         <Route path={'/sys/account'} component={Account} />
         <Route path={'/sys/rolesAndPermission'} component={roles} />
-        <Route path={'/sys/dev/menus'} component={menus} />
-        <Route path={'/sys/dev/menus'} component={menus} />
-        <Route path={'/sys/dev/ManagePages'} component={ManagePages} />
-        <Route path={'/sys/dev/SchemaVersions'} component={SchemaVersions} />
-        <Route path={'/sys/dev/page-editor'} component={AmisEditor} />
-        <Route path={'/sys/dev/dynamicIndex'} component={dynamicIndex} />
+
+        {/* #region 在线开发相关路由 */}
+        <Route path={'/dev/menus'} component={menus} />
+        <Route path={'/dev/menus'} component={menus} />
+        <Route path={'/dev/ManagePages'} component={ManagePages} />
+        <Route path={'/dev/SchemaVersions'} component={SchemaVersions} />
+        <Route path={'/dev/page-editor'} component={AmisEditor} />
+        <Route path={'/dev/dynamicIndex'} component={dynamicIndex} />
 
         <Route
-          path={'/sys/type-management/contentTypeList'}
+          path={'/dev/type-management/contentTypeList'}
           component={typeManagement}
         />
         <Route
-          path={'/sys/type-management/editModel'}
+          path={'/dev/type-management/editModel'}
           component={ModelEditor}
         />
         <Route
-          path={'/sys/type-management/genTypeFromRDBMS'}
+          path={'/dev/type-management/genTypeFromRDBMS'}
           component={genTypeFromRDBMS}
         />
-        <Route path={'/sys/Preview/:versionId'} component={AmisPreview} />
+        <Route
+          path={'/dev/type-management/ModelsER'}
+          component={React.lazy(
+            () => import('@/pages/develop/typeManagement/ModelsER')
+          )}
+        />
+        <Route
+          path={'/dev/type-management/workflow'}
+          component={React.lazy(
+            () => import('@/pages/develop/typeManagement/workflow')
+          )}
+        />
+
+        <Route path={'/dev/Preview/:versionId'} component={AmisPreview} />
+
+        {/* #endregion 在线开发相关路由 */}
+
         <Route path="/404" component={PageNotFound} />
 
         {/* 动态构建的路径 */}
@@ -80,43 +103,3 @@ const ContentRoutes: FC = () => {
   );
 };
 export default observer(ContentRoutes);
-
-// export const path2components = [
-//   {
-//     to: '/',
-//     redicect: '/dashboard'
-//   },
-//   {
-//     path: '/dashboard',
-//     component: svgIndex
-//   },
-//   {path: '/sys/Preview/:versionId', component: AmisPreview},
-//   {path: '/sys/dev/ManagePages', component: ManagePages},
-//   {path: '/sys/dev/SchemaVersions', component: SchemaVersions},
-//   {path: '/sys/dev/page-editor', component: AmisEditor},
-//   {path: '/sys/dev/dynamicIndex', component: dynamicIndex},
-//   {path: '/sys/dev/menus', component: menus},
-//   {path: '/sys/type-management/contentTypeList', component: typeManagement},
-//   {path: '/sys/type-management/editModel', component: ModelEditor},
-//   {path: '/sys/type-management/genTypeFromRDBMS', component: genTypeFromRDBMS},
-//   {path: '*', component: AmisDynamicPage}
-// ];
-// const ContentRoutes = () => {
-//   const Routes = () => {
-//     var routeIndex = 0;
-//     return path2components.map(item => {
-//       const routeKey = `RouteIndex_${routeIndex++}_${item.path ?? 'default'}`;
-//       console.log(routeKey);
-//       return (
-//         <Route
-//           key={routeKey}
-//           path={`${appSettings.publicPath}${item.path}`}
-//           component={item.component}
-//         />
-//       );
-//     });
-//   };
-//   return <Switch>{Routes}</Switch>;
-// };
-
-// export default observer(ContentRoutes);

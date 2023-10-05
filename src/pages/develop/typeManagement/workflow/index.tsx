@@ -17,6 +17,7 @@ interface NodeStatus {
 }
 
 const style: React.CSSProperties = {background: '', padding: '8px 0'};
+//TODO: 远程资源保存到本地
 const image = {
   logo: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*evDjT5vjkX0AAAAAAAAAAAAAARQnAQ',
   success:
@@ -26,7 +27,7 @@ const image = {
   running:
     'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*t8fURKfgSOgAAAAAAAAAAAAAARQnAQ'
 };
-export class AlgoNode extends React.Component<{node?: Node}> {
+export class AlgoNode extends React.Component<{node: Node; graph: Graph}> {
   shouldComponentUpdate() {
     const {node} = this.props;
     if (node) {

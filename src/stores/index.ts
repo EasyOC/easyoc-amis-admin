@@ -20,7 +20,16 @@ class IMainStore {
   @observable offScreen: false
 
   @observable
-  settings: Partial<EocLayoutSettings> = {};
+  settings: Partial<EocLayoutSettings> = {
+    navTheme: 'light',
+    contentWidth: 'Fluid',
+    colorPrimary: '#1677FF',
+    siderMenuType: 'group',
+    fixSiderbar: true,
+    layout: 'mix',
+    fixedHeader: false,
+    splitMenus: true
+  };
 
   @observable
   amisEnv: RenderOptions = { ...defaultAmisEnv } as RenderOptions
@@ -70,6 +79,11 @@ class IMainStore {
   @action
   updateSettings = (newSettingsProps: Partial<EocLayoutSettings>) => {
     deepMerge(this.settings, newSettingsProps)
+    if (newSettingsProps.navTheme == "realDark") {
+      this.settings.amis.theme = 'dark'
+    } else {
+      this.settings.amis.theme = 'cxd'
+    }
   }
 
   @action

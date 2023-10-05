@@ -3,7 +3,7 @@ import { processResponseMessage } from './processResponseMessage'
 import { toast } from 'amis'
 import Axios from 'axios'
 import authService from '../auth/authService'
-import appSettings from '../appSettings'
+import appSettings from '../appsettings'
 
 const defaultRequest = axios.create({
   baseURL: appSettings.apiBaseUrl, // url = base url + request url
@@ -77,4 +77,3 @@ defaultRequest.interceptors.response.use(response => {
   return Promise.reject(error);
 });
 export default defaultRequest
-export { defaultRequest }

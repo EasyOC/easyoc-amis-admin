@@ -1,28 +1,40 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Checkbox, Col, Row, Modal, Form, Input } from 'antd';
-import { Node, Graph } from '@antv/x6';
-import defaultRequest from '@/services/requests/defaultRequest';
-import { toast } from 'amis';
+import React, {useEffect, useRef, useState} from 'react';
+import {Button, Checkbox, Col, Row, Modal, Form, Input} from 'antd';
+import {Node, Graph} from '@antv/x6';
+import {toast} from 'amis';
 import copy from 'copy-to-clipboard';
 import AMISComponent from '@/components/AMISComponent';
 import './index.less';
-import { ContentType } from '@/types/src/OCRecipeTypes';
-import { useSize } from 'ahooks';
-import { addField, removeField, removeFields, TempFiled, updateField } from './typeNodeService';
+import {ContentType} from '@/types/src/OCRecipeTypes';
+import {useSize} from 'ahooks';
+import {
+  addField,
+  removeField,
+  removeFields,
+  TempFiled,
+  updateField
+} from './typeNodeService';
+import defaultRequest from '@/services/requests';
 
 export const loadTypeRecipeData = async (typeName): Promise<ContentType> => {
   const result = await defaultRequest.request({
     url: `/api/ContentTypeManagement/GetTypeDefinitionRecipe?name=${typeName}`,
     method: 'GET',
     params: {
-      name: typeName,
-    },
+      name: typeName
+    }
   });
-  console.log('🚀 ~ file: typeNode.tsx:21 ~ loadTypeRecipeData ~ result:', result);
+  console.log(
+    '🚀 ~ file: typeNode.tsx:21 ~ loadTypeRecipeData ~ result:',
+    result
+  );
   return result.data.data;
 };
 
-export const InitNewNodeData = (formData: { Name: string; DisplayName: string }) => {
+export const InitNewNodeData = (formData: {
+  Name: string;
+  DisplayName: string;
+}) => {
   const nodeData = {
     dataChanged: true,
     isNew: true,
@@ -37,10 +49,10 @@ export const InitNewNodeData = (formData: { Name: string; DisplayName: string })
           Draftable: true,
           Versionable: true,
           Securable: true,
-          Description: formData.DisplayName,
+          Description: formData.DisplayName
         },
         FullTextAspectSettings: {},
-        GraphQLContentTypeSettings: {},
+        GraphQLContentTypeSettings: {}
       },
       ContentTypePartDefinitionRecords: [
         {
@@ -48,17 +60,17 @@ export const InitNewNodeData = (formData: { Name: string; DisplayName: string })
           Name: formData.Name,
           Settings: {
             ContentTypePartSettings: {
-              Position: '1',
-            },
-          },
-        },
-      ],
+              Position: '1'
+            }
+          }
+        }
+      ]
     },
     ContentPartDefinitionRecord: {
       Name: formData.Name,
       Settings: {},
-      ContentPartFieldDefinitionRecords: [],
-    },
+      ContentPartFieldDefinitionRecords: []
+    }
   } as Partial<ContentTypeNodeData>;
   return nodeData;
 };
@@ -84,9 +96,9 @@ export type TypeNodeProps = Node & {
   data: ContentTypeNodeData;
 };
 
-const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
-  const { node, graph } = props;
-  const { id } = node;
+const NodeComponent = (props: {node: TypeNodeProps; graph: Graph}) => {
+  const {node, graph} = props;
+  const {id} = node;
 
   // const [nodeData, setNodeData] = useState<ContentTypeNodeData>(node.data);
   const [nodeState, setNodeState] = useState<{
@@ -102,7 +114,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
     showName: false,
     expand: false,
     editMode: false,
-    width: 200,
+    width: 200
   });
 
   let mounted = false;
@@ -111,20 +123,23 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
       // alert(node.id);
 
       const result = await loadTypeRecipeData(id);
-      console.log('🚀 ~ file: typeNode.tsx:69 ~ initNodeData ~ result:', result);
+      console.log(
+        '🚀 ~ file: typeNode.tsx:69 ~ initNodeData ~ result:',
+        result
+      );
       node.data = {
         ...node.data,
         ...result,
         dataChanged: false,
         isNew: false,
-        serverSnapsort: { ...result },
+        serverSnapsort: {...result}
       } as ContentTypeNodeData;
     } catch (error) {
       node.data = {
         ...node.data,
         dataChanged: false,
         isNew: false,
-        ...InitNewNodeData({ Name: '', DisplayName: '' }),
+        ...InitNewNodeData({Name: '', DisplayName: ''})
       };
       // const nodeType = node.data as ContentType;
     } finally {
@@ -138,7 +153,10 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
 
   useEffect(() => {
     if (!mounted) {
-      if (id && !(node.data as ContentTypeNodeData).ContentPartDefinitionRecord) {
+      if (
+        id &&
+        !(node.data as ContentTypeNodeData).ContentPartDefinitionRecord
+      ) {
         initNodeData();
       }
     }
@@ -158,13 +176,13 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
     ) {
       props.node.resize(
         (nodeHtmlRootSize?.width as number) + 10,
-        (nodeHtmlRootSize?.height as number) + 5,
+        (nodeHtmlRootSize?.height as number) + 5
       );
     }
     // props.node.resize(nodeHtmlRootSize?.width as number, nodeHtmlRootSize?.height as number);
   }, [nodeHtmlRootSize]);
 
-  const crudDoAction = (data) => {
+  const crudDoAction = data => {
     node.data.ContentPartDefinitionRecord.ContentPartFieldDefinitionRecords =
       data?.ContentPartDefinitionRecord?.ContentPartFieldDefinitionRecords;
     node.data.dataChanged = true;
@@ -172,12 +190,12 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
     node.data = {
       ...node.data,
       ...data,
-      dataChanged: true,
+      dataChanged: true
     };
     node.data?.afterLoad?.(node, graph);
   };
 
-  const fieldFormSchema = (isAdd) => {
+  const fieldFormSchema = isAdd => {
     return {
       type: 'form',
       onEvent: {
@@ -190,40 +208,47 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                 const formData = formRendder.getData();
                 const data = isAdd
                   ? addField(node.data, formData as TempFiled)
-                  : updateField(node.data, formData as TempFiled, formData.index);
-                console.log('🚀 ~ file: typeNode.tsx:123 ~ fieldFormSchema ~ data:', data);
+                  : updateField(
+                      node.data,
+                      formData as TempFiled,
+                      formData.index
+                    );
+                console.log(
+                  '🚀 ~ file: typeNode.tsx:123 ~ fieldFormSchema ~ data:',
+                  data
+                );
                 doAction({
                   actionType: 'setValue',
                   componentId: 'u:crud',
                   args: {
                     value: {
                       items: [
-                        ...(data.ContentPartDefinitionRecord?.ContentPartFieldDefinitionRecords ||
-                          []),
-                      ],
-                    },
-                  },
+                        ...(data.ContentPartDefinitionRecord
+                          ?.ContentPartFieldDefinitionRecords || [])
+                      ]
+                    }
+                  }
                 });
                 crudDoAction(data);
-              },
-            },
+              }
+            }
           ],
-          reload: 'crudTable',
-        },
+          reload: 'crudTable'
+        }
       },
       canAccessSuperData: true,
       body: [
         {
           name: 'index',
           type: 'hidden',
-          value: '${index}',
+          value: '${index}'
         },
         {
           name: 'Settings.ContentPartFieldSettings.DisplayName',
           label: '显示名称',
           id: 'u:a06d524fe3d9',
           type: 'input-text',
-          required: true,
+          required: true
         },
         {
           name: 'Name',
@@ -234,10 +259,10 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
           id: 'u:ab9ef29927e8',
           hidden: false,
           validations: {
-            matchRegexp: '^[a-zA-Z_$][a-zA-Z0-9_$]*$',
+            matchRegexp: '^[a-zA-Z_$][a-zA-Z0-9_$]*$'
           },
           validationErrors: {
-            matchRegexp: '不能以数字开头',
+            matchRegexp: '不能以数字开头'
           },
           required: true,
           value:
@@ -255,13 +280,14 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                     actionType: 'setValue',
                     componentId: 'u:ab9ef29927e8',
                     args: {
-                      value: '${pinyinStartCase(Settings.ContentPartFieldSettings.DisplayName)}',
-                    },
-                  },
-                ],
-              },
-            },
-          },
+                      value:
+                        '${pinyinStartCase(Settings.ContentPartFieldSettings.DisplayName)}'
+                    }
+                  }
+                ]
+              }
+            }
+          }
         },
         {
           label: '字段类型',
@@ -273,29 +299,29 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
           options: [
             {
               label: '文本',
-              value: 'TextField',
+              value: 'TextField'
             },
             {
               label: '数值',
-              value: 'NumericField',
+              value: 'NumericField'
             },
             {
               label: '多行文本',
-              value: 'MultiTextField',
+              value: 'MultiTextField'
             },
             {
               label: '布尔值',
-              value: 'BooleanField',
+              value: 'BooleanField'
             },
             {
               label: '内容选择器',
-              value: 'ContentPickerField',
+              value: 'ContentPickerField'
             },
             {
               label: '用户选择器',
-              value: 'UserPickerField',
-            },
-          ],
+              value: 'UserPickerField'
+            }
+          ]
         },
         {
           type: 'tabs',
@@ -309,7 +335,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   option: '必填',
                   name: 'Settings.TextFieldSettings.Required',
                   id: 'u:23dbeec8feb2',
-                  description: '是否需要值。',
+                  description: '是否需要值。'
                 },
                 {
                   type: 'textarea',
@@ -318,18 +344,18 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   description: '编辑器上为此字段显示的提示文本。',
                   label: '提示',
                   minRows: 3,
-                  maxRows: 20,
+                  maxRows: 20
                 },
                 {
                   type: 'input-text',
                   name: 'Settings.TextFieldSettings.DefaultValue',
                   id: 'u:9ccaec74e498',
                   description: '默认值。（可选）',
-                  label: '默认值',
-                },
+                  label: '默认值'
+                }
               ],
               id: 'u:b6d4d131ea9c',
-              hiddenOn: "${FieldName!='TextField'}",
+              hiddenOn: "${FieldName!='TextField'}"
             },
             // 数字字段设置
             {
@@ -340,7 +366,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   option: '必填',
                   name: 'Settings.NumericFieldSettings.Required',
                   id: 'u:4c7974c5617e',
-                  description: '是否需要值。',
+                  description: '是否需要值。'
                 },
                 {
                   type: 'textarea',
@@ -349,46 +375,46 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   description: '编辑器上为此字段显示的提示文本。',
                   label: '提示',
                   minRows: 3,
-                  maxRows: 20,
+                  maxRows: 20
                 },
                 {
                   type: 'input-text',
                   label: '水印（占位符）',
                   name: 'Settings.NumericFieldSettings.Placeholder',
                   id: 'u:7d3e9ed2d299',
-                  description: '当输入为空时显示的提示。(可选)',
+                  description: '当输入为空时显示的提示。(可选)'
                 },
                 {
                   type: 'input-text',
                   label: '小数位数',
                   name: 'Settings.NumericFieldSettings.Scale',
                   id: 'u:1a891fb8dc6e',
-                  description: '小数点后的位数。',
+                  description: '小数点后的位数。'
                 },
                 {
                   type: 'input-text',
                   label: '最小值',
                   name: 'Settings.NumericFieldSettings.Minimum',
                   id: 'u:c29de66766e7',
-                  description: '允许的最小值。（可选）',
+                  description: '允许的最小值。（可选）'
                 },
                 {
                   type: 'input-text',
                   label: '最大值',
                   name: 'Settings.NumericFieldSettings.Maximum',
                   id: 'u:6fc966b9c11a',
-                  description: '允许的最大值。（可选）',
+                  description: '允许的最大值。（可选）'
                 },
                 {
                   type: 'input-text',
                   label: '默认值',
                   name: 'Settings.NumericFieldSettings.DefaultValue',
                   id: 'u:a110189dd2eb',
-                  description: '默认值(可选)',
-                },
+                  description: '默认值(可选)'
+                }
               ],
               id: 'u:82730d725eeb',
-              hiddenOn: "${FieldName!='NumericField'}",
+              hiddenOn: "${FieldName!='NumericField'}"
             },
             // 多行文本
             {
@@ -400,7 +426,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   name: 'Settings.MultiTextFieldSettings.Required',
                   id: 'u:10533c8ecb28',
                   description: '值是必需的',
-                  label: '',
+                  label: ''
                 },
                 {
                   type: 'textarea',
@@ -409,7 +435,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:b5044fad2534',
                   minRows: 3,
                   maxRows: 20,
-                  description: '编辑器中显示此字段的提示文本。',
+                  description: '编辑器中显示此字段的提示文本。'
                 },
                 {
                   type: 'combo',
@@ -424,7 +450,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                     icon: 'fa fa-plus',
                     level: 'primary',
                     size: 'sm',
-                    id: 'u:69a80bf99221',
+                    id: 'u:69a80bf99221'
                   },
                   items: [
                     {
@@ -435,7 +461,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                       description: '',
                       label: '选项标签',
                       clearable: false,
-                      mode: 'normal',
+                      mode: 'normal'
                     },
                     {
                       type: 'input-text',
@@ -444,24 +470,24 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                       id: 'u:95398dda20e1',
                       description: '',
                       label: '值',
-                      mode: 'normal',
+                      mode: 'normal'
                     },
                     {
                       type: 'checkbox',
                       name: 'default',
                       label: '默认',
                       id: 'u:79ce100f5166',
-                      mode: 'normal',
-                    },
+                      mode: 'normal'
+                    }
                   ],
                   strictMode: true,
                   syncFields: [],
                   tabsMode: false,
-                  mode: 'normal',
-                },
+                  mode: 'normal'
+                }
               ],
               id: 'u:a01a0ac8d278',
-              hiddenOn: "${FieldName!='MultiTextField'}",
+              hiddenOn: "${FieldName!='MultiTextField'}"
             },
             // 内容选择设置
             {
@@ -474,7 +500,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:c666dfc05bd6',
                   description: '是否选择至少一个元素。',
                   value: false,
-                  mode: 'horizontal',
+                  mode: 'horizontal'
                 },
                 {
                   type: 'checkbox',
@@ -483,7 +509,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:4964b9771e0d',
                   description: '是否允许选择多个元素。',
                   label: '',
-                  mode: 'horizontal',
+                  mode: 'horizontal'
                 },
                 {
                   type: 'select',
@@ -502,13 +528,13 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                     adaptor:
                       'const items = response.data.items.map((x) => {\r\n  return {\r\n    label: `${x.displayName}`,\r\n    value: x.name,\r\n  };\r\n});\r\nreturn { items, total: response.total };',
                     messages: {},
-                    dataType: 'json',
+                    dataType: 'json'
                   },
                   checkAll: false,
                   size: 'full',
                   labelAlign: 'left',
                   joinValues: false,
-                  extractValue: true,
+                  extractValue: true
                 },
                 {
                   type: 'textarea',
@@ -517,11 +543,11 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:b5044fad2534',
                   minRows: 3,
                   maxRows: 20,
-                  description: '编辑器中显示此字段的提示文本。',
-                },
+                  description: '编辑器中显示此字段的提示文本。'
+                }
               ],
               id: 'ContentPartFieldSettings',
-              hiddenOn: "${FieldName!='ContentPickerField'}",
+              hiddenOn: "${FieldName!='ContentPickerField'}"
             },
             // 用户选择器
             {
@@ -534,7 +560,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:e18f9052d734',
                   description: '是否选择至少一个元素。',
                   value: false,
-                  mode: 'horizontal',
+                  mode: 'horizontal'
                 },
                 {
                   type: 'checkbox',
@@ -543,7 +569,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:4964b9771e0d',
                   description: '是否允许选择多个元素。',
                   label: '',
-                  mode: 'horizontal',
+                  mode: 'horizontal'
                 },
                 {
                   type: 'select',
@@ -560,10 +586,10 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                     adaptor:
                       'const items = response.data.map((x) => {\r\n    return {\r\n        label: `${x.roleName}`,\r\n        value: x.roleName,\r\n    };\r\n});\r\nreturn { items };',
                     messages: {},
-                    dataType: 'json',
+                    dataType: 'json'
                   },
                   searchable: true,
-                  clearable: true,
+                  clearable: true
                 },
                 {
                   type: 'textarea',
@@ -573,11 +599,11 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   minRows: 3,
                   maxRows: 20,
                   description: '编辑器中显示此字段的提示文本。',
-                  mode: 'horizontal',
-                },
+                  mode: 'horizontal'
+                }
               ],
               id: 'u:c18a0cc71ac2',
-              hiddenOn: "${FieldName!='UserPickerField'}",
+              hiddenOn: "${FieldName!='UserPickerField'}"
             },
             // 布尔值
             {
@@ -590,25 +616,25 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:e714c0c33cb8',
                   minRows: 3,
                   maxRows: 20,
-                  description: '编辑器上为此字段显示的提示文本。',
+                  description: '编辑器上为此字段显示的提示文本。'
                 },
                 {
                   type: 'input-text',
                   label: '标签',
                   name: 'Settings.BooleanFieldSettings.Label',
                   id: 'u:40abcc397e64',
-                  description: '与该复选框关联的文本。',
+                  description: '与该复选框关联的文本。'
                 },
                 {
                   type: 'checkbox',
                   option: '默认值为“true”。',
                   name: 'Settings.BooleanFieldSettings.DefaultValue',
                   id: 'u:b4c994af6884',
-                  description: '创建新项目时，此字段将初始化。',
-                },
+                  description: '创建新项目时，此字段将初始化。'
+                }
               ],
               id: 'u:6dd378750473',
-              hiddenOn: "${FieldName!='BooleanField'}",
+              hiddenOn: "${FieldName!='BooleanField'}"
             },
             // 全文索引设置
             {
@@ -619,34 +645,35 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   id: 'u:559e5958fadd',
                   option: '在索引中包括此元素',
                   name: 'Settings.LuceneContentIndexSettings.Included',
-                  description: '选中可将此元素的值包含在索引中。',
+                  description: '选中可将此元素的值包含在索引中。'
                 },
                 {
                   type: 'checkbox',
                   option: '关键字',
                   name: 'Settings.LuceneContentIndexSettings.Analyzed',
                   id: 'u:ca9a3d73ea90',
-                  description: '选中可作为关键字值进行索引（作为单个标记进行索引）。',
+                  description:
+                    '选中可作为关键字值进行索引（作为单个标记进行索引）。'
                 },
                 {
                   type: 'checkbox',
                   id: 'u:07392650505e',
                   option: '已存储',
                   name: 'Settings.LuceneContentIndexSettings.Stored',
-                  description: '选中可从索引中检索原始值。',
-                },
+                  description: '选中可从索引中检索原始值。'
+                }
               ],
-              id: 'u:00093c9e7baf',
-            },
+              id: 'u:00093c9e7baf'
+            }
           ],
           id: 'u:c97ba3ecfbff',
           tabsMode: '',
           showTip: false,
           activeKey: '',
-          hidden: false,
-        },
+          hidden: false
+        }
       ],
-      id: 'u:24018a370066',
+      id: 'u:24018a370066'
     };
   };
 
@@ -657,19 +684,23 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
       id: 'u:crud',
       syncLocation: false,
       primaryField: 'Name',
-      data: { items: node.data.ContentPartDefinitionRecord?.ContentPartFieldDefinitionRecords },
+      data: {
+        items:
+          node.data.ContentPartDefinitionRecord
+            ?.ContentPartFieldDefinitionRecords
+      },
       columns: [
         {
           name: 'Settings.ContentPartFieldSettings.DisplayName',
           label: '显示名称',
-          id: 'u:a06d524fe3d9',
+          id: 'u:a06d524fe3d9'
         },
         {
           name: 'Name',
           label: '技术名',
           type: 'text',
           id: 'u:ab9ef29927e8',
-          hidden: !nodeState.showName,
+          hidden: !nodeState.showName
         },
         {
           label: '类型',
@@ -680,13 +711,13 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
           type: 'mapping',
           map: {
             '*': '通配值',
-            MultiTextField: '多行文本',
-            TextField: '文本',
-            BooleanField: '布尔值',
-            ContentPickerField: '内容选择器',
-            UserPickerField: '用户选择器',
-            NumericField: '数值',
-          },
+            'MultiTextField': '多行文本',
+            'TextField': '文本',
+            'BooleanField': '布尔值',
+            'ContentPickerField': '内容选择器',
+            'UserPickerField': '用户选择器',
+            'NumericField': '数值'
+          }
           // placeholder: '-',
         },
         {
@@ -711,9 +742,9 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                 withDefaultData: false,
                 dataMapSwitch: false,
                 size: 'md',
-                overlay: false,
+                overlay: false
               },
-              id: 'u:2390b1025db2',
+              id: 'u:2390b1025db2'
             },
             {
               type: 'button',
@@ -738,21 +769,21 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                             value: {
                               items: [
                                 ...data.ContentPartDefinitionRecord
-                                  .ContentPartFieldDefinitionRecords,
-                              ],
-                            },
-                          },
+                                  .ContentPartFieldDefinitionRecords
+                              ]
+                            }
+                          }
                         });
                         crudDoAction(data);
-                      },
-                    },
-                  ],
-                },
-              },
-            },
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           ],
-          id: 'u:81578b2c1896',
-        },
+          id: 'u:81578b2c1896'
+        }
       ],
       bulkActions: [
         {
@@ -769,25 +800,29 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   actionType: 'custom',
                   script: (context, doAction, event) => {
                     // console.log('nodeDatanodeData', nodeData);
-                    const data = removeFields(node.data, event.data.selectedItems);
+                    const data = removeFields(
+                      node.data,
+                      event.data.selectedItems
+                    );
                     doAction({
                       actionType: 'setValue',
                       componentId: 'u:crud',
                       args: {
                         value: {
                           items: [
-                            ...data.ContentPartDefinitionRecord?.ContentPartFieldDefinitionRecords,
-                          ],
-                        },
-                      },
+                            ...data.ContentPartDefinitionRecord
+                              ?.ContentPartFieldDefinitionRecords
+                          ]
+                        }
+                      }
                     });
                     crudDoAction(data);
-                  },
-                },
-              ],
-            },
-          },
-        },
+                  }
+                }
+              ]
+            }
+          }
+        }
       ],
       // itemActions: [],
       // features: ['create', 'update', 'delete', 'bulkDelete'],
@@ -798,7 +833,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
               tpl: '内容',
               wrapperComponent: '',
               id: 'u:a0869072b1a0',
-              align: 'right',
+              align: 'right'
             },
             {
               type: 'button',
@@ -813,13 +848,13 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                 closeOnEsc: true,
                 // dataMapSwitch: false,
                 size: 'md',
-                overlay: false,
+                overlay: false
               },
-              id: 'u:7fe0418f7258',
+              id: 'u:7fe0418f7258'
             },
-            'bulkActions',
+            'bulkActions'
           ]
-        : [],
+        : []
     };
     console.log('schema', schema);
     return schema;
@@ -840,7 +875,8 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
               // 使用当前nodeData为表单设置初始值
               const editFormSchema = {
                 type: 'form',
-                data: (node.data as ContentTypeNodeData).ContentTypeDefinitionRecord,
+                data: (node.data as ContentTypeNodeData)
+                  .ContentTypeDefinitionRecord,
                 id: 'frmTypEdit',
                 title: '表单',
                 onEvent: {
@@ -849,7 +885,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                     actions: [
                       {
                         actionType: 'custom',
-                        script: (formRendder) => {
+                        script: formRendder => {
                           const formData = formRendder.getData();
                           node.data = {
                             ...node.data,
@@ -857,20 +893,20 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                             ContentTypeDefinitionRecord: {
                               ...node.data.ContentTypeDefinitionRecord,
                               Name: formData.Name,
-                              DisplayName: formData.DisplayName,
-                            },
+                              DisplayName: formData.DisplayName
+                            }
                           };
-                        },
-                      },
-                    ],
-                  },
+                        }
+                      }
+                    ]
+                  }
                 },
                 body: [
                   {
                     type: 'input-text',
                     label: '显示名称',
                     name: 'DisplayName',
-                    id: 'u:a73ec2dd0728',
+                    id: 'u:a73ec2dd0728'
                   },
                   {
                     label: '技术名称',
@@ -892,16 +928,16 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                               actionType: 'setValue',
                               componentId: 'u:1067cab4b614',
                               args: {
-                                value: '${pinyinStartCase(DisplayName)}',
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    },
-                  },
+                                value: '${pinyinStartCase(DisplayName)}'
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
                 ],
-                wrapWithPanel: false,
+                wrapWithPanel: false
               };
               const dialogSchema = {
                 actionType: 'dialog',
@@ -913,16 +949,16 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                   showErrorMsg: true,
                   showLoading: true,
                   id: 'u:ca9bf9237cd6',
-                  closeOnEsc: false,
-                },
+                  closeOnEsc: false
+                }
               };
               doAction(dialogSchema);
-            },
-          },
+            }
+          }
         ],
-        weight: 0,
-      },
-    },
+        weight: 0
+      }
+    }
   };
 
   return (
@@ -932,7 +968,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
           <Col>
             <div
               title="双击复制"
-              style={{ fontSize: '15px', fontWeight: 'bold' }}
+              style={{fontSize: '15px', fontWeight: 'bold'}}
               onDoubleClick={() => {
                 copy(props.node.data?.ContentTypeDefinitionRecord?.DisplayName);
                 toast.success('显示名称已复制到剪切板');
@@ -954,7 +990,8 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
           <span
             style={{
               marginRight: '5px',
-              visibility: node.data.isNew || node.data.dataChanged ? 'visible' : 'hidden',
+              visibility:
+                node.data.isNew || node.data.dataChanged ? 'visible' : 'hidden'
             }}
           >
             *
@@ -963,12 +1000,15 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
             <AMISComponent schema={editTypeSchema} />
           </Col>
         </Row>
-        <div className="fieldsList" style={{ userSelect: 'auto', cursor: 'default' }}>
+        <div
+          className="fieldsList"
+          style={{userSelect: 'auto', cursor: 'default'}}
+        >
           <div className="node-toolbar">
             <Checkbox
               checked={nodeState.expand}
               onChange={() => {
-                setNodeState((s) => ({ ...s, expand: !s.expand }));
+                setNodeState(s => ({...s, expand: !s.expand}));
               }}
             >
               展开字段
@@ -977,11 +1017,11 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
               <Checkbox
                 checked={nodeState.editMode}
                 onChange={() => {
-                  setNodeState((s) => ({
+                  setNodeState(s => ({
                     ...s,
                     editMode: !s.editMode,
                     showName: true,
-                    showType: true,
+                    showType: true
                   }));
                 }}
               >
@@ -996,7 +1036,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                 <Checkbox
                   checked={nodeState.showName}
                   onChange={() => {
-                    setNodeState((s) => ({ ...s, showName: !s.showName }));
+                    setNodeState(s => ({...s, showName: !s.showName}));
                   }}
                 >
                   技术名称
@@ -1004,7 +1044,7 @@ const NodeComponent = (props: { node: TypeNodeProps; graph: Graph }) => {
                 <Checkbox
                   checked={nodeState.showType}
                   onChange={() => {
-                    setNodeState((s) => ({ ...s, showType: !s.showType }));
+                    setNodeState(s => ({...s, showType: !s.showType}));
                   }}
                 >
                   类型

@@ -14,7 +14,6 @@ import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
 interface AMISComponentProps {
   schema: any;
-  store?: IMainStore;
   amisMounted?: (amisScoped: any) => void;
   trackerFn?: (
     tracker: any,
@@ -22,9 +21,17 @@ interface AMISComponentProps {
   ) => boolean | void | Promise<boolean> | Promise<void>;
 }
 
-const AMISComponent: React.FC<AMISComponentProps> = inputProps => {
+const AMISComponent: React.FC<AMISComponentProps & any> = (
+  inputProps: AMISComponentProps & {
+    store: IMainStore;
+  }
+) => {
   console.log('inputProps: ', inputProps);
-  const [AmisEnv, setAmisEnv] = useState(inputProps.store.amisEnv);
+  const {store} = inputProps;
+  const [AmisEnv, setAmisEnv] = useState({
+    ...store.amisEnv,
+    preview: false
+  });
   const [schema, setSchema] = React.useState<any>({});
   const [amisSate, setAmisState] = useState();
   const handleScope = (scope: any) => {

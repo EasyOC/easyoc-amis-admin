@@ -9,7 +9,7 @@ import authService from '../auth/authService';
 //自定义过滤器
 import './filters'
 import { unset } from 'lodash';
-import AppSettings from '../appSettings';
+import AppSettings from '../appsettings';
 
 const amisRequest = axios.create({
     baseURL: AppSettings.apiBaseUrl,
@@ -82,6 +82,7 @@ const AmisEnv = {
         toast[type]
             ? toast[type](msg, type === 'error' ? '系统错误' : '系统消息')
             : console.warn('[Notify]', type, msg);
+
         console.log('[notify]', type, msg);
     },
     enableAMISDebug: localStorage.getItem('enableAMISDebug') == '1',

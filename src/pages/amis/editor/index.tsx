@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Editor, ShortcutKey} from 'amis-editor';
 // import '@/components/AMISComponent/components/DisabledEditorPlugin'; // 用于隐藏一些不需要的Editor预置组件
+import {Icon} from '@/components/icons/index';
 
 // import '@/components/AMISComponent/components/MyRenderer';
 import AmisEnv from '@/services/amis/AmisEnv';
@@ -19,21 +20,19 @@ import {
 import defaultRequest from '@/services/requests';
 // import 'amis-editor-core/lib/style.css';
 import './style.less';
-import {Icon} from '@/icons/index';
 import {FullScreen, useFullScreenHandle} from 'react-full-screen';
 import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
-import {gql, useQuery} from '@apollo/client';
 import {CloudUploadOutlined, DownOutlined} from '@ant-design/icons';
 import {Switch, DatePicker as AMISDatePicker} from 'amis';
 import {isEqual, unset} from 'lodash';
 import {mustEndsWith} from '@/utils';
-import qs from 'qs';
+import qs from 'query-string';
 import dayjs from 'dayjs';
-import {History} from 'history';
 import {currentLocale} from 'i18n-runtime';
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import appSettings from '@/services/appsettings';
+import {useHistory} from 'react-router';
 // import 'amis/schema.json';
 //禁用部分组件
 // import './components/DisabledEditorPlugin';
@@ -57,14 +56,13 @@ console.log('schemaUrl: ', schemaUrl);
 // @ts-ignore
 // __uri('amis/schema.json');
 
-const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
+const AmisEditor: React.FC<{store: IMainStore}> = props => {
   const curLanguage = currentLocale(); // 获取当前语料类型
-
+  const {store} = props;
   const [form] = Form.useForm();
-  const {history} = props;
+  const history = useHistory();
   const [state, setState] = React.useState({
-    // theme: initialState?.serverSideSettings?.siteSettingsData?.amis?.theme || 'cxd',
-    theme: 'cxd',
+    theme: store.amisEnv?.theme || 'cxd',
     title: '可视化页面编辑器',
     isMobile: false,
     fullScreen: false,
@@ -84,12 +82,6 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
     debug: AmisEnv.enableAMISDebug,
     currentLanguage: false
   });
-  const {id, vId} = qs.parse(location.search);
-  console.log(
-    'history.location: ',
-    history.location,
-    qs.parse(history.location.search)
-  );
   const fullScreenHandle = useFullScreenHandle();
 
   const editorLanguages = [
@@ -167,7 +159,7 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
   useEffect(() => {
     checkSnapshot(state.version);
   }, [state.version]);
-
+  const {id, vId} = qs.parse(location.search);
   useEffect(() => {
     if (isMounted) {
       return;
@@ -426,7 +418,7 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
                   setState(s => ({...s, isMobile: false}));
                 }}
               >
-                {/* <Icon icon="pcPreview" title="PC模式" /> */}
+                <Icon icon="pcPreview" title="PC模式" />
               </div>
               <div
                 className={`Editor-view-mode-btn ${
@@ -436,7 +428,7 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
                   setState(s => ({...s, isMobile: true}));
                 }}
               >
-                {/* <Icon icon="h5Preview" title="移动模式" /> */}
+                <Icon icon="h5Preview" title="移动模式" />
               </div>
             </div>
           </div>
@@ -508,6 +500,7 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
         </div>
         <div className="Editor-inner">
           <Editor
+            amisEnv={{...getEnv()} as any}
             theme={state.theme}
             preview={state.preview}
             isMobile={state.isMobile}
@@ -520,7 +513,6 @@ const AmisEditor: React.FC<{history: History; store: IMainStore}> = props => {
             className="is-fixed"
             $schemaUrl={schemaUrl}
             showCustomRenderersPanel={true}
-            amisEnv={{...getEnv()} as any}
           />
         </div>
       </div>
