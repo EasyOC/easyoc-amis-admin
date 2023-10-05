@@ -29,10 +29,10 @@ class IMainStore {
   userStore = _userStore
 
   @observable
-  showSettingsDrawer?: boolean;
+  showSettingsDrawer: boolean = false;
 
   @observable
-  loading?: boolean;
+  loading: boolean = false;
 
   /**
    * 标记站点设置是否已加载

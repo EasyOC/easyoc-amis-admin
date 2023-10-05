@@ -1,14 +1,21 @@
 import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import React, {useEffect, useState} from 'react';
-import {Route, useHistory, useLocation} from 'react-router-dom';
+import {
+  Redirect,
+  Route,
+  Switch,
+  useHistory,
+  useLocation
+} from 'react-router-dom';
 import {routerPathName} from '@/utils/urlHelper';
 import queryString from 'query-string';
-import {PageLoading} from '@ant-design/pro-components';
 import authService from '@/services/auth/authService';
 import appSettings from '@/services/appsettings';
 import AntdProLayout from '@/Layout/AntdProLayout';
 import {Spinner} from 'amis';
+import ContentRoutes from './ContentRoutes';
+
 const loginPage = appSettings.loginPage;
 
 const WITHELIST = [
@@ -58,7 +65,9 @@ const PermissionWaper: React.FC<{
       {showLoading ? (
         <Spinner overlay className="m-t-lg" size="lg" />
       ) : (
-        <AntdProLayout store={store} />
+        <AntdProLayout store={store}>
+          <ContentRoutes />
+        </AntdProLayout>
       )}
     </>
   );

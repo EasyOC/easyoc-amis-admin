@@ -2,8 +2,7 @@
 import authService from '@/services/auth/authService';
 import {ExclamationCircleOutlined} from '@ant-design/icons';
 import {PageLoading} from '@ant-design/pro-components';
-import {ConfirmBox, alert, confirm, toast} from 'amis-ui';
-import {History} from 'history';
+import {ConfirmBox, Spinner, alert, confirm, toast} from 'amis-ui';
 import {inject, observer} from 'mobx-react';
 import React from 'react';
 import {useEffect, useState} from 'react';
@@ -68,9 +67,9 @@ const LoginCallBack: React.FC<{
     if (!state.loginTimeOut) {
       return (
         <div>
-          <PageLoading>
+          <Spinner overlay>
             <div>Logging in, please wait...</div>
-          </PageLoading>
+          </Spinner>
         </div>
       );
     } else {

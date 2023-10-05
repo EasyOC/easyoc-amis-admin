@@ -7,6 +7,8 @@ import {inject, observer} from 'mobx-react';
 import React, {useEffect, useState} from 'react';
 import {useHistory, useLocation} from 'react-router';
 const AmisDynamicPage: React.FC<{store?: IMainStore}> = (props: any) => {
+  console.log('命中动态路由~~~~~~~~~~~~~~~~~~~~~~~~~');
+
   const {store} = props as {store: IMainStore};
   const history = useHistory();
   const [state, setState] = useState<{
@@ -153,7 +155,7 @@ const AmisDynamicPage: React.FC<{store?: IMainStore}> = (props: any) => {
     } else {
       go404();
     }
-  }, [localtion, store?.settings?.menuData]);
+  }, [localtion.pathname, store?.settings?.menuData]);
 
   const RenderSchema = () => {
     if (state.usePageWrapper) {

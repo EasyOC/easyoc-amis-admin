@@ -1,4 +1,5 @@
 import AntdProLayout from '@/Layout/AntdProLayout';
+import PageNotFound from '@/pages/PageNotFound';
 import appSettings from '@/services/appsettings';
 import {IMainStore} from '@/stores';
 import {treeFind} from '@/utils';
@@ -36,70 +37,49 @@ const AmisDynamicPage = React.lazy(
   () => import('@/pages/amis/AmisDynamicPage')
 );
 
-const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
+const Account = React.lazy(() => import('@/pages/sys/ou/account'));
+const roles = React.lazy(() => import('@/pages/sys/roles'));
+
+const ContentRoutes: FC = () => {
   const location = useLocation();
   const history = useHistory();
 
-  useEffect(() => {
-    try {
-      //处理默认跳转
-      let pathKey = location.pathname as string;
-      if (store?.settings?.menuData) {
-        console.log('store?.settings?.menuData: ', store?.settings?.menuData);
-        const redirectMenu = treeFind(
-          store.settings.menuData,
-          node => node?.fullPath.toLowerCase() == pathKey.toLowerCase()
-        );
-        //如果是节点路径，则应该自动跳转
-        //解析路由默认跳转
-        //尝试从路由节点本身查找redirect 属性
-        let redirect = redirectMenu?.redirect;
-        if (!redirect) {
-          if (redirectMenu?.children && redirectMenu?.children?.length > 0) {
-            //使用第一个节点的 路径作为 redirect
-            redirect = redirectMenu.children?.fullPath;
-          }
-        }
-        if (redirect) {
-          history.push(redirect);
-        }
-      }
-    } catch (error) {
-      console.log('onPageChangeerror: ', error);
-    }
-  }, [location]);
-
   return (
-    <Switch>
-      <Redirect exact path={'/'} to={'/dashboard'} />
-      <Route exact path={'/dashboard'} component={svgIndex} />
-      <Route path={'/sys/dev/menus'} component={menus} />
-      <Route path={'/sys/dev/ManagePages'} component={ManagePages} />
+    <React.Suspense fallback={<Spinner overlay />}>
+      <Switch>
+        <Redirect exact path={'/'} to={'/dashboard'} />
+        <Route exact path={'/dashboard'} component={svgIndex} />
+        <Route path={'/sys/account'} component={Account} />
+        <Route path={'/sys/rolesAndPermission'} component={roles} />
+        <Route path={'/sys/dev/menus'} component={menus} />
+        <Route path={'/sys/dev/menus'} component={menus} />
+        <Route path={'/sys/dev/ManagePages'} component={ManagePages} />
+        <Route path={'/sys/dev/SchemaVersions'} component={SchemaVersions} />
+        <Route path={'/sys/dev/page-editor'} component={AmisEditor} />
+        <Route path={'/sys/dev/dynamicIndex'} component={dynamicIndex} />
 
-      <Route path={'/sys'}>
-        <Route path={'dev'}>
-          <Route path={'/sys/dev/SchemaVersions'} component={SchemaVersions} />
-          <Route path={'/sys/dev/page-editor'} component={AmisEditor} />
-          <Route path={'/sys/dev/dynamicIndex'} component={dynamicIndex} />
-        </Route>
-      </Route>
+        <Route
+          path={'/sys/type-management/contentTypeList'}
+          component={typeManagement}
+        />
+        <Route
+          path={'/sys/type-management/editModel'}
+          component={ModelEditor}
+        />
+        <Route
+          path={'/sys/type-management/genTypeFromRDBMS'}
+          component={genTypeFromRDBMS}
+        />
+        <Route path={'/sys/Preview/:versionId'} component={AmisPreview} />
+        <Route path="/404" component={PageNotFound} />
 
-      <Route
-        path={'/sys/type-management/contentTypeList'}
-        component={typeManagement}
-      />
-      <Route path={'/sys/type-management/editModel'} component={ModelEditor} />
-      <Route
-        path={'/sys/type-management/genTypeFromRDBMS'}
-        component={genTypeFromRDBMS}
-      />
-      <Route path={'/sys/Preview/:versionId'} component={AmisPreview} />
-      {/* 动态构建的路径 */}
-      <Route path="*" component={AmisDynamicPage} />
-    </Switch>
+        {/* 动态构建的路径 */}
+        <Route path={'*'} component={AmisDynamicPage} />
+      </Switch>
+    </React.Suspense>
   );
 };
-export default inject('store')(observer(ContentRoutes));
+export default observer(ContentRoutes);
 
 // export const path2components = [
 //   {

@@ -40,7 +40,7 @@ const translateMenuItem = (element) => {
 }
 
 
-export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> => {
+export const loadMenuData = async (serverMenus: any): Promise<EocMenuDataItem[]> => {
     let result = treeMap(serverMenus || [], {
         children: 'routes',
         conversion: (item: any) => {
@@ -68,7 +68,7 @@ export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> =
             } else {
                 item.fullPath = mustStartsWith(item.path, '/')
             }
-
+            item.key ??= item.keyPath
             translateMenuItem(item)
             // extendLocale(currlang, menuLang[currlang])
             // item.name = i18n(item.keyPath)
@@ -79,11 +79,7 @@ export const loadMenuData = async (serverMenus: any): Promise<DynamicMenuData> =
     //修复图标
     const menus = fixMenuItemIcon(result as EocMenuDataItem[])
     console.log('menus: ', menus);
-    return {
-        menuData: menus,
-        serverMenus,
-        // dynamicMenuDict: dynamicMenuDict
-    } as DynamicMenuData;
+    return menus;
 };
 
 const buildDynamicMenus = (antdMenuItems) => {
@@ -283,8 +279,7 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
                 menuData.push(...menuDataObj)
             }
             const dynamicMenuData = await loadMenuData(menuData);
-            siteConfig.dynamicMenuData = dynamicMenuData
-            siteConfig.menuData = dynamicMenuData.menuData;
+            siteConfig.menuData = dynamicMenuData;
         }
 
     } catch (error) {

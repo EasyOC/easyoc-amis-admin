@@ -33,26 +33,21 @@ const RootRoute = function (props: {store: IMainStore}) {
     <Router>
       <ToastComponent
         key="toast"
-        position={settings}
+        position={settings.toastPosition}
         {...store.amisEnv}
         closeButton={true}
       />
       <AlertComponent key="alert" {...store.amisEnv} />
       <div className="routes-wrapper">
         {/* 需要授权的页面 */}
-
-        <React.Suspense
-          fallback={<Spinner overlay className="m-t-lg" size="lg" />}
-        >
-          <Switch>
-            {/* 不需要授权的页面 */}
-            <Route path="/auth/login" component={login} />
-            <Route path="/auth/redirect" component={redirect} />
-            <Route path="/auth/logout_redirect" component={logout_redirect} />
-            <Route path="/404" component={PageNotFound} />
-            <Route render={() => <PermissionWaper store={store} />}></Route>
-          </Switch>
-        </React.Suspense>
+        <Switch>
+          {/* 不需要授权的页面 */}
+          <Route path="/auth/login" component={login} />
+          <Route path="/auth/redirect" component={redirect} />
+          <Route path="/auth/logout_redirect" component={logout_redirect} />
+          <Route component={PermissionWaper}></Route>
+          <Route path="/404" component={PageNotFound} />
+        </Switch>
       </div>
     </Router>
   );
