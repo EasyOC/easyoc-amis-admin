@@ -293,8 +293,8 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
 export const updateSiteGlobalSettings = async (configData: EocLayoutSettings): Promise<EocLayoutSettings> => {
 
     const data: any = {}
-    if (configData.dynamicMenuData) {
-        const settings = clone(configData.dynamicMenuData)
+    if (configData) {
+        const settings = clone(configData)
         unset(settings, "menuData")
         data.siteSettingsData = JSON.stringify(settings, null, 2)
     }

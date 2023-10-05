@@ -6,6 +6,7 @@
   "scripts": {
     "vite": "vite",
     "vite-build": "vite build",
+    "vite-build-cloud": "cross-env NODE_ENV=cloud vite build",
     "tsc-build": "tsc --build"
   },
   "dependencies": {
@@ -72,6 +73,7 @@
     "@types/lodash": "^4.14.199",
     "@types/node": "^11.15.54",
     "@types/qs": "^6.9.8",
+    "cross-env": "^7.0.3",
     "@types/react": "^17.0.65",
     "@types/react-dom": "^18.2.7",
     "@types/react-router": "^5.1.20",

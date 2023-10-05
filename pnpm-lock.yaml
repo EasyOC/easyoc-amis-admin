@@ -211,6 +211,9 @@ devDependencies:
   axios-mock-adapter:
     specifier: ^1.22.0
     version: 1.22.0(axios@0.26.1)
+  cross-env:
+    specifier: ^7.0.3
+    version: 7.0.3
   css-loader:
     specifier: ^6.8.1
     version: 6.8.1(webpack@5.88.2)
@@ -3315,6 +3318,14 @@ packages:
   /cropperjs@1.6.1:
     resolution: {integrity: sha512-F4wsi+XkDHCOMrHMYjrTEE4QBOrsHHN5/2VsVAaRq8P7E5z7xQpT75S+f/9WikmBEailas3+yo+6zPIomW+NOA==}
     dev: false
+
+  /cross-env@7.0.3:
+    resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
+    engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+    dev: true
 
   /cross-fetch@3.1.8:
     resolution: {integrity: sha512-cvA+JwZoU0Xq+h6WkMvAUqPEYy92Obet6UdKLfW60qn99ftItKjB5T+BkyWOFWe2pUyfQ+IJHmpOTznqk1M6Kg==}
