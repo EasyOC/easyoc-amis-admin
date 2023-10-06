@@ -4,7 +4,6 @@ import {Editor, ShortcutKey} from 'amis-editor';
 import {Icon} from '@/components/icons/index';
 
 // import '@/components/AMISComponent/components/MyRenderer';
-import AmisEnv from '@/services/amis/AmisEnv';
 import {
   Button,
   DatePicker,
@@ -79,7 +78,7 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
     showGenModal: false,
     showVersion: false,
     latest: true,
-    debug: AmisEnv.enableAMISDebug,
+    debug: store.amisEnv.enableAMISDebug,
     currentLanguage: false
   });
   const fullScreenHandle = useFullScreenHandle();
@@ -274,9 +273,7 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
       form.resetFields();
       clearSnapshot(state.version);
       setState(s => ({...s, showSaveModal: false}));
-      history.push(
-        `/sys/dev/page-editor?vId=${result.data.ContentItemVersionId}`
-      );
+      history.push(`/dev/page-editor?vId=${result.data.ContentItemVersionId}`);
       //触发重新加载
       setIsMounted(false);
     } catch (errorInfo) {
@@ -309,7 +306,7 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
   };
 
   const getEnv = () => {
-    return {...AmisEnv};
+    return {...store.amisEnv};
   };
 
   return (
@@ -396,7 +393,7 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
             <Button
               type="link"
               onClick={() => {
-                history.push('/sys/dev/ManagePages');
+                history.push('/dev/ManagePages');
               }}
             >
               &lt; 返回列表

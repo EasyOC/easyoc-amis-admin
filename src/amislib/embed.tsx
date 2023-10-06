@@ -22,14 +22,16 @@ import 'history';
 import {attachmentAdpator} from 'amis-core';
 
 import type {ToastLevel, ToastConf} from 'amis-ui/lib/components/Toast';
+import {useHistory} from 'react-router';
+import {inject, observer} from 'mobx-react';
 
-export function embed(
+const embed = (
   container: string | HTMLElement,
   schema: any,
   props: any = {},
   env?: any,
   callback?: () => void
-) {
+) => {
   const __ = makeTranslator(env?.locale || props?.locale);
 
   // app 模式自动加 affixOffsetTop
@@ -94,7 +96,39 @@ export function embed(
     };
     return result;
   };
+  const history = useHistory();
 
+  const isCurrentUrl = (to: string, ctx?: any) => {
+    const link = normalizeLink(to);
+    const location = window.location;
+    let pathname = link;
+    let search = '';
+    const idx = link.indexOf('?');
+    if (~idx) {
+      pathname = link.substring(0, idx);
+      search = link.substring(idx);
+    }
+
+    if (search) {
+      if (pathname !== location.pathname || !location.search) {
+        return false;
+      }
+
+      const query = qs.parse(search.substring(1));
+      const currentQuery = qs.parse(location.search.substring(1));
+
+      return Object.keys(query).every(key => query[key] === currentQuery[key]);
+    } else if (pathname === location.pathname) {
+      return true;
+    } else if (!~pathname.indexOf('http') && ~pathname.indexOf(':')) {
+      return match(link, {
+        decode: decodeURIComponent,
+        strict: ctx?.strict ?? true
+      })(location.pathname);
+    }
+
+    return false;
+  };
   const amisEnv = {
     getModalContainer: () =>
       env?.getModalContainer?.() || document.querySelector('.amis-scope'),
@@ -116,68 +150,45 @@ export function embed(
 
       location.href = normalizeLink(to);
     },
-    isCurrentUrl: (to: string, ctx?: any) => {
-      const link = normalizeLink(to);
-      const location = window.location;
-      let pathname = link;
-      let search = '';
-      const idx = link.indexOf('?');
-      if (~idx) {
-        pathname = link.substring(0, idx);
-        search = link.substring(idx);
-      }
-
-      if (search) {
-        if (pathname !== location.pathname || !location.search) {
-          return false;
-        }
-
-        const query = qs.parse(search.substring(1));
-        const currentQuery = qs.parse(location.search.substring(1));
-
-        return Object.keys(query).every(
-          key => query[key] === currentQuery[key]
-        );
-      } else if (pathname === location.pathname) {
-        return true;
-      } else if (!~pathname.indexOf('http') && ~pathname.indexOf(':')) {
-        return match(link, {
-          decode: decodeURIComponent,
-          strict: ctx?.strict ?? true
-        })(location.pathname);
-      }
-
-      return false;
-    },
+    isCurrentUrl,
     jumpTo: (to: string, action?: any) => {
       if (to === 'goBack') {
-        return window.history.back();
+        return history.goBack();
       }
 
       to = normalizeLink(to);
 
-      if (action && action.actionType === 'url') {
-        action.blank === false ? (window.location.href = to) : window.open(to);
+      if (isCurrentUrl(to)) {
         return;
       }
 
-      // 主要是支持 nav 中的跳转
-      if (action && to && action.target) {
-        window.open(to, action.target);
+      if (action && action.actionType === 'url') {
+        action.blank === false
+          ? (window.location.href = to)
+          : window.open(to, '_blank');
+        return;
+      } else if (action && action.blank) {
+        window.open(to, '_blank');
         return;
       }
 
       if (/^https?:\/\//.test(to)) {
-        window.location.replace(to);
+        window.location.href = to;
+      } else if (
+        (!/^https?\:\/\//.test(to) &&
+          to === history.location.pathname + history.location.search) ||
+        to === history.location.pathname
+      ) {
+        // do nothing
       } else {
-        location.href = to;
+        history.push(to);
       }
     },
     fetcher: async (api: any) => {
       let {url, method, data, responseType, config, headers} = api;
       config = config || {};
       config.url = url;
-      config.withCredentials = true;
+      // config.withCredentials = true;
       responseType && (config.responseType = responseType);
 
       if (config.cancelExecutor) {
@@ -299,4 +310,4 @@ export function embed(
       root.unmount();
     }
   });
-}
+};

@@ -38,7 +38,6 @@ const getAppSettings = () => {
     if (!cachedSettings) {
         cachedSettings = localAppSettings;
         const url = window.location;
-        debugger
         switch (cloudSettings.clientUrlMode) {
             case "SubFolder":
                 // eslint-disable-next-line no-case-declarations

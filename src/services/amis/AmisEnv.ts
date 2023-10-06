@@ -1,101 +1,182 @@
 import { RenderOptions, toast } from 'amis';
 import { alert, confirm } from 'amis';
-import { currentLocale } from 'i18n-runtime';
-
 import copy from 'copy-to-clipboard';
 import axios from 'axios';
 import authService from '../auth/authService';
-// import { umiRequest } from './umiRequest';
+import { attachmentAdpator, makeTranslator, extendLocale, ActionObject } from 'amis-core';
 //自定义过滤器
-import './filters'
-import { unset } from 'lodash';
-import AppSettings from '../appsettings';
+import './filters';
+import { currentLocale } from 'i18n-runtime';
+import zhCN from '@/locales/zh-CN';
+import enUS from '@/locales/en-US';
+import defaultRequest from '../requests';
 
-const amisRequest = axios.create({
-    baseURL: AppSettings.apiBaseUrl,
-    timeout: 10 * 1000,
-})
+// const amisRequest = nativeRquest
+export const amisRequest = defaultRequest;
+const currentLang = currentLocale();
+const $t = makeTranslator(currentLang);
+// const langDicts = {
+//     'zh-CN': zhCN,
+//     'en-US': enUS
+// }
+// extendLocale(currentLang, langDicts[currentLang])
+
+switch (currentLang) {
+    case 'en-US':
+        extendLocale(currentLang, enUS);
+        break;
+    case 'zh-CN':
+    default:
+        extendLocale(currentLang, zhCN);
+        break;
+}
+
+const buildResponse = (response) => {
+    if (response.headers['content-disposition']) {
+        return response;
+    } else {
+        console.log('amis env result: ', response);
+        return response.data ?? response;
+    }
+};
+
+export const amisAxios = async (api: any) => {
+    if (api === false) {
+        return await Promise.resolve();
+    }
+    //检查使用本地数据
+    if (api.useLocal === true) {
+        if (api.getData) return api.getData();
+        else {
+            return api.data;
+        }
+    }
+    console.log('amisAxios api: ', api);
+    const {
+        url, // 接口地址
+        method, // 请求方法 get、post、put、delete
+        responseType,
+        headers,
+        // 其他配置
+    } = api;
+    let data = api.data; // 请求数据
+    const config = api.config || {};
+
+    config.withCredentials = false;
+    responseType && (config.responseType = responseType);
+
+    if (config.cancelExecutor) {
+        config.cancelToken = new axios.CancelToken(config.cancelExecutor);
+    }
+    config.headers = headers || {};
+    if (!config.ignoreToken) {
+        const token = await authService.getAccessToken();
+        if (token) {
+            if (!config.headers) {
+                config.headers = {};
+            }
+            // jwt token
+            config.headers.Authorization = 'Bearer ' + token;
+        }
+    }
+
+    if (method !== 'post' && method !== 'put' && method !== 'patch') {
+        if (data) {
+            config.params = data;
+        }
+
+        let response = await amisRequest[method](url, config);
+        console.log('response: ', response);
+        response = await attachmentAdpator(response, $t);
+
+        return buildResponse(response);
+    } else if (data && data instanceof FormData) {
+        config.headers = config.headers || {};
+        config.headers['Content-Type'] = 'multipart/form-data';
+    } else if (
+        data &&
+        typeof data !== 'string' &&
+        !(data instanceof Blob) &&
+        !(data instanceof ArrayBuffer)
+    ) {
+        data = JSON.stringify(data);
+        config.headers = config.headers || {};
+        config.headers['Content-Type'] = 'application/json';
+    }
+    let response = await amisRequest[method](url, data, config);
+
+    // console.log('response: ', response);
+    // processResponseMessage(response.data?.msg)
+    response = await attachmentAdpator(response, $t);
+
+    return buildResponse(response);
+};
+
+// const jumpTo = (to: string, action?: Action & { blank: boolean }, ctx?: object) => {
+
+
+//由于引入了一些antd 组件，保持风格一致
+let theme = localStorage.getItem('amis-theme');
+if (!theme) {
+    theme = 'cxd';
+    localStorage.setItem('amis-theme', theme);
+}
 
 const AmisEnv = {
-    theme: 'cxd',
-    locale: currentLocale(),
-    fetcher: async ({
-        url,
-        method,
-        data,
-        config,
-        responseType,
-        headers
-    }: any) => {
-        config = config || {};
-
-        config.withCredentials = false;
-        responseType && (config.responseType = responseType);
-
-        if (config.cancelExecutor) {
-            config.cancelToken = new axios.CancelToken(config.cancelExecutor);
+    //当前语言
+    locale: currentLang,
+    //翻译方法
+    translate: $t,
+    theme: theme,
+    // fetcher: umiRequest as any,
+    fetcher: amisAxios,
+    // tracker: this.handleTrace,
+    //   updateLocation(location, replace?) {
+    //     console.log('updateLocation location, replace?: ', location, replace);
+    //     if (!replace) {
+    //       history.push(location);
+    //     } else {
+    //       window.open(location);
+    //     }
+    //   },
+    // adaptor: (payload: any, response: any, api: any) => {
+    //     if (api.redirect) {
+    //         jumpTo(api.redirect)
+    //     }
+    //     return response
+    // },
+    isCancel: (value: any) => (axios as any).isCancel(value),
+    notify: (type: 'success' | 'error' | 'info', msg: string, conf) => {
+        if (!msg || msg == '暂无数据') {
+            console.log('[notify]', type, msg, conf);
+            return;
         }
-        config.headers = config.headers || headers || {};
-
-        if (!config.ignoreToken) {
-            const token = await authService.getAccessToken();
-            if (token) {
-                if (!config.headers) {
-                    config.headers = {};
-                }
-                // jwt token
-                config.headers.Authorization = 'Bearer ' + token;
-            }
-        }
-        if (config.headers.authorization) {
-            config.headers.Authorization = config.headers.authorization;
-            unset(config.headers, 'authorization');
-        }
-
-        if (method !== 'post' && method !== 'put' && method !== 'patch') {
-            if (data) {
-                config.params = data;
-            }
-            return (amisRequest as any)[method](url, config);
-        } else if (data && data instanceof FormData) {
-            // config.headers = config.headers || {};
-            // config.headers['Content-Type'] = 'multipart/form-data';
-        } else if (
-            data &&
-            typeof data !== 'string' &&
-            !(data instanceof Blob) &&
-            !(data instanceof ArrayBuffer)
-        ) {
-            data = JSON.stringify(data);
-            config.headers['Content-Type'] = 'application/json';
-        }
-
-        return (amisRequest as any)[method](url, data, config);
-    },
-    isCancel: (e: any) => axios.isCancel(e),
-    notify: (type: 'success' | 'error' | 'info', msg: string) => {
         // @ts-ignore
         if (type == 'infomation') {
             // eslint-disable-next-line no-param-reassign
             type = 'info';
         }
-        toast[type]
-            ? toast[type](msg, type === 'error' ? '系统错误' : '系统消息')
-            : console.warn('[Notify]', type, msg);
-
-        console.log('[notify]', type, msg);
+        !!toast[type] ? toast[type](msg) : toast.info(msg, conf);
+        console.log('[notify]', type, msg, conf);
     },
-    enableAMISDebug: localStorage.getItem('enableAMISDebug') == '1',
     alert,
     confirm,
-    copy: (contents: string, options: any = {}) => {
+    enableAMISDebug: localStorage.getItem('enableAMISDebug') == '1',
+    copy: (
+        contents: string,
+        options: {
+            debug?: boolean;
+            message?: string;
+            format?: string; // MIME type
+            onCopy?: (clipboardData: object) => void;
+            shutup?: boolean;
+        } = {},
+    ) => {
         const ret = copy(contents, options);
-        ret &&
-            (!options || options.shutup !== true) &&
-            toast.info('内容已拷贝到剪切板');
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        ret && (!options || options.shutup !== true) && toast.info('内容已拷贝到剪切板');
         return ret;
-    }
-}
-// as RenderOptions
+    },
+} as RenderOptions;
 
-export default AmisEnv
+export default AmisEnv;

@@ -33,11 +33,9 @@ const LoginCallBack: React.FC<{
       }
       try {
         await authService.completeLogin();
-        props.store.userStore.isAuthenticated = true;
         var userInfo = await authService.getLocalUserInfo();
         if (userInfo) {
           props.store.userStore.login(userInfo);
-          props.store.settingsLoaded = false;
           await props.store.loadServerSideSettings();
           toast.success(_t('pages.login.success'));
           localStorage.removeItem('returnUrl');

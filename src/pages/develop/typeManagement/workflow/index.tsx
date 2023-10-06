@@ -9,66 +9,19 @@ import {PageContainer} from '@ant-design/pro-components';
 // import { Flow } from '../xflow/flow';
 import './index.less';
 import {inject, observer} from 'mobx-react';
-
+import {ActivityNode} from './Components/ActivityNode';
+import schema2component from '@/components/AMISComponent/schema2component';
 interface NodeStatus {
   id: string;
   status: string;
   label?: string;
 }
 
-const style: React.CSSProperties = {background: '', padding: '8px 0'};
-//TODO: 远程资源保存到本地
-const image = {
-  logo: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*evDjT5vjkX0AAAAAAAAAAAAAARQnAQ',
-  success:
-    'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*6l60T6h8TTQAAAAAAAAAAAAAARQnAQ',
-  failed:
-    'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SEISQ6My-HoAAAAAAAAAAAAAARQnAQ',
-  running:
-    'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*t8fURKfgSOgAAAAAAAAAAAAAARQnAQ'
-};
-export class AlgoNode extends React.Component<{node: Node; graph: Graph}> {
-  shouldComponentUpdate() {
-    const {node} = this.props;
-    if (node) {
-      if (node.hasChanged('data')) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  render() {
-    const {node} = this.props;
-    const nodedata = node?.getData();
-    // debugger;
-    // const data = node?.getData() as NodeStatus;
-    const {name, label, status = 'default'} = nodedata;
-    console.log('🚀 ~ file: index.tsx:39 ~ AlgoNode ~ render ~ data:', data);
-    return (
-      <div className={`node ${status}`}>
-        <div>
-          <img src={image.logo} alt="logo" />
-          <span className="label">{label}</span>
-          <span className="status">
-            {status === 'success' && <img src={image.success} alt="success" />}
-            {status === 'failed' && <img src={image.failed} alt="failed" />}
-            {status === 'running' && <img src={image.running} alt="running" />}
-          </span>
-        </div>
-        <div className="subheading">
-          <span>{name}</span>
-        </div>
-      </div>
-    );
-  }
-}
-
 register({
   shape: 'dag-node',
   width: 180,
   height: 42,
-  component: AlgoNode,
+  component: ActivityNode,
   ports: {
     groups: {
       top: {
@@ -465,7 +418,9 @@ export default class WorkflowIndex extends React.Component {
     init(nodeDataHandle(nodeDataSource));
     showNodeStatus(nodeStatusHandle(nodeDataInstance));
   }
-
+  componentWillUnmount(): void {
+    this.container = null;
+  }
   refContainer = (container: HTMLDivElement) => {
     this.container = container;
   };
@@ -474,7 +429,7 @@ export default class WorkflowIndex extends React.Component {
     return (
       <PageContainer subTitle={false} title={false}>
         <div className="x6-graph-wrap">
-          <AMISComponent schema={propertyList}></AMISComponent>
+          {schema2component(propertyList)}
           <div ref={this.refContainer} className="work-flow" />
         </div>
         {/* <Flow /> */}

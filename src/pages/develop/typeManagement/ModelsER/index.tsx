@@ -66,7 +66,6 @@ const genRecipe = (
   return data;
 };
 
-const X6ReactPortalProvider = Portal.getProvider(); // 注意，一个 graph 只能申明一个 portal provider
 interface PageState {
   showMiniMap: boolean;
   canUndo: boolean;
@@ -136,7 +135,7 @@ const ModelsER = () => {
       return;
     }
     //@ts-ignore
-    window.__x6_instances__ = [];
+    // window.__x6_instances__ = [];
     graph = new Graph({
       container: container.current as HTMLDivElement,
       background: {
@@ -170,9 +169,10 @@ const ModelsER = () => {
         minScale: 0.1
       }
     });
+
     setGraphState(graph);
     //@ts-ignore
-    window.__x6_instances__.push(graph);
+    // window.__x6_instances__.push(graph);
     // 选择框插件
     graph.use(
       new Selection({
@@ -248,7 +248,6 @@ const ModelsER = () => {
     return graph || graphState;
   };
 
-  const protList: string[] = [];
   const refreshEdges = () => {
     const exisEdges = currentGraph().getEdges();
     exisEdges.forEach(x => {
@@ -824,6 +823,7 @@ const ModelsER = () => {
   const scaleChanged = (settgins: ScaleSettingsState) => {
     graphState?.scale(settgins?.scale || 1);
   };
+  const X6ReactPortalProvider = Portal.getProvider(); // 注意，一个 graph 只能申明一个 portal provider
 
   return (
     <>

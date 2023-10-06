@@ -34,11 +34,10 @@ const PermissionWaper: React.FC<{
   useEffect(() => {
     const {search} = location;
     (async () => {
-      store.userStore.isAuthenticated = await authService.isLoggedIn();
-      if (!store.userStore.isAuthenticated) {
+      if (!(await authService.isLoggedIn())) {
         const currentPath = routerPathName();
         if (!WITHELIST.includes(currentPath)) {
-          store.loading = false;
+          props.store.setLoading(false);
           let query = queryString.parse(search) as any;
           let redirect = currentPath + (search || '').toLowerCase();
           if (query.redirect) {

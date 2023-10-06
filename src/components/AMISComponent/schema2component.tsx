@@ -2,9 +2,9 @@ import React from 'react';
 import {RouteComponentProps, useHistory, withRouter} from 'react-router';
 import {inject, observer} from 'mobx-react';
 import {getEnv} from 'mobx-state-tree';
-import {IMainStore} from '../stores';
-import qs from 'qs';
-import {render, utils, filter} from 'amis';
+import {IMainStore} from '@/stores';
+import qs from 'query-string';
+import {render as amisRender, utils, filter} from 'amis';
 
 export function schema2component(
   schema: any,
@@ -19,7 +19,6 @@ export function schema2component(
   @inject('store')
   @observer
   class SchemaRenderer extends React.Component<SchemaRendererProps> {
-    static displayName = 'SchemaRenderer';
     env: any;
 
     getEnv() {
@@ -27,8 +26,8 @@ export function schema2component(
         return this.env;
       }
 
-      const props = this.props;
-      const store = props.store;
+      const envProps = this.props;
+      const store = envProps.store;
       const rootEnv = getEnv(store.amisEnv);
 
       const normalizeLink = (to: string, preserveHash?: boolean) => {
@@ -37,9 +36,9 @@ export function schema2component(
         }
 
         to = to || '';
-        const history = props.history;
+        const history = envProps.history;
         const location = history.location;
-        const currentQuery = qs.parse(location.search.substring(1));
+        const currentQuery = qs.parse(location.search);
         to = filter(
           to.replace(/\$\$/g, qs.stringify(currentQuery)),
           currentQuery
@@ -100,8 +99,8 @@ export function schema2component(
           if (pathname !== location.pathname || !location.search) {
             return false;
           }
-          const currentQuery = qs.parse(location.search.substring(1));
-          const query = qs.parse(search.substring(1));
+          const currentQuery = qs.parse(location.search);
+          const query = qs.parse(search);
 
           return Object.keys(query).every(
             key => query[key] === currentQuery[key]
@@ -109,59 +108,53 @@ export function schema2component(
         } else if (pathname === location.pathname) {
           return true;
         }
-
         return false;
       };
+      const jumpTo = (to: string, action?: any) => {
+        const history = useHistory();
+        if (to === 'goBack') {
+          return history.goBack();
+        }
 
+        to = normalizeLink(to);
+
+        if (isCurrentUrl(to)) {
+          return;
+        }
+
+        if (action && action.actionType === 'url') {
+          action.blank === false
+            ? (window.location.href = to)
+            : window.open(to, '_blank');
+          return;
+        } else if (action && action.blank) {
+          window.open(to, '_blank');
+          return;
+        }
+
+        if (/^https?:\/\//.test(to)) {
+          window.location.href = to;
+        } else {
+          history.push(to);
+        }
+      };
+      const updateLocation = (location: string, replace: boolean) => {
+        const history = envProps.history;
+        if (location === 'goBack') {
+          return history.goBack();
+        } else if (/^https?\:\/\//.test(location)) {
+          return (window.location.href = location);
+        }
+
+        history[replace ? 'replace' : 'push'](normalizeLink(location, replace));
+      };
       return (this.env = {
         ...rootEnv,
         session,
         isCurrentUrl,
-        updateLocation:
-          props.updateLocation ||
-          ((location: string, replace: boolean) => {
-            const history = props.history;
-            if (location === 'goBack') {
-              return history.goBack();
-            } else if (/^https?\:\/\//.test(location)) {
-              return (window.location.href = location);
-            }
-
-            history[replace ? 'replace' : 'push'](
-              normalizeLink(location, replace)
-            );
-          }),
-        jumpTo:
-          props.jumpTo ||
-          ((to: string, action?: any) => {
-            const history = useHistory();
-            if (to === 'goBack') {
-              return history.goBack();
-            }
-
-            to = normalizeLink(to);
-
-            if (isCurrentUrl(to)) {
-              return;
-            }
-
-            if (action && action.actionType === 'url') {
-              action.blank === false
-                ? (window.location.href = to)
-                : window.open(to, '_blank');
-              return;
-            } else if (action && action.blank) {
-              window.open(to, '_blank');
-              return;
-            }
-
-            if (/^https?:\/\//.test(to)) {
-              window.location.href = to;
-            } else {
-              history.push(to);
-            }
-          }),
-        affixOffsetTop: props.embedMode ? 0 : 50,
+        updateLocation: envProps.updateLocation || updateLocation,
+        jumpTo: envProps.jumpTo || jumpTo,
+        affixOffsetTop: envProps.embedMode ? 0 : 50,
         theme: store.amisEnv?.theme
       });
     }
@@ -184,7 +177,7 @@ export function schema2component(
 
       finalSchema.type || (finalSchema.type = 'page');
 
-      body = render(
+      body = amisRender(
         finalSchema,
         {
           location: window.location,
@@ -211,4 +204,4 @@ export function schema2component(
   return withRouter(SchemaRenderer);
 }
 
-export default schema2component({type: 'page', body: 'It works'});
+export default schema2component;

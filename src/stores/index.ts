@@ -1,5 +1,5 @@
 import UserStore from './userStore';
-import { action, computed, flow, observable } from 'mobx';
+import { action, computed, configure, flow, observable } from 'mobx';
 import { EocLayoutSettings } from '@/types/src/SiteGlobalSettings';
 import { type RenderOptions } from 'amis';
 import type CurrentUser from '@/types/src/CurrentUser';
@@ -8,10 +8,10 @@ import { deepMerge } from '@/utils';
 import defaultAmisEnv from '@/services/amis/AmisEnv';
 import authService from '@/services/auth/authService';
 
+configure({ enforceActions: "always" });
 const _userStore = new UserStore();
 
 class IMainStore {
-  @observable theme: 'cxd'
 
   @observable asideFixed: true
 
@@ -45,6 +45,11 @@ class IMainStore {
   @observable
   loading: boolean = false;
 
+  @action
+  setLoading(value) {
+    this.loading = value
+  }
+
   /**
    * 标记站点设置是否已加载
    */
@@ -58,14 +63,13 @@ class IMainStore {
   * 确保已从服务器获取站点配置，获取完成后保存 到settings 里
   * 配合 store.settingsLoaded=false 重置加载
   */
+  @action
   loadServerSideSettings = flow(function* (this: IMainStore, userInfo?: CurrentUser) { // <- 注意*号，这是生成器函数！
     // flows 相关文档https://cn.mobx.js.org/best/actions.html#flows
     this.settingsLoading = true;
     try {
       if (!userInfo) {
-        if (yield authService.isLoggedIn()) {
-          userInfo = yield authService.getLocalUserInfo();
-        }
+        userInfo = yield authService.getLocalUserInfo();
       }
       //只尝试一次，不管能不能取到 直接传入到下一步
       this.userStore.user = userInfo
@@ -81,11 +85,12 @@ class IMainStore {
   @action
   updateSettings = (newSettingsProps: Partial<EocLayoutSettings>) => {
     deepMerge(this.settings, newSettingsProps)
-    if (newSettingsProps.navTheme == "realDark") {
-      this.settings.amis.theme = 'dark'
-    } else {
-      this.settings.amis.theme = 'cxd'
-    }
+
+    // if (newSettingsProps.navTheme == "realDark") {
+    //   this.settings.amis.theme = 'dark'
+    // } else {
+    //   this.settings.amis.theme = 'cxd'
+    // }
   }
 
   @action

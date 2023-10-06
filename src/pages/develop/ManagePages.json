@@ -329,7 +329,7 @@
                                         {
                                             "actionType": "url",
                                             "args": {
-                                                "url": "/sys/dev/page-editor",
+                                                "url": "/dev/page-editor",
                                                 "params": {
                                                     "id": "${contentItemId}"
                                                 },
@@ -341,7 +341,7 @@
                                             "actionType": "url",
                                             "expression": "!this.published",
                                             "args": {
-                                                "url": "/sys/dev/page-editor",
+                                                "url": "/dev/page-editor",
                                                 "params": {
                                                     "vId": "${contentItemVersionId}"
                                                 },
@@ -363,7 +363,7 @@
                                         {
                                             "actionType": "url",
                                             "args": {
-                                                "url": "/sys/dev/SchemaVersions",
+                                                "url": "/dev/SchemaVersions",
                                                 "params": {
                                                     "category": "Content",
                                                     "correlationId": "${contentItemId}"
@@ -414,7 +414,7 @@
                             "id": "u:ae7c76370ed4",
                             "placeholder": "-",
                             "level": "link",
-                            "url": "/sys/dev/Preview/${contentItemVersionId}",
+                            "url": "/dev/Preview/${contentItemVersionId}",
                             "blank": false
                         }
                     ],
