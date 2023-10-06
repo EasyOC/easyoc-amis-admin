@@ -37,19 +37,21 @@ const RootRoute = function (props: {store: IMainStore}) {
         closeButton={true}
       />
       <AlertComponent key="alert" {...store.amisEnv} />
-      <Router basename={appSettings.routeBase ?? '/'}>
-        <div className="routes-wrapper">
-          {/* 需要授权的页面 */}
-          <Switch>
-            {/* 不需要授权的页面 */}
-            <Route path="/auth/login" component={login} />
-            <Route path="/auth/redirect" component={redirect} />
-            <Route path="/auth/logout_redirect" component={logout_redirect} />
-            <Route component={PermissionWaper}></Route>
-            <Route path="/404" component={PageNotFound} />
-          </Switch>
-        </div>
-      </Router>
+      <React.Suspense fallback={<Spinner overlay />}>
+        <Router basename={appSettings.routeBase ?? '/'}>
+          <div className="routes-wrapper">
+            {/* 需要授权的页面 */}
+            <Switch>
+              {/* 不需要授权的页面 */}
+              <Route path="/auth/login" component={login} />
+              <Route path="/auth/redirect" component={redirect} />
+              <Route path="/auth/logout_redirect" component={logout_redirect} />
+              <Route component={PermissionWaper}></Route>
+              <Route path="/404" component={PageNotFound} />
+            </Switch>
+          </div>
+        </Router>
+      </React.Suspense>
     </>
   );
 };

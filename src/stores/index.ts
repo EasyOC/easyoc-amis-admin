@@ -8,7 +8,7 @@ import { deepMerge } from '@/utils';
 import defaultAmisEnv from '@/services/amis/AmisEnv';
 import authService from '@/services/auth/authService';
 
-configure({ enforceActions: "always" });
+const _userStore = new UserStore();
 
 class IMainStore {
 
@@ -39,7 +39,7 @@ class IMainStore {
 
 
   @observable
-  userStore = new UserStore()
+  userStore = _userStore
 
 
 

@@ -65,7 +65,7 @@ const PermissionWaper: React.FC<{
         <Spinner overlay className="m-t-lg" size="lg" />
       ) : (
         <AntdProLayout store={store}>
-          <ContentRoutes />
+          <ContentRoutes store={store} />
         </AntdProLayout>
       )}
     </>
