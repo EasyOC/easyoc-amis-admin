@@ -19,7 +19,6 @@ function LoutCallBack(props: {store: IMainStore}) {
         await authService.completeLogout();
         //重置登录信息
         props.store.userStore.afterLogout();
-        props.store.settingsLoaded = false;
         await props.store.loadServerSideSettings();
         const {pathname} = location;
         // const urlParams = queryString.parse(search);
