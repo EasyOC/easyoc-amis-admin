@@ -55,15 +55,12 @@ const AntdProLayout: FC<{
 }> = props => {
   const {store, children} = props;
 
-  const [settings, setSetting] = useState<Partial<EocLayoutSettings>>(
-    store.settings
-  );
+  const [settings, setSetting] = useState<Partial<EocLayoutSettings>>();
   //监听配置变化
   useEffect(() => {
     setSetting(store.settings);
-  }, [store.settings]);
+  }, []);
 
-  const location = useLocation();
   const history = useHistory();
   //使用 useEffect hook，检查登录状态
   if (typeof document === 'undefined') {

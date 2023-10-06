@@ -32,6 +32,7 @@ import {IMainStore} from '@/stores';
 import {inject, observer} from 'mobx-react';
 import appSettings from '@/services/appsettings';
 import {useHistory} from 'react-router';
+import 'amis-editor-core/lib/style.css';
 // import 'amis/schema.json';
 //禁用部分组件
 // import './components/DisabledEditorPlugin';

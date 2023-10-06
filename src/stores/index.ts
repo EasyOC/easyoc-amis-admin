@@ -9,7 +9,6 @@ import defaultAmisEnv from '@/services/amis/AmisEnv';
 import authService from '@/services/auth/authService';
 
 configure({ enforceActions: "always" });
-const _userStore = new UserStore();
 
 class IMainStore {
 
@@ -40,7 +39,7 @@ class IMainStore {
 
 
   @observable
-  userStore = _userStore
+  userStore = new UserStore()
 
 
 
