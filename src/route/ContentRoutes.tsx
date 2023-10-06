@@ -11,12 +11,12 @@ import {
   useHistory,
   useLocation
 } from 'react-router-dom';
-
+import AmisEditor from '@/pages/amis/editor';
 const menus = React.lazy(() => import('@/pages/sys/menus'));
 
 //#region 在线开发相关路由
 
-const AmisEditor = React.lazy(() => import('@/pages/amis/editor'));
+// const AmisEditor = React.lazy(() => import('@/pages/amis/editor'));
 const genTypeFromRDBMS = React.lazy(
   () => import('@/pages/develop/typeManagement/genTypeFromRDBMS')
 );
@@ -91,7 +91,11 @@ const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
         <Route path={'/dev/ManagePages'} component={ManagePages} />
         <Route path={'/dev/SchemaVersions'} component={SchemaVersions} />
         <Route path={'/dev/page-editor'} component={AmisEditor} />
-        <Route path={'/dev/dynamicIndex'} component={dynamicIndex} />
+        <Route
+          path={'/dev/dynamicIndex'}
+          {...{store}}
+          component={dynamicIndex}
+        />
 
         <Route
           path={'/dev/type-management/contentTypeList'}

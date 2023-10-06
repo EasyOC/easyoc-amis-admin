@@ -185,7 +185,6 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
       updateEnv({...getCurrentEnv()} as RenderOptions);
     };
   }, [inputProps, store.amisEnv]);
-  console.log('store.settings?.amis: ', store.settings?.amis);
   return (
     <div className="schema-wrapper">
       {renderAmis(

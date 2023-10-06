@@ -33,6 +33,7 @@ export default {
     }
   ],
   navTheme: 'light',
+  theme: 'light',
   colorPrimary: '#1890ff',
   layout: 'mix',
   serverTitle: 'SalesPortal',

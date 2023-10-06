@@ -548,8 +548,7 @@
                                                         "name": "moduleName",
                                                         "label": "模块",
                                                         "type": "input-text",
-                                                        "id": "u:1da73723f1c4",
-                                                        "value": ""
+                                                        "id": "u:1da73723f1c4"
                                                     },
                                                     {
                                                         "name": "useLayout",

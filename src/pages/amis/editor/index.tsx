@@ -184,7 +184,6 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
                   }
                 }`
       }).then(result => {
-        console.log('可视化编辑器 result: ', result);
         if (result?.contentItem) {
           try {
             const jData = result?.contentItem?.schema;
@@ -269,11 +268,14 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
         },
         timeout: 10000
       });
+      console.log('result:1111111111111111111111111111111 ', result);
       setPublishOption({} as any);
       form.resetFields();
       clearSnapshot(state.version);
       setState(s => ({...s, showSaveModal: false}));
-      history.push(`/dev/page-editor?vId=${result.data.ContentItemVersionId}`);
+      history.push(
+        `/dev/page-editor?vId=${result.data.data.contentItemVersionId}`
+      );
       //触发重新加载
       setIsMounted(false);
     } catch (errorInfo) {
@@ -311,7 +313,7 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
 
   return (
     <FullScreen handle={fullScreenHandle}>
-      <div className="Editor-Demo">
+      <div className="Editor-container">
         <Modal
           title="提示"
           zIndex={9999}

@@ -1,5 +1,6 @@
 import {
   GithubFilled,
+  HighlightOutlined,
   InfoCircleFilled,
   LogoutOutlined,
   QuestionCircleFilled
@@ -50,6 +51,7 @@ const locales = [
 
 const AntdProLayout: FC<{
   store: IMainStore;
+  [key: string]: any;
 }> = props => {
   const {store, children} = props;
 
@@ -59,7 +61,7 @@ const AntdProLayout: FC<{
   //监听配置变化
   useEffect(() => {
     setSetting(store.settings);
-  }, []);
+  }, [store.settings]);
 
   const location = useLocation();
   const history = useHistory();
@@ -107,19 +109,31 @@ const AntdProLayout: FC<{
           size: 'small',
           title: store.userStore?.name,
           render: (_props, dom) => {
+            const menuItems = [];
+            if (store.userStore.isAdmin) {
+              menuItems.push({
+                key: 'themeSettings',
+                onClick: async () => {
+                  setSetting(s => ({...s, showSettingsDrawer: true}));
+                  console.log('store.settings: ', store.settings);
+                },
+                icon: <HighlightOutlined rev={undefined} />,
+                label: '主题设置'
+              });
+            }
+            menuItems.push({
+              key: 'logout',
+              onClick: async () => {
+                await authService.logout();
+              },
+              //@ts-ignore
+              icon: <LogoutOutlined />,
+              label: '退出登录'
+            });
             return (
               <Dropdown
                 menu={{
-                  items: [
-                    {
-                      key: 'logout',
-                      onClick: async () => {
-                        await authService.logout();
-                      },
-                      icon: <LogoutOutlined />,
-                      label: '退出登录'
-                    }
-                  ]
+                  items: menuItems
                 }}
               >
                 {dom}
@@ -132,9 +146,9 @@ const AntdProLayout: FC<{
           if (props.isMobile) return [];
           if (typeof window === 'undefined') return [];
           return [
-            <InfoCircleFilled key="InfoCircleFilled" />,
-            <QuestionCircleFilled key="QuestionCircleFilled" />,
-            <GithubFilled key="GithubFilled" />,
+            // <InfoCircleFilled key="InfoCircleFilled" />,
+            // <QuestionCircleFilled key="QuestionCircleFilled" />,
+            // <GithubFilled key="GithubFilled" />,
 
             <Select
               style={{width: '100px'}}
@@ -203,6 +217,11 @@ const AntdProLayout: FC<{
               if (typeof window === 'undefined') return e;
               return document.getElementById('amis-pro-layout');
             }}
+            onCollapseChange={val => {
+              setSetting(s => ({...s, showSettingsDrawer: val}));
+              // await store.updateSettings({showSettingsDrawer: val});
+            }}
+            collapse={settings?.showSettingsDrawer}
             settings={{...(settings as any)}}
             onSettingChange={async changedSetting => {
               await store.updateSettings(changedSetting);
