@@ -45,12 +45,7 @@ export default defineConfig({
         }
       }
     }),
-    transpileDynamicImportForCJS(),
-    autoExternal(),
-    json(),
-    commonjs({
-      sourceMap: false
-    }),
+
     svgr({
       exportAsDefault: true,
       svgrOptions: {
@@ -68,7 +63,14 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-      }
+      }, plugins: [
+        transpileDynamicImportForCJS(),
+        autoExternal(),
+        json(),
+        commonjs({
+          sourceMap: false
+        }),
+      ]
     }
   }
 });
