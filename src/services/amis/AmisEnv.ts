@@ -108,13 +108,23 @@ export const amisAxios = async (api: any) => {
 };
 
 
-
-//由于引入了一些antd 组件，保持风格一致
-let theme = localStorage.getItem('amis-theme');
-if (!theme) {
-    theme = 'cxd';
+export const getAmisEnvTheme = (checkOnly?) => {
+    let theme = localStorage.getItem('amis-theme');
+    if (checkOnly && !theme) {
+        theme = 'cxd';
+        localStorage.setItem('amis-theme', theme);
+    }
+    return theme
+}
+export const setAmisEnvTheme = (theme) => {
     localStorage.setItem('amis-theme', theme);
 }
+
+
+//由于引入了一些antd 组件，保持风格一致
+let theme = getAmisEnvTheme()
+
+
 
 const AmisEnv = {
     //当前语言

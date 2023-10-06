@@ -13,6 +13,7 @@ import ProLayoutProps from '@/Layout/AntdProLayout/defaultProps';
 import { apiUrl } from '@/utils/urlHelper';
 import { fixMenuItemIcon } from '@/utils/helper/iconHelper';
 import appSettings from '../appsettings';
+import { getAmisEnvTheme } from './AmisEnv';
 
 
 
@@ -291,6 +292,13 @@ export const getSiteGlobalSettings = async (currentUser?: CurrentUser): Promise<
     } catch (error) {
         console.error('GetSettings siteSettingsData faild: ', result, error);
     }
+    const localThme = getAmisEnvTheme(true)
+    const locale = currentLocale();
+    deepMerge(siteConfig.amis, {
+        locale,
+        theme: localThme
+    })
+
     return siteConfig;
 }
 

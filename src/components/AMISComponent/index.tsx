@@ -153,6 +153,7 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
     };
     return {
       ...store.amisEnv,
+
       session: inputProps.session || 'page',
       isCurrentUrl,
       updateLocation: updateLocation,
@@ -178,8 +179,7 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
     setSchema(inputProps.schema || {type: 'page', body: '空页面'});
     updateEnv({
       ...getCurrentEnv(),
-      tracker: inputProps.trackerFn || handleTrace,
-      session: inputProps.session
+      tracker: inputProps.trackerFn || handleTrace
     } as RenderOptions);
     return () => {
       updateEnv({...getCurrentEnv()} as RenderOptions);

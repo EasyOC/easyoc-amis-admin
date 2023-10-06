@@ -15,6 +15,7 @@ import authService from '@/services/auth/authService';
 import {treeFind} from '@/utils';
 import {i18n, setLocale} from 'i18n-runtime';
 import './styles/index.less';
+import {setAmisEnvTheme} from '@/services/amis/AmisEnv';
 
 const themes = [
   {
@@ -176,14 +177,14 @@ const AntdProLayout: FC<{
               options={themes}
               onChange={theme => {
                 console.log('theme: ', theme);
-                store.updateEnv({theme});
-                localStorage.setItem('amis-theme', `${theme}`);
-                document
-                  .querySelector('body')
-                  ?.classList[
-                    (theme as any).value === 'dark' ? 'add' : 'remove'
-                  ]('dark');
+                setAmisEnvTheme(theme);
                 window.location.reload();
+                // store.updateEnv({theme});
+                // document
+                //   .querySelector('body')
+                //   ?.classList[
+                //     (theme as any).value === 'dark' ? 'add' : 'remove'
+                //   ]('dark');
               }}
             />
           ];
