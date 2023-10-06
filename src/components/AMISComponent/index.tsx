@@ -165,10 +165,7 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
   };
 
   const [schema, setSchema] = React.useState<any>({});
-  const [amisSate, setAmisState] = useState();
   const handleScope = (scope: any) => {
-    setAmisState(scope);
-    // console.log('handleScope scope: ', scope);
     inputProps?.amisMounted?.(scope);
   };
 
@@ -187,8 +184,8 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
     return () => {
       updateEnv({...getCurrentEnv()} as RenderOptions);
     };
-  }, [inputProps]);
-
+  }, [inputProps, store.amisEnv]);
+  console.log('store.settings?.amis: ', store.settings?.amis);
   return (
     <div className="schema-wrapper">
       {renderAmis(
@@ -196,7 +193,8 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
         schema,
         {
           scopeRef: handleScope,
-          locale: store.settings?.amis?.locale || 'zh-CN'
+          locale: store.settings?.amis?.locale || 'zh-CN',
+          ...(getCurrentEnv() as RenderOptions)
         },
         {
           ...(getCurrentEnv() as RenderOptions)

@@ -15,11 +15,6 @@ import defaultRequest from '../requests';
 export const amisRequest = defaultRequest;
 const currentLang = currentLocale();
 const $t = makeTranslator(currentLang);
-// const langDicts = {
-//     'zh-CN': zhCN,
-//     'en-US': enUS
-// }
-// extendLocale(currentLang, langDicts[currentLang])
 
 switch (currentLang) {
     case 'en-US':
@@ -112,7 +107,6 @@ export const amisAxios = async (api: any) => {
     return buildResponse(response);
 };
 
-// const jumpTo = (to: string, action?: Action & { blank: boolean }, ctx?: object) => {
 
 
 //由于引入了一些antd 组件，保持风格一致
@@ -128,23 +122,7 @@ const AmisEnv = {
     //翻译方法
     translate: $t,
     theme: theme,
-    // fetcher: umiRequest as any,
     fetcher: amisAxios,
-    // tracker: this.handleTrace,
-    //   updateLocation(location, replace?) {
-    //     console.log('updateLocation location, replace?: ', location, replace);
-    //     if (!replace) {
-    //       history.push(location);
-    //     } else {
-    //       window.open(location);
-    //     }
-    //   },
-    // adaptor: (payload: any, response: any, api: any) => {
-    //     if (api.redirect) {
-    //         jumpTo(api.redirect)
-    //     }
-    //     return response
-    // },
     isCancel: (value: any) => (axios as any).isCancel(value),
     notify: (type: 'success' | 'error' | 'info', msg: string, conf) => {
         if (!msg || msg == '暂无数据') {
@@ -178,5 +156,6 @@ const AmisEnv = {
         return ret;
     },
 } as RenderOptions;
+console.log('AmisEnv: ', AmisEnv);
 
 export default AmisEnv;

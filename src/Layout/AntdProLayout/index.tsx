@@ -4,18 +4,48 @@ import {
   LogoutOutlined,
   QuestionCircleFilled
 } from '@ant-design/icons';
-import type {MenuDataItem, ProSettings} from '@ant-design/pro-components';
+import type {ProSettings} from '@ant-design/pro-components';
 import {ProLayout, SettingDrawer} from '@ant-design/pro-components';
-import {BackTop, Dropdown, FloatButton} from 'antd';
+import {Dropdown, FloatButton, Select} from 'antd';
 import React, {FC, useEffect, useState} from 'react';
 import {inject, observer} from 'mobx-react';
 import {IMainStore} from '@/stores';
 import {useHistory, useLocation} from 'react-router';
 import authService from '@/services/auth/authService';
 import {treeFind} from '@/utils';
-import {i18n} from 'i18n-runtime';
-import RightContent from '../Components/RightContent';
+import {i18n, setLocale} from 'i18n-runtime';
 import './styles/index.less';
+
+const themes = [
+  {
+    label: '云舍',
+    ns: 'cxd-',
+    value: 'cxd'
+  },
+  {
+    label: '仿 AntD',
+    ns: 'antd-',
+    value: 'antd'
+  },
+  {
+    label: 'ang',
+    ns: 'a-',
+    value: 'ang'
+  }
+];
+
+const locales = [
+  {
+    label: '中文',
+    value: 'zh-CN'
+  },
+
+  {
+    label: 'English',
+    value: 'en-US'
+  }
+];
+
 const AntdProLayout: FC<{
   store: IMainStore;
 }> = props => {
@@ -129,7 +159,33 @@ const AntdProLayout: FC<{
             <InfoCircleFilled key="InfoCircleFilled" />,
             <QuestionCircleFilled key="QuestionCircleFilled" />,
             <GithubFilled key="GithubFilled" />,
-            <RightContent menu={true} store={store} />
+
+            <Select
+              style={{width: '100px'}}
+              value={store.settings.amis?.locale}
+              options={locales}
+              onChange={locale => {
+                console.log('locale: ', locale);
+                store.updateSettings({...store.settings, amis: {locale}});
+                setLocale(locale);
+                window.location.reload();
+              }}
+            />,
+            <Select
+              value={store.amisEnv.theme}
+              options={themes}
+              onChange={theme => {
+                console.log('theme: ', theme);
+                store.updateEnv({theme});
+                localStorage.setItem('amis-theme', `${theme}`);
+                document
+                  .querySelector('body')
+                  ?.classList[
+                    (theme as any).value === 'dark' ? 'add' : 'remove'
+                  ]('dark');
+                window.location.reload();
+              }}
+            />
           ];
         }}
         //菜单底部

@@ -33,8 +33,8 @@ export type EocLayoutSettings = Partial<ProLayoutProps> & {
   showLangSelect?: boolean;
   amis?: {
     locale?: string;
-    toastConf: {
-      position: 'top-right' | 'top-center' | 'top-left' | 'bottom-center' | 'bottom-left' | 'bottom-right' | 'center'
+    toastConf?: {
+      position?: 'top-right' | 'top-center' | 'top-left' | 'bottom-center' | 'bottom-left' | 'bottom-right' | 'center'
     }
     theme?: 'cxd' | 'antd' | 'dark';
   };

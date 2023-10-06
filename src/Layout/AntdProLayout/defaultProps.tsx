@@ -1,5 +1,7 @@
 import {EocLayoutSettings} from '@/types/src/SiteGlobalSettings';
 import {localPath} from '@/utils/urlHelper';
+import {currentLocale} from 'i18n-runtime';
+const currentLang = currentLocale();
 
 //@ts-expect-error
 export default {
@@ -41,10 +43,11 @@ export default {
   fixSiderbar: true,
   pwa: true,
   locale: {
-    default: 'zh-CN'
+    default: currentLang
   },
   amis: {
-    theme: 'cxd'
+    theme: 'cxd',
+    locale: currentLang
   },
   siderMenuType: 'group',
   splitMenus: true
