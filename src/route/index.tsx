@@ -37,8 +37,8 @@ const RootRoute = function (props: {store: IMainStore}) {
         closeButton={true}
       />
       <AlertComponent key="alert" {...store.amisEnv} />
-      <React.Suspense fallback={<Spinner overlay />}>
-        <Router basename={appSettings.routeBase ?? '/'}>
+      <Router basename={appSettings.routeBase ?? '/'}>
+        <React.Suspense fallback={<Spinner overlay />}>
           <div className="routes-wrapper">
             {/* 需要授权的页面 */}
             <Switch>
@@ -50,8 +50,8 @@ const RootRoute = function (props: {store: IMainStore}) {
               <Route path="/404" component={PageNotFound} />
             </Switch>
           </div>
-        </Router>
-      </React.Suspense>
+        </React.Suspense>
+      </Router>
     </>
   );
 };
