@@ -1,6 +1,4 @@
-import AntdProLayout from '@/Layout/AntdProLayout';
 import PageNotFound from '@/pages/PageNotFound';
-import appSettings from '@/services/appsettings';
 import {IMainStore} from '@/stores';
 import {treeFind} from '@/utils';
 import {Spinner} from 'amis-ui';
@@ -47,7 +45,37 @@ const AmisDynamicPage = React.lazy(
 const Account = React.lazy(() => import('@/pages/sys/ou/account'));
 const roles = React.lazy(() => import('@/pages/sys/roles'));
 
-const ContentRoutes = () => {
+const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
+  const location = useLocation();
+  const history = useHistory();
+  useEffect(() => {
+    try {
+      //处理默认跳转
+      let pathKey = location.pathname as string;
+      if (store.settings?.menuData) {
+        const redirectMenu = treeFind(
+          store.settings.menuData,
+          node => node?.fullPath.toLowerCase() == pathKey.toLowerCase()
+        );
+        //如果是节点路径，则应该自动跳转
+        //解析路由默认跳转
+        //尝试从路由节点本身查找redirect 属性
+        let redirect = redirectMenu?.redirect;
+        if (!redirect) {
+          if (redirectMenu?.children && redirectMenu?.children?.length > 0) {
+            //使用第一个节点的 路径作为 redirect
+            redirect = redirectMenu.children[0]?.fullPath;
+          }
+        }
+        if (redirect) {
+          history.push(redirect);
+        }
+      }
+    } catch (error) {
+      console.log('onPageChangeerror: ', error);
+    }
+  }, [location.pathname]);
+
   return (
     <React.Suspense fallback={<Spinner overlay />}>
       <Switch>
@@ -102,4 +130,4 @@ const ContentRoutes = () => {
     </React.Suspense>
   );
 };
-export default observer(ContentRoutes);
+export default inject('store')(observer(ContentRoutes));

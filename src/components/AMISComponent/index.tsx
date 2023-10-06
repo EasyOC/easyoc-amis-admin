@@ -161,7 +161,7 @@ const AMISComponent: React.FC<AMISComponentProps & any> = (
       tracker: handleTrace,
       preview: false,
       //CRUD 顶部固定时距离顶部的偏移量 ,为页面顶部固定时预留空间
-      affixOffsetTop: inputProps.embedMode ? 0 : 50
+      affixOffsetTop: inputProps.embedMode ? 0 : 56
     };
   };
 

@@ -16,6 +16,7 @@ import {treeFind} from '@/utils';
 import {i18n, setLocale} from 'i18n-runtime';
 import './styles/index.less';
 import {setAmisEnvTheme} from '@/services/amis/AmisEnv';
+import {EocLayoutSettings} from '@/types/src/SiteGlobalSettings';
 
 const themes = [
   {
@@ -52,42 +53,16 @@ const AntdProLayout: FC<{
 }> = props => {
   const {store, children} = props;
 
-  const [settings, setSetting] = useState<ProSettings>();
+  const [settings, setSetting] = useState<Partial<EocLayoutSettings>>(
+    store.settings
+  );
   //监听配置变化
   useEffect(() => {
-    setSetting(store.settings as Partial<ProSettings>);
+    setSetting(store.settings);
   }, []);
 
   const location = useLocation();
   const history = useHistory();
-  useEffect(() => {
-    try {
-      //处理默认跳转
-      let pathKey = location.pathname as string;
-      if (store?.settings?.menuData) {
-        const redirectMenu = treeFind(
-          store.settings.menuData,
-          node => node?.fullPath.toLowerCase() == pathKey.toLowerCase()
-        );
-        //如果是节点路径，则应该自动跳转
-        //解析路由默认跳转
-        //尝试从路由节点本身查找redirect 属性
-        let redirect = redirectMenu?.redirect;
-        if (!redirect) {
-          if (redirectMenu?.children && redirectMenu?.children?.length > 0) {
-            //使用第一个节点的 路径作为 redirect
-            redirect = redirectMenu.children[0]?.fullPath;
-          }
-        }
-        if (redirect) {
-          history.push(redirect);
-        }
-      }
-    } catch (error) {
-      console.log('onPageChangeerror: ', error);
-    }
-  }, [location.pathname]);
-
   //使用 useEffect hook，检查登录状态
   if (typeof document === 'undefined') {
     return <div />;
@@ -167,7 +142,7 @@ const AntdProLayout: FC<{
               options={locales}
               onChange={locale => {
                 console.log('locale: ', locale);
-                store.updateSettings({...store.settings, amis: {locale}});
+                // store.updateSettings({...store.settings, amis: {locale}});
                 setLocale(locale);
                 window.location.reload();
               }}
@@ -228,7 +203,7 @@ const AntdProLayout: FC<{
               if (typeof window === 'undefined') return e;
               return document.getElementById('amis-pro-layout');
             }}
-            settings={{...settings}}
+            settings={{...(settings as any)}}
             onSettingChange={async changedSetting => {
               await store.updateSettings(changedSetting);
               setSetting(
