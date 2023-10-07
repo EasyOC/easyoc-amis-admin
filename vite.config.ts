@@ -31,6 +31,7 @@ export default defineConfig({
     host: '0.0.0.0'
   },
   resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.esm.js', '.umd.js', '.min.js', '.json'],
     alias: {
       '@': resolve(__dirname, './src')
     }

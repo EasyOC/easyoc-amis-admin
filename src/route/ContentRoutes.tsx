@@ -3,20 +3,21 @@ import {IMainStore} from '@/stores';
 import {treeFind} from '@/utils';
 import {Spinner} from 'amis-ui';
 import {inject, observer} from 'mobx-react';
-import React, {FC, useEffect} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {
   Redirect,
   Route,
   Switch,
   useHistory,
-  useLocation
+  useLocation,
+  useRouteMatch
 } from 'react-router-dom';
-import AmisEditor from '@/pages/amis/editor';
+// import AmisEditor from '@/pages/amis/editor';
 const menus = React.lazy(() => import('@/pages/sys/menus'));
 
 //#region 在线开发相关路由
 
-// const AmisEditor = React.lazy(() => import('@/pages/amis/editor'));
+const AmisEditor = React.lazy(() => import('@/pages/amis/editor'));
 const genTypeFromRDBMS = React.lazy(
   () => import('@/pages/develop/typeManagement/genTypeFromRDBMS')
 );
@@ -48,7 +49,13 @@ const roles = React.lazy(() => import('@/pages/sys/roles'));
 const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
   const location = useLocation();
   const history = useHistory();
+  const [state, setState] = useState({
+    pathname: '',
+    component: Spinner
+  });
+
   useEffect(() => {
+
     try {
       //处理默认跳转
       let pathKey = location.pathname as string;
@@ -76,61 +83,46 @@ const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
     }
   }, [location.pathname]);
 
+  const routes = [
+    <Redirect exact path={'/'} to={'/dashboard'} />,
+    <Route exact path={'/dashboard'} component={svgIndex} />,
+    <Route path={'/sys/account'} component={Account} />,
+    <Route path={'/sys/rolesAndPermission'} component={roles} />,
+    <Route path={'/dev/menus'} component={menus} />,
+    <Route path={'/dev/ManagePages'} component={ManagePages} />,
+    <Route path={'/dev/SchemaVersions'} component={SchemaVersions} />,
+    <Route path={'/dev/page-editor'} component={AmisEditor} />,
+    <Route path={'/dev/dynamicIndex'} {...{store}} component={dynamicIndex} />,
+
+    <Route
+      path={'/dev/type-management/contentTypeList'}
+      component={typeManagement}
+    />,
+    <Route path={'/dev/type-management/editModel'} component={ModelEditor} />,
+    <Route
+      path={'/dev/type-management/genTypeFromRDBMS'}
+      component={genTypeFromRDBMS}
+    />,
+    <Route
+      path={'/dev/type-management/ModelsER'}
+      component={React.lazy(
+        () => import('@/pages/develop/typeManagement/ModelsER')
+      )}
+    />,
+    <Route
+      path={'/dev/type-management/workflow'}
+      component={React.lazy(
+        () => import('@/pages/develop/typeManagement/workflow')
+      )}
+    />,
+    <Route path={'/dev/Preview/:versionId'} component={AmisPreview} />,
+    <Route path="/404" component={PageNotFound} />,
+    <Route path={'*'} component={AmisDynamicPage} />
+  ];
+
   return (
     <React.Suspense fallback={<Spinner overlay />}>
-      <Switch>
-        <Redirect exact path={'/'} to={'/dashboard'} />
-        <Route exact path={'/dashboard'} component={svgIndex} />
-
-        <Route path={'/sys/account'} component={Account} />
-        <Route path={'/sys/rolesAndPermission'} component={roles} />
-
-        {/* #region 在线开发相关路由 */}
-        <Route path={'/dev/menus'} component={menus} />
-        <Route path={'/dev/menus'} component={menus} />
-        <Route path={'/dev/ManagePages'} component={ManagePages} />
-        <Route path={'/dev/SchemaVersions'} component={SchemaVersions} />
-        <Route path={'/dev/page-editor'} component={AmisEditor} />
-        <Route
-          path={'/dev/dynamicIndex'}
-          {...{store}}
-          component={dynamicIndex}
-        />
-
-        <Route
-          path={'/dev/type-management/contentTypeList'}
-          component={typeManagement}
-        />
-        <Route
-          path={'/dev/type-management/editModel'}
-          component={ModelEditor}
-        />
-        <Route
-          path={'/dev/type-management/genTypeFromRDBMS'}
-          component={genTypeFromRDBMS}
-        />
-        <Route
-          path={'/dev/type-management/ModelsER'}
-          component={React.lazy(
-            () => import('@/pages/develop/typeManagement/ModelsER')
-          )}
-        />
-        <Route
-          path={'/dev/type-management/workflow'}
-          component={React.lazy(
-            () => import('@/pages/develop/typeManagement/workflow')
-          )}
-        />
-
-        <Route path={'/dev/Preview/:versionId'} component={AmisPreview} />
-
-        {/* #endregion 在线开发相关路由 */}
-
-        <Route path="/404" component={PageNotFound} />
-
-        {/* 动态构建的路径 */}
-        <Route path={'*'} component={AmisDynamicPage} />
-      </Switch>
+      <Switch>{routes}</Switch>
     </React.Suspense>
   );
 };
