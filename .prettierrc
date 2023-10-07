@@ -8,5 +8,15 @@
   "bracketSpacing": false,
   "quoteProps": "consistent",
   "arrowParens": "avoid",
-  "jsxBracketSameLine": false
+  "jsxBracketSameLine": false,
+  "overrides": [
+    {
+      "files": [
+        "fis-conf.js"
+      ],
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ]
 }

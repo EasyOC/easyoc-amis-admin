@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Provider} from 'mobx-react';
 import {IMainStore} from './stores/index';
-import RootRoute from '@/route';
+import RootRoute from './route/index';
 import {extendLocale} from 'amis-core';
 import zhCN from './locales/zh-CN';
 import enUS from './locales/en-US';

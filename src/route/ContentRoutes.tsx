@@ -55,7 +55,6 @@ const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
   });
 
   useEffect(() => {
-
     try {
       //处理默认跳转
       let pathKey = location.pathname as string;
@@ -110,10 +109,8 @@ const ContentRoutes: FC<{store: IMainStore}> = ({store}) => {
       )}
     />,
     <Route
-      path={'/dev/type-management/workflow'}
-      component={React.lazy(
-        () => import('@/pages/develop/typeManagement/workflow')
-      )}
+      path={'/workflows'}
+      component={React.lazy(() => import('@/pages/workflows'))}
     />,
     <Route path={'/dev/Preview/:versionId'} component={AmisPreview} />,
     <Route path="/404" component={PageNotFound} />,
