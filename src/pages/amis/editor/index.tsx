@@ -1,25 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Editor, ShortcutKey} from 'amis-editor';
+import {Editor, registerEditorPlugin, ShortcutKey} from 'amis-editor';
 // import '@/components/AMISComponent/components/DisabledEditorPlugin'; // 用于隐藏一些不需要的Editor预置组件
 import {Icon} from '@/components/icons/index';
 
 // import '@/components/AMISComponent/components/MyRenderer';
-import {
-  Button,
-  DatePicker,
-  Dropdown,
-  Form,
-  Input,
-  Menu,
-  message,
-  Modal,
-  Select
-} from 'antd';
+import {Button, Dropdown, Form, Input, message, Modal, Select} from 'antd';
 
 import defaultRequest from '@/services/requests';
-// import 'amis-editor-core/lib/style.css';
 import './style.less';
-import {FullScreen, useFullScreenHandle} from 'react-full-screen';
+import {useFullScreenHandle} from 'react-full-screen';
 import {excuteGraphqlQuery} from '@/services/graphql/graphqlApi';
 import {CloudUploadOutlined, DownOutlined} from '@ant-design/icons';
 import {Switch, DatePicker as AMISDatePicker} from 'amis';
@@ -38,10 +27,9 @@ import 'amis-editor-core/lib/style.css';
 // import './components/DisabledEditorPlugin';
 
 //#region 导入自定义组件
-// import '@/components/AMISComponent/components/table/index';
-// import TableEditor from '@/components/AMISComponent/components/table/tableEditor';
-// import edit from '../type-management/edit';
-// registerEditorPlugin(TableEditor);
+import '@/components/AMISComponent/components/table/index';
+import TableEditor from '@/components/AMISComponent/components/table/tableEditor';
+registerEditorPlugin(TableEditor);
 //#endregion
 
 const schemaUrl =
@@ -308,215 +296,213 @@ const AmisEditor: React.FC<{store: IMainStore}> = props => {
     makeSnapshot();
   };
 
-  const getEnv = () => {
-    return {...store.amisEnv};
-  };
-
   return (
-    <FullScreen handle={fullScreenHandle}>
-      <div className="Editor-container">
-        <Modal
-          title="提示"
-          zIndex={9999}
-          open={state.showSaveModal}
-          onOk={handlePublish}
-          onCancel={() => {
-            setState(s => ({...s, showSaveModal: false}));
-          }}
+    <div className="Editor-container">
+      <Modal
+        title="提示"
+        zIndex={9999}
+        open={state.showSaveModal}
+        onOk={handlePublish}
+        onCancel={() => {
+          setState(s => ({...s, showSaveModal: false}));
+        }}
+      >
+        <Form
+          labelAlign="right"
+          labelCol={{flex: '100px'}}
+          form={form}
+          name="basic"
+          autoComplete="off"
         >
-          <Form
-            labelAlign="right"
-            labelCol={{flex: '100px'}}
-            form={form}
-            name="basic"
-            autoComplete="off"
+          <Form.Item
+            hidden={publishOption.publishLaterFlag}
+            name="publish"
+            label="立即发布"
           >
-            <Form.Item
-              hidden={publishOption.publishLaterFlag}
-              name="publish"
-              label="立即发布"
-            >
-              <Switch
-                value={publishOption.publish}
-                onChange={(v: any) =>
-                  setPublishOption(s => ({...s, publish: v}))
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              hidden={publishOption.publish}
-              name="publishLaterFlag"
-              label="延迟发布"
-            >
-              <Switch
-                value={publishOption.publishLaterFlag}
-                onChange={(v: any) =>
-                  setPublishOption(s => ({...s, publishLaterFlag: v}))
-                }
-              />
-            </Form.Item>
-            <Form.Item
-              hidden={!publishOption.publishLaterFlag}
-              name="publishLaterWhen"
-              label="发布时间"
-            >
-              <AMISDatePicker
-                value={publishOption.publishLaterWhen}
-                onChange={(v: any) =>
-                  setPublishOption(s => ({...s, publishLaterWhen: v}))
-                }
-                timeFormat={'HH:mm'}
-                inputFormat={'YYYY-MM-DD HH:mm'}
-              ></AMISDatePicker>
-            </Form.Item>
-            <Form.Item name="versionDescription" label="版本描述">
-              <Input.TextArea
-                value={state.description}
-                onChange={event =>
-                  setState(s => ({...s, description: event.target.value}))
-                }
-              />
-            </Form.Item>
-          </Form>
-        </Modal>
-        <Modal
-          okButtonProps={{hidden: true}}
-          cancelButtonProps={{hidden: true}}
-          onOk={() => setState(s => ({...s, showGenModal: false}))}
-          destroyOnClose={true}
-          onCancel={() => {
-            setState(s => ({...s, showGenModal: false}));
-          }}
-          open={state.showGenModal}
-        >
-          {/* <GenFromType setSchemaHandle={handleGen} /> */}
-        </Modal>
-        <div className="Editor-header">
-          <div className="Editor-back">
-            <Button
-              type="link"
+            <Switch
+              value={publishOption.publish}
+              onChange={(v: any) => setPublishOption(s => ({...s, publish: v}))}
+            />
+          </Form.Item>
+          <Form.Item
+            hidden={publishOption.publish}
+            name="publishLaterFlag"
+            label="延迟发布"
+          >
+            <Switch
+              value={publishOption.publishLaterFlag}
+              onChange={(v: any) =>
+                setPublishOption(s => ({...s, publishLaterFlag: v}))
+              }
+            />
+          </Form.Item>
+          <Form.Item
+            hidden={!publishOption.publishLaterFlag}
+            name="publishLaterWhen"
+            label="发布时间"
+          >
+            <AMISDatePicker
+              value={publishOption.publishLaterWhen}
+              onChange={(v: any) =>
+                setPublishOption(s => ({...s, publishLaterWhen: v}))
+              }
+              timeFormat={'HH:mm'}
+              inputFormat={'YYYY-MM-DD HH:mm'}
+            ></AMISDatePicker>
+          </Form.Item>
+          <Form.Item name="versionDescription" label="版本描述">
+            <Input.TextArea
+              value={state.description}
+              onChange={event =>
+                setState(s => ({...s, description: event.target.value}))
+              }
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        okButtonProps={{hidden: true}}
+        cancelButtonProps={{hidden: true}}
+        onOk={() => setState(s => ({...s, showGenModal: false}))}
+        destroyOnClose={true}
+        onCancel={() => {
+          setState(s => ({...s, showGenModal: false}));
+        }}
+        open={state.showGenModal}
+      >
+        {/* <GenFromType setSchemaHandle={handleGen} /> */}
+      </Modal>
+      <div className="Editor-header">
+        <div className="Editor-back">
+          <Button
+            type="link"
+            onClick={() => {
+              history.push('/dev/ManagePages');
+            }}
+          >
+            &lt; 返回列表
+          </Button>
+        </div>
+        <div className="Editor-title">
+          {state.id
+            ? `编辑-${state?.displayText}  ${state.latest ? '' : '-(草稿)'}`
+            : state.title}
+        </div>
+
+        <div className="Editor-view-mode-group-container">
+          <div className="Editor-view-mode-group">
+            <div
+              className={`Editor-view-mode-btn ${
+                !state.isMobile ? 'is-active' : ''
+              }`}
               onClick={() => {
-                history.push('/dev/ManagePages');
+                setState(s => ({...s, isMobile: false}));
               }}
             >
-              &lt; 返回列表
+              <Icon icon="pcPreview" title="PC模式" />
+            </div>
+            <div
+              className={`Editor-view-mode-btn ${
+                state.isMobile ? 'is-active' : ''
+              }`}
+              onClick={() => {
+                setState(s => ({...s, isMobile: true}));
+              }}
+            >
+              <Icon icon="h5Preview" title="移动模式" />
+            </div>
+          </div>
+        </div>
+
+        <div className="Editor-header-actions">
+          <ShortcutKey />
+          <div style={{marginLeft: '15px'}}>
+            <Switch
+              checked={state.debug}
+              onText={'Debug 开启'}
+              offText={'Debug 关闭'}
+              onChange={() => toggleDebug()}
+            />
+          </div>
+          <Select
+            style={{marginLeft: '15px'}}
+            options={editorLanguages}
+            value={curLanguage}
+            onChange={(e: any) => changeLocale(e)}
+          />
+          <div
+            className={`header-action-btn exit-btn`}
+            onClick={changeFullScreen}
+          >
+            {state.fullScreen ? '退出' : '全屏'}
+          </div>
+
+          <div
+            className={`header-action-btn  ${state.preview ? 'primary' : ''}`}
+            onClick={() => togglePreview()}
+          >
+            {state.preview ? '编辑' : '预览'}
+          </div>
+
+          <div style={{marginLeft: '15px'}}>
+            <Dropdown.Button
+              icon={<DownOutlined />}
+              menu={{
+                items: [
+                  {
+                    label: '从类型生成',
+                    key: '1',
+                    onClick: () => {
+                      setState(s => ({...s, showGenModal: true}));
+                    }
+                  },
+                  {
+                    label: '历史版本',
+                    key: '2',
+                    onClick: () => {
+                      setState(s => ({...s, showVersion: true}));
+                    }
+                  }
+                ]
+              }}
+            >
+              加载...
+            </Dropdown.Button>
+          </div>
+          <div style={{marginLeft: '15px'}}>
+            <Button
+              icon={<CloudUploadOutlined />}
+              onClick={() => setState(s => ({...s, showSaveModal: true}))}
+            >
+              发布
             </Button>
           </div>
-          <div className="Editor-title">
-            {state.id
-              ? `编辑-${state?.displayText}  ${state.latest ? '' : '-(草稿)'}`
-              : state.title}
-          </div>
-
-          <div className="Editor-view-mode-group-container">
-            <div className="Editor-view-mode-group">
-              <div
-                className={`Editor-view-mode-btn ${
-                  !state.isMobile ? 'is-active' : ''
-                }`}
-                onClick={() => {
-                  setState(s => ({...s, isMobile: false}));
-                }}
-              >
-                <Icon icon="pcPreview" title="PC模式" />
-              </div>
-              <div
-                className={`Editor-view-mode-btn ${
-                  state.isMobile ? 'is-active' : ''
-                }`}
-                onClick={() => {
-                  setState(s => ({...s, isMobile: true}));
-                }}
-              >
-                <Icon icon="h5Preview" title="移动模式" />
-              </div>
-            </div>
-          </div>
-
-          <div className="Editor-header-actions">
-            <ShortcutKey />
-            <div style={{marginLeft: '15px'}}>
-              <Switch
-                checked={state.debug}
-                onText={'Debug 开启'}
-                offText={'Debug 关闭'}
-                onChange={() => toggleDebug()}
-              />
-            </div>
-            <Select
-              style={{marginLeft: '15px'}}
-              options={editorLanguages}
-              value={curLanguage}
-              onChange={(e: any) => changeLocale(e)}
-            />
-            <div
-              className={`header-action-btn exit-btn`}
-              onClick={changeFullScreen}
-            >
-              {state.fullScreen ? '退出' : '全屏'}
-            </div>
-
-            <div
-              className={`header-action-btn  ${state.preview ? 'primary' : ''}`}
-              onClick={() => togglePreview()}
-            >
-              {state.preview ? '编辑' : '预览'}
-            </div>
-
-            <div style={{marginLeft: '15px'}}>
-              <Dropdown.Button
-                icon={<DownOutlined />}
-                menu={{
-                  items: [
-                    {
-                      label: '从类型生成',
-                      key: '1',
-                      onClick: () => {
-                        setState(s => ({...s, showGenModal: true}));
-                      }
-                    },
-                    {
-                      label: '历史版本',
-                      key: '2',
-                      onClick: () => {
-                        setState(s => ({...s, showVersion: true}));
-                      }
-                    }
-                  ]
-                }}
-              >
-                加载...
-              </Dropdown.Button>
-            </div>
-            <div style={{marginLeft: '15px'}}>
-              <Button
-                icon={<CloudUploadOutlined />}
-                onClick={() => setState(s => ({...s, showSaveModal: true}))}
-              >
-                发布
-              </Button>
-            </div>
-          </div>
-        </div>
-        <div className="Editor-inner">
-          <Editor
-            amisEnv={{...getEnv()} as any}
-            theme={state.theme}
-            preview={state.preview}
-            isMobile={state.isMobile}
-            value={state.schema}
-            onChange={value => handleEdtorChange(value)}
-            onPreview={() => {
-              setState(s => ({...s, preview: true}));
-            }}
-            onSave={() => handleSave()}
-            className="is-fixed"
-            $schemaUrl={schemaUrl}
-            showCustomRenderersPanel={true}
-          />
         </div>
       </div>
-    </FullScreen>
+      <div className="Editor-inner">
+        <Editor
+          amisEnv={{
+            theme: store.amisEnv.theme,
+            fetcher: store.amisEnv.fetcher,
+            notify: store.amisEnv.notify,
+            alert: store.amisEnv.alert,
+            copy: store.amisEnv.copy
+          }}
+          theme={state.theme}
+          preview={state.preview}
+          isMobile={state.isMobile}
+          value={state.schema}
+          onChange={value => handleEdtorChange(value)}
+          onPreview={() => {
+            setState(s => ({...s, preview: true}));
+          }}
+          onSave={() => handleSave()}
+          className="is-fixed"
+          $schemaUrl={schemaUrl}
+          showCustomRenderersPanel={true}
+        />
+      </div>
+    </div>
   );
 };
 export default inject('store')(observer(AmisEditor));
