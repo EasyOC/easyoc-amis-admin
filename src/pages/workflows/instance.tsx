@@ -10,7 +10,6 @@ import {PageContainer} from '@ant-design/pro-components';
 import './index.less';
 import {inject, observer} from 'mobx-react';
 import {ActivityNode} from './Components/ActivityNode';
-import schema2component from '@/components/AMISComponent/schema2component';
 interface NodeStatus {
   id: string;
   status: string;
@@ -429,7 +428,7 @@ export default class WorkflowIndex extends React.Component {
     return (
       <PageContainer subTitle={false} title={false}>
         <div className="x6-graph-wrap">
-          {schema2component(propertyList)}
+          <AMISComponent schema={propertyList}></AMISComponent>
           <div ref={this.refContainer} className="work-flow" />
         </div>
         {/* <Flow /> */}

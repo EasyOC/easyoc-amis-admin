@@ -103,6 +103,7 @@
     "typescript": "^4.9.5",
     "url-loader": "^4.1.1",
     "vite": "^4.4.9",
+    "amis-widget-cli": "^3.1.8",
     "rollup-plugin-auto-external": "^2.0.0",
     "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",

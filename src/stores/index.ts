@@ -12,12 +12,6 @@ const _userStore = new UserStore();
 
 class IMainStore {
 
-  @observable asideFixed: true
-
-  @observable asideFolded: false
-
-  @observable offScreen: false
-
   @observable
   settings: Partial<EocLayoutSettings> = {
     navTheme: 'light',
@@ -40,8 +34,6 @@ class IMainStore {
 
   @observable
   userStore = _userStore
-
-
 
   @observable
   showSettingsDrawer: boolean = false;
